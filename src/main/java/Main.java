@@ -1,6 +1,6 @@
 
 import no.nav.apiapp.ApiApp;
-import no.nav.fo.veilarbdirigent.ApplicationConfig;
+import no.nav.fo.veilarbdirigent.config.ApplicationConfig;
 
 public class Main {
 

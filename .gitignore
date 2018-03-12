@@ -1,0 +1,6 @@
+.idea/*
+!.idea/runConfigurations/
+*.iml
+
+target/
+SERVICE_CALLS_HOME_IS_UNDEFINED/

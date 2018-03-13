@@ -25,8 +25,13 @@ public class OppfolgingFeedConfig {
     private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
 
     @Bean
-    public OppfolgingFeedService oppfolgingFeedService(DataSource ds, JdbcTemplate jdbc, CoreIn core){
-        return new OppfolgingFeedService(ds, jdbc, core);
+    public FeedDAO feedDAO(DataSource ds, JdbcTemplate jdbc){
+        return new FeedDAO(ds, jdbc);
+    }
+
+    @Bean
+    public OppfolgingFeedService oppfolgingFeedService(CoreIn core, FeedDAO dao){
+        return new OppfolgingFeedService(core, dao);
     }
 
     @Bean

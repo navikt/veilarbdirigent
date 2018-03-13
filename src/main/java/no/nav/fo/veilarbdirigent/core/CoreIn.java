@@ -1,30 +1,24 @@
 package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
+import no.nav.fo.veilarbdirigent.dao.TaskDAO;
 
 public class CoreIn {
     private final CoreOut coreOut;
+    private final TaskDAO taskDAO;
     private final List<MessageHandler> handlers;
 
-    @Inject
-    public CoreIn(CoreOut coreOut, List<MessageHandler> handlers) {
+    public CoreIn(CoreOut coreOut, TaskDAO taskDAO, List<MessageHandler> handlers) {
         this.coreOut = coreOut;
+        this.taskDAO = taskDAO;
         this.handlers = handlers;
     }
 
-    @Transactional
     public void submit(Message message) {
         List<Task> tasks = handlers.flatMap((handlers) -> handlers.handle(message));
 
-        saveTasks(tasks);
+        taskDAO.insert(tasks);
 
         coreOut.runActuators();
-    }
-
-    private void saveTasks(List<Task> tasks) {
-        // TODO Save using DAO
     }
 }

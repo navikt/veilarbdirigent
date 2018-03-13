@@ -2,23 +2,22 @@ package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.sbl.dialogarena.types.Pingable;
 import no.nav.sbl.jdbc.Transactor;
-import no.nav.sbl.sql.SQLFunction;
 import no.nav.sbl.sql.SqlUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 @Configuration
+@EnableTransactionManagement
 public class DbConfig {
+
     @Bean
     public DataSource dataSourceJndiLookup() throws NamingException {
         JndiDataSourceLookup jndiDataSourceLookup = new JndiDataSourceLookup();

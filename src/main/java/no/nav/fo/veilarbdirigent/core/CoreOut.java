@@ -1,37 +1,31 @@
 package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
+import io.vavr.control.Try;
+import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.SchedulerLock;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
-import no.nav.sbl.jdbc.Transactor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.inject.Inject;
-
+@Slf4j
 public class CoreOut {
     private final List<Actuator> actuators;
-    private final Transactor transactor;
     private final TaskDAO taskDAO;
 
-    @Inject
-    public CoreOut(List<Actuator> actuators, Transactor transactor, TaskDAO taskDAO) {
+    public CoreOut(List<Actuator> actuators, TaskDAO taskDAO) {
         this.actuators = actuators;
-        this.transactor = transactor;
         this.taskDAO = taskDAO;
     }
 
     @Async
     public void submit(Task task) {
-        // TODO start scheduled task for actuators
-        transactor.inTransaction(() -> {
-            try {
-                actuators.forEach((actuator) -> actuator.handle(task));
-                taskDAO.setStateForTask(task, Status.OK);
-            } catch (Exception e) {
-                taskDAO.setStateForTask(task, Status.FAILED);
-            }
-        });
+        Try.run(() -> actuators.forEach((actuator) -> actuator.handle(task)))
+                .andThen(() -> taskDAO.setStateForTask(task, Status.OK))
+                .orElseRun((Throwable error) -> {
+                    log.info("Something went wrong in submit to CoreOut", error);
+                    taskDAO.setStateForTask(task, Status.FAILED);
+                });
     }
 
     @Async

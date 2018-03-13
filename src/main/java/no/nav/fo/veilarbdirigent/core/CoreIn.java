@@ -15,7 +15,7 @@ public class CoreIn {
     }
 
     public void submit(Message message) {
-        List<Task> tasks = handlers.flatMap((handlers) -> handlers.handle(message));
+        List<Task> tasks = handlers.flatMap((handler) -> handler.handle(message));
 
         taskDAO.insert(tasks);
 

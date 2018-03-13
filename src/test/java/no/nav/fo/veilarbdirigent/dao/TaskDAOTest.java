@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.dao;
 
 import io.vavr.collection.List;
+import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.core.Status;
 import no.nav.fo.veilarbdirigent.core.Task;
 import no.nav.fo.veilarbdirigent.db.IntegrasjonsTest;
@@ -17,13 +18,7 @@ class TaskDAOTest extends IntegrasjonsTest {
     void persisting_task() {
         String data = "Noe data her";
         List<Task> tasks = List.of(
-                Task
-                        .builder()
-                        .id("id1")
-                        .type("TestType")
-                        .status(Status.PENDING)
-                        .data(data)
-                        .build()
+                TestUtils.createTask("id1", "type", data)
         );
 
         dao.insert(tasks);

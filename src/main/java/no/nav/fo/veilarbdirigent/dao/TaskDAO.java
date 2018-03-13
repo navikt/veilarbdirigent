@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class TaskDAO {
     private static final String TASK_TABLE = "task";
@@ -21,11 +22,17 @@ public class TaskDAO {
         this.jdbc = jdbc;
     }
 
+    @Transactional
     public void setStateForTask(Task task, Status status) {
         SqlUtils.update(jdbc, TASK_TABLE)
-                .set("status", status)
+                .set("status", status.name())
                 .whereEquals("id", task.getId())
                 .execute();
+    }
+
+    @Transactional
+    public void insert(List<Task> tasks) {
+        tasks.forEach(this::insert);
     }
 
     public List<Task> fetchTasks() {
@@ -38,15 +45,6 @@ public class TaskDAO {
                 .executeToList());
     }
 
-    private static Task toTask(ResultSet rs) {
-        return Task.builder().build();
-    }
-
-    @Transactional
-    public void insert(List<Task> tasks) {
-        tasks.forEach(this::insert);
-    }
-
     private void insert(Task task) {
         SqlUtils.insert(jdbc, TASK_TABLE)
                 .value("id", task.getId())
@@ -54,5 +52,19 @@ public class TaskDAO {
                 .value("status", task.getStatus().name())
                 .value("data", task.getData())
                 .execute();
+    }
+
+    private static Task toTask(ResultSet rs) throws SQLException {
+        return Task.builder()
+                .id(rs.getString("id"))
+                .type(rs.getString("type"))
+                .status(Status.valueOf(rs.getString("status")))
+                .created(rs.getTimestamp("created").toLocalDateTime())
+                .attempts(rs.getInt("attempts"))
+                .nextAttempt(Utils.readTimestamp(rs, "next_attempt"))
+                .lastAttempt(Utils.readTimestamp(rs, "last_attempt"))
+                .data(rs.getString("data"))
+                .error(rs.getString("error"))
+                .build();
     }
 }

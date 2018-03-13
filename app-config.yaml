@@ -21,3 +21,8 @@ fasitResources:
     resourceType: loadbalancerconfig
   - alias: srvveilarbdirigent
     resourceType: credential
+  - alias: veilarbdirigentDB
+    resourceType: datasource
+  - alias: veilArbOppfolgingAPI
+    mapToProperty: veilarboppfolging.api
+    resourceType: restservice

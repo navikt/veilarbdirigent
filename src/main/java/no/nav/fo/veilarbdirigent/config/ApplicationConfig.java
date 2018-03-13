@@ -8,6 +8,7 @@ import no.nav.fo.veilarbdirigent.core.CoreIn;
 import no.nav.fo.veilarbdirigent.core.CoreOut;
 import no.nav.fo.veilarbdirigent.core.MessageHandler;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -19,7 +20,11 @@ import javax.sql.DataSource;
 import static no.nav.apiapp.ApiApplication.Sone.FSS;
 
 @Configuration
-@Import({DbConfig.class, DAOConfig.class, MessageHandlerConfig.class, ActuatorConfig.class})
+@Import({DbConfig.class,
+        DAOConfig.class,
+        MessageHandlerConfig.class,
+        ActuatorConfig.class,
+        OppfolgingFeedConfig.class})
 public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
 

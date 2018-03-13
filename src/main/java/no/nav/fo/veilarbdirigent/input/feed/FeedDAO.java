@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class FeedDAO {
     private static final String TABLE_NAME = "FEED_METADATA";
-    private static final String LAST_ID_COLUMN_NAME = "SISTE_ID";
+    private static final String LAST_ID_COLUMN_NAME = "NYE_BRUKERE_FEED_SISTE_ID";
     private final DataSource ds;
     private final JdbcTemplate jdbc;
 

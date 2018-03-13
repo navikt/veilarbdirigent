@@ -15,14 +15,19 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
 
+import static java.lang.System.setProperty;
+
 public class AbstractIntegrationTest {
     private static AnnotationConfigApplicationContext annotationConfigApplicationContext;
     private static PlatformTransactionManager platformTransactionManager;
     private TransactionStatus transactionStatus;
 
     @SneakyThrows
-    public static void setupContext(Class<?>... classes) {
+    static void setupContext(Class<?>... classes) {
         DatabaseTestContext.setupInMemoryContext();
+
+        setProperty("no.nav.modig.security.systemuser.username", "username");
+        setProperty("no.nav.modig.security.systemuser.password", "password");
 
         annotationConfigApplicationContext = new AnnotationConfigApplicationContext(classes);
         annotationConfigApplicationContext.start();

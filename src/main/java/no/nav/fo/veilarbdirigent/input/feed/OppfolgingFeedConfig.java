@@ -1,6 +1,8 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
 import io.vavr.collection.List;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider;
 import no.nav.brukerdialog.security.oidc.OidcFeedOutInterceptor;
 import no.nav.fo.feed.consumer.FeedConsumer;
 import no.nav.fo.feed.consumer.FeedConsumerConfig;
@@ -19,8 +21,11 @@ public class OppfolgingFeedConfig {
     @Value("${veilarboppfolging.api.url}")
     private String host;
 
-    @Value("${feed.consumer.pollingrate:*/10 * * * 2 ?}")
-    private String polling;
+    @Value("${feed.consumer.pollingrate.millis:10000}")
+    private int polling;
+
+    @Value("${feed.consumer.lock.timeout.millis:5000}")
+    private int lockTimeout;
 
     private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
 
@@ -35,7 +40,12 @@ public class OppfolgingFeedConfig {
     }
 
     @Bean
-    public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service) {
+    public LockProvider lockProvider(DataSource dataSource) {
+        return new JdbcLockProvider(dataSource);
+    }
+
+    @Bean
+    public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service, LockProvider lock) {
         FeedConsumerConfig<OppfolgingDataFraFeed> config = new FeedConsumerConfig<>(
                 new FeedConsumerConfig.BaseConfig<>(
                         OppfolgingDataFraFeed.class,
@@ -43,8 +53,9 @@ public class OppfolgingFeedConfig {
                         host,
                         OPPFOLGING_FEED_NAME
                 ),
-                new FeedConsumerConfig.PollingConfig(polling)
+                new FeedConsumerConfig.SimplePollingConfig(polling)
         )
+                .lockProvider(lock, lockTimeout)
                 .callback((lastId, list) -> service.compute(lastId, List.ofAll(list)))
                 .interceptors(Collections.singletonList(new OidcFeedOutInterceptor()));
 

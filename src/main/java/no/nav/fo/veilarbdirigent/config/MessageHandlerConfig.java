@@ -1,9 +1,9 @@
 package no.nav.fo.veilarbdirigent.config;
 
 import io.vavr.collection.List;
-import no.nav.fo.veilarbdirigent.core.Message;
-import no.nav.fo.veilarbdirigent.core.MessageHandler;
-import no.nav.fo.veilarbdirigent.core.Task;
+import no.nav.fo.veilarbdirigent.coreapi.Message;
+import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
+import no.nav.fo.veilarbdirigent.coreapi.Task;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

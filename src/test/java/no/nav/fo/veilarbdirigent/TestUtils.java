@@ -2,8 +2,8 @@ package no.nav.fo.veilarbdirigent;
 
 import io.vavr.collection.List;
 import lombok.SneakyThrows;
-import no.nav.fo.veilarbdirigent.core.Status;
-import no.nav.fo.veilarbdirigent.core.Task;
+import no.nav.fo.veilarbdirigent.coreapi.Status;
+import no.nav.fo.veilarbdirigent.coreapi.Task;
 import org.mockito.ArgumentCaptor;
 
 public class TestUtils {

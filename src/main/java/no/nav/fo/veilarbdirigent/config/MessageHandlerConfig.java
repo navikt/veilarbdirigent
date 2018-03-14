@@ -5,7 +5,9 @@ import no.nav.fo.veilarbdirigent.core.Message;
 import no.nav.fo.veilarbdirigent.core.MessageHandler;
 import no.nav.fo.veilarbdirigent.core.Task;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class MessageHandlerConfig {
 
     @Bean

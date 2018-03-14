@@ -18,7 +18,7 @@ class TaskDAOTest extends IntegrasjonsTest {
     void persisting_task() {
         String data = "Noe data her";
         List<Task> tasks = List.of(
-                TestUtils.createTask("id1", "type", data)
+                TestUtils.createTask("id1", data)
         );
 
         dao.insert(tasks);

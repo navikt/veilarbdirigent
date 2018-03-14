@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
+import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
 import org.junit.jupiter.api.AfterEach;
@@ -16,12 +17,13 @@ class CoreTest {
     private TaskDAO dao = mock(TaskDAO.class);
     private Actuator actuator = mock(Actuator.class);
     private MessageHandler handler = mock(MessageHandler.class);
+    private LockingTaskExecutor lock = (runnable, lockConfiguration) -> runnable.run();
 
     @BeforeEach
     public void setup() {
         List<Task> tasks = List.of(
-                TestUtils.createTask("id1", "type", "data"),
-                TestUtils.createTask("id2", "type", "data")
+                TestUtils.createTask("id1", "data"),
+                TestUtils.createTask("id2", "data")
         );
 
         when(handler.handle(any())).thenReturn(tasks);
@@ -35,9 +37,11 @@ class CoreTest {
     }
 
     @Test
-    void name() {
-        CoreOut coreOut = new CoreOut(List.of(actuator), dao);
-        CoreIn coreIn = new CoreIn(coreOut, dao, List.of(handler));
+    void normal_path() {
+        CoreOut coreOut = new CoreOutImpl(dao, lock);
+        CoreIn coreIn = new CoreInImpl(coreOut, dao);
+        coreIn.registerHandler(handler);
+        coreOut.registerActuator(TestUtils.TASK_TYPE, actuator);
 
         Message message = new Message() {
         };

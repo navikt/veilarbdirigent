@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Value
 @Builder
-public class Task {
+public class Task<T> {
     String id;
     String type;
     Status status;
@@ -15,6 +15,6 @@ public class Task {
     int attempts;
     LocalDateTime nextAttempt;
     LocalDateTime lastAttempt;
-    String data;
+    T data;
     String error;
 }

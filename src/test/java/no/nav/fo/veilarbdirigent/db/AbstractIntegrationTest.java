@@ -23,7 +23,7 @@ public class AbstractIntegrationTest {
     private TransactionStatus transactionStatus;
 
     @SneakyThrows
-    static void setupContext(Class<?>... classes) {
+    protected static void setupContext(Class<?>... classes) {
         DatabaseTestContext.setupInMemoryContext();
 
         setProperty("no.nav.modig.security.systemuser.username", "username");

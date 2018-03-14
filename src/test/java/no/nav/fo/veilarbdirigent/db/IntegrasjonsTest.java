@@ -1,9 +1,10 @@
 package no.nav.fo.veilarbdirigent.db;
 
 import no.nav.fo.veilarbdirigent.config.ApplicationConfig;
-import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.naming.NamingException;
@@ -18,7 +19,8 @@ public class IntegrasjonsTest extends AbstractIntegrationTest {
         setupContext(ApplicationConfig.class);
     }
 
-    @After
+    @AfterEach
+    @BeforeEach
     public void deleteTestData() {
         jdbc.update("DELETE FROM TASK");
     }

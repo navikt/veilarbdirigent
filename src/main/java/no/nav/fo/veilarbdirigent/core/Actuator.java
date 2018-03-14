@@ -1,5 +1,5 @@
 package no.nav.fo.veilarbdirigent.core;
 
-public interface Actuator {
-    public void handle(Task task);
+public interface Actuator<T> {
+    public Task<T> handle(Task<T> task);
 }

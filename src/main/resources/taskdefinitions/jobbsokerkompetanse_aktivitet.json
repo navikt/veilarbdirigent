@@ -1,0 +1,11 @@
+{
+  "type": "EGEN",
+  "tittel": "Hvordan søker du på jobber?",
+  "beskrivelse": "Svar på noen spørsmål om hvordan du søker på jobber. Få råd og tips til søknaden, CV-en, intervjuet og hvordan du finner jobbene.",
+  "hensikt": "Få råd og tips når du søker jobber",
+  "oppfolging": "Husk å flytt aktiviteten i aktivitetsplanen når du har fullført den",
+  "lenke": " https://tjenester{miljo}.nav.no/jobbsokerkompetanse/",
+  "status": "BRUKER_ER_INTERESSERT",
+  "fraDato": "{now}",
+  "tilDato": "{now + 14d}"
+}

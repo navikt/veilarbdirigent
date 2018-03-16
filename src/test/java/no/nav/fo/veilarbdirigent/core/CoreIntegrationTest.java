@@ -17,8 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Bean;
 
-import javax.naming.NamingException;
-
 import static no.nav.fo.veilarbdirigent.TestUtils.delay;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,8 +55,7 @@ class CoreIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void core_should_transform_messages_to_tasks_save_them_and_execute_them() {
-
-        throwExpectionOnTaskWithId(TASKS.get(2).getId());
+        throwExceptionOnTaskWithId(TASKS.get(2).getId());
         core.submit(null);
 
         List<Task> savedTasks = dao.fetchTasks();
@@ -73,7 +70,7 @@ class CoreIntegrationTest extends AbstractIntegrationTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void throwExpectionOnTaskWithId(String taskId) {
+    private void throwExceptionOnTaskWithId(String taskId) {
         when(actuator.handle(any())).thenAnswer(a -> {
             Task task = (Task) a.getArguments()[0];
             if (taskId.equals(task.getId())) {

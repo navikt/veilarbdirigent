@@ -2,8 +2,8 @@ package no.nav.fo.veilarbdirigent.dao;
 
 import io.vavr.collection.List;
 import no.nav.fo.veilarbdirigent.TestUtils;
-import no.nav.fo.veilarbdirigent.core.Status;
-import no.nav.fo.veilarbdirigent.core.Task;
+import no.nav.fo.veilarbdirigent.coreapi.Status;
+import no.nav.fo.veilarbdirigent.coreapi.Task;
 import no.nav.fo.veilarbdirigent.db.IntegrasjonsTest;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class TaskDAOTest extends IntegrasjonsTest {
     void persisting_task() {
         String data = "Noe data her";
         List<Task> tasks = List.of(
-                TestUtils.createTask("id1", "type", data)
+                TestUtils.createTask("id1", data)
         );
 
         dao.insert(tasks);

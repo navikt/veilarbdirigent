@@ -1,12 +1,19 @@
 package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
+import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.TestUtils;
+import no.nav.fo.veilarbdirigent.coreapi.Actuator;
+import no.nav.fo.veilarbdirigent.coreapi.Message;
+import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
+import no.nav.fo.veilarbdirigent.coreapi.Task;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,15 +23,17 @@ class CoreTest {
     private TaskDAO dao = mock(TaskDAO.class);
     private Actuator actuator = mock(Actuator.class);
     private MessageHandler handler = mock(MessageHandler.class);
+    private LockingTaskExecutor lock = (runnable, lockConfiguration) -> runnable.run();
 
     @BeforeEach
     public void setup() {
         List<Task> tasks = List.of(
-                TestUtils.createTask("id1", "type", "data"),
-                TestUtils.createTask("id2", "type", "data")
+                TestUtils.createTask("id1", "data"),
+                TestUtils.createTask("id2", "data")
         );
 
         when(handler.handle(any())).thenReturn(tasks);
+        when(actuator.getType()).thenReturn(TestUtils.TASK_TYPE);
         when(dao.fetchTasks()).thenReturn(tasks);
     }
 
@@ -35,13 +44,20 @@ class CoreTest {
     }
 
     @Test
-    void name() {
-        CoreOut coreOut = new CoreOut(List.of(actuator), dao);
-        CoreIn coreIn = new CoreIn(coreOut, dao, List.of(handler));
+    @SuppressWarnings("unchecked")
+    void normal_path() {
+        Core core = new Core(
+                List.of(handler),
+                List.of(actuator),
+                lock,
+                Executors.newScheduledThreadPool(1),
+                dao
+        );
 
-        Message message = new Message() {
-        };
-        coreIn.submit(message);
+        Message message = new Message() {};
+        core.submit(message);
+
+        TestUtils.delay(100);
 
         ArgumentCaptor<List<Task>> captor = TestUtils.listArgumentCaptor(Task.class);
 

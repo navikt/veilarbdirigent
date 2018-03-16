@@ -1,7 +1,7 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
 import io.vavr.collection.List;
-import no.nav.fo.veilarbdirigent.core.CoreIn;
+import no.nav.fo.veilarbdirigent.core.Core;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,10 +14,25 @@ import static org.mockito.Mockito.*;
 @DisplayName("OppfolgingFeedService")
 class OppfolgingFeedServiceTest {
 
-    private CoreIn core = mock(CoreIn.class);
+    private Core core = mock(Core.class);
     private FeedDAO feedDao = mock(FeedDAO.class);
     private OppfolgingFeedService oppfolgingFeedService = new OppfolgingFeedService(core, feedDao);
 
+    private OppfolgingDataFraFeed newOppfolgingDataFraFeed(long id) {
+        return OppfolgingDataFraFeed
+                .builder()
+                .id(id)
+                .aktorId("123")
+                .opprettet(new Date())
+                .selvgaende(true)
+                .build();
+    }
+
+    private List<OppfolgingDataFraFeed> elements = List.of(
+            newOppfolgingDataFraFeed(1),
+            newOppfolgingDataFraFeed(2),
+            newOppfolgingDataFraFeed(3)
+    );
 
     @Test
     void submits_the_recived_message_to_the_core() {
@@ -44,24 +59,6 @@ class OppfolgingFeedServiceTest {
         assertThrows(RuntimeException.class, () -> oppfolgingFeedService.compute("dosn't matter", elements));
 
         verify(core, times(2)).submit(any());
-        verify(feedDao, never()).oppdaterSisteKjenteId(anyLong());
+        verify(feedDao, times(1)).oppdaterSisteKjenteId(anyLong());
     }
-
-    private OppfolgingDataFraFeed newOppfolgingDataFraFeed(long id) {
-        return OppfolgingDataFraFeed
-                .builder()
-                .id(id)
-                .aktorId("123")
-                .opprettet(new Date())
-                .selvgaende(true)
-                .build();
-    }
-
-    private List<OppfolgingDataFraFeed> elements = List.of(
-            newOppfolgingDataFraFeed(1),
-            newOppfolgingDataFraFeed(2),
-            newOppfolgingDataFraFeed(3)
-    );
-
-
 }

@@ -1,14 +1,14 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
 import io.vavr.collection.List;
-import no.nav.fo.veilarbdirigent.core.CoreIn;
+import no.nav.fo.veilarbdirigent.core.Core;
 
 public class OppfolgingFeedService {
 
     private final FeedDAO feedDAO;
-    private final CoreIn core;
+    private final Core core;
 
-    public OppfolgingFeedService(CoreIn core, FeedDAO feedDAO) {
+    public OppfolgingFeedService(Core core, FeedDAO feedDAO) {
         this.core = core;
         this.feedDAO = feedDAO;
     }
@@ -18,11 +18,9 @@ public class OppfolgingFeedService {
     }
 
     void compute(String lastEntryId, List<OppfolgingDataFraFeed> elements) {
-        elements.map(element -> {
+        elements.forEach((element) -> {
             core.submit(element);
-            return element.getId();
-        })
-                .lastOption()
-                .forEach(feedDAO::oppdaterSisteKjenteId);
+            feedDAO.oppdaterSisteKjenteId(element.getId());
+        });
     }
 }

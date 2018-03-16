@@ -1,8 +1,8 @@
 package no.nav.fo.veilarbdirigent.dao;
 
 import io.vavr.collection.List;
-import no.nav.fo.veilarbdirigent.core.Status;
-import no.nav.fo.veilarbdirigent.core.Task;
+import no.nav.fo.veilarbdirigent.coreapi.Status;
+import no.nav.fo.veilarbdirigent.coreapi.Task;
 import no.nav.sbl.sql.SqlUtils;
 import no.nav.sbl.sql.where.WhereClause;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -15,7 +15,6 @@ public class Task<DATA, RESULT> {
     int attempts;
     LocalDateTime nextAttempt;
     LocalDateTime lastAttempt;
-    int step;
     DATA data;
     RESULT result;
     String error;

@@ -21,16 +21,16 @@ import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
 @EnableTransactionManagement
 public class DbConfig {
 
-    public static final String VEILARBJOBBSOKERKOMPETANSEDB_URL = "VEILARBDIRIGENTDB_URL";
-    public static final String VEILARBJOBBSOKERKOMPETANSEDB_USERNAME = "VEILARBDIRIGENTDB_USERNAME";
-    public static final String VEILARBJOBBSOKERKOMPETANSEDB_PASSWORD = "VEILARBDIRIGENTDB_PASSWORD";
+    public static final String VEILARBDIRIGENTDB_URL = "VEILARBDIRIGENTDB_URL";
+    public static final String VEILARBDIRIGENTDB_USERNAME = "VEILARBDIRIGENTDB_USERNAME";
+    public static final String VEILARBDIRIGENTDB_PASSWORD = "VEILARBDIRIGENTDB_PASSWORD";
 
     @Bean
     public static DataSource getDataSource() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(getRequiredProperty(VEILARBJOBBSOKERKOMPETANSEDB_URL));
-        config.setUsername(getRequiredProperty(VEILARBJOBBSOKERKOMPETANSEDB_USERNAME));
-        config.setPassword(getRequiredProperty(VEILARBJOBBSOKERKOMPETANSEDB_PASSWORD));
+        config.setJdbcUrl(getRequiredProperty(VEILARBDIRIGENTDB_URL));
+        config.setUsername(getRequiredProperty(VEILARBDIRIGENTDB_USERNAME));
+        config.setPassword(getRequiredProperty(VEILARBDIRIGENTDB_PASSWORD));
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 
@@ -50,7 +50,7 @@ public class DbConfig {
     @Bean
     public Pingable dbPinger(final DataSource ds) {
         HelsesjekkMetadata metadata = new HelsesjekkMetadata("db",
-                "Database: " + getRequiredProperty(VEILARBJOBBSOKERKOMPETANSEDB_URL),
+                "Database: " + getRequiredProperty(VEILARBDIRIGENTDB_URL),
                 "Database for veilarbdirigent",
                 true);
 

@@ -7,14 +7,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.naming.NamingException;
-
 public class IntegrasjonsTest extends AbstractIntegrationTest {
     private JdbcTemplate jdbc = getBean(JdbcTemplate.class);
 
     @BeforeAll
     @BeforeClass
-    public static void setupContext() throws NamingException {
+    public static void setupContext() {
         DatabaseTestContext.setupInMemoryContext();
         setupContext(ApplicationConfig.class);
     }

@@ -12,7 +12,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,19 +46,18 @@ class CoreTest {
     @Test
     @SuppressWarnings("unchecked")
     void normal_path() {
-        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.initialize();
-
         Core core = new Core(
                 List.of(handler),
                 List.of(actuator),
                 lock,
-                taskScheduler,
+                Executors.newScheduledThreadPool(1),
                 dao
         );
 
         Message message = new Message() {};
         core.submit(message);
+
+        TestUtils.delay(100);
 
         ArgumentCaptor<List<Task>> captor = TestUtils.listArgumentCaptor(Task.class);
 

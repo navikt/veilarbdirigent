@@ -10,10 +10,10 @@ public class ActuatorConfig {
 
     @Bean
     public Actuator actuator() {
-        return new Actuator<String>() {
+        return new Actuator<String, String>() {
 
             @Override
-            public Task<String> handle(Task<String> task) {
+            public Task<String, String> handle(Task<String, String> task) {
                 return null;
             }
 

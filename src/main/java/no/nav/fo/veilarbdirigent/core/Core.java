@@ -13,7 +13,8 @@ import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.coreapi.*;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 
@@ -22,14 +23,14 @@ public class Core {
     private final List<MessageHandler> handlers;
     private final TaskDAO taskDAO;
     private final LockingTaskExecutor lock;
-    private final ThreadPoolTaskScheduler taskScheduler;
+    private final ScheduledExecutorService taskExecutor;
     private final Map<String, Actuator> actuators;
 
     public Core(
             List<MessageHandler> handlers,
             List<Actuator> actuators,
             LockingTaskExecutor lock,
-            ThreadPoolTaskScheduler taskScheduler,
+            ScheduledExecutorService taskExecutor,
             TaskDAO taskDAO
     ) {
 
@@ -40,7 +41,7 @@ public class Core {
         this.handlers = handlers;
         this.taskDAO = taskDAO;
         this.lock = lock;
-        this.taskScheduler = taskScheduler;
+        this.taskExecutor = taskExecutor;
         this.actuators = HashMap.ofEntries(actuatorList);
     }
 
@@ -49,10 +50,10 @@ public class Core {
 
         taskDAO.insert(tasks);
 
-        taskScheduler.execute(this::runActuators);
+        taskExecutor.execute(this::runActuators);
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedDelay = 10000)
     public void runActuators() {
         runWithLock(lock, "runActuators", () -> taskDAO.fetchTasks().forEach(this::submit));
     }
@@ -70,7 +71,7 @@ public class Core {
     @SuppressWarnings("unchecked")
     private void submitTry(Task task) {
         Option<Actuator> maybeActuator = this.actuators.get(task.getType());
-        Actuator<?> actuator = maybeActuator.getOrElseThrow(RuntimeException::new);
+        Actuator<?, ?> actuator = maybeActuator.getOrElseThrow(RuntimeException::new);
         actuator.handle(task);
     }
 }

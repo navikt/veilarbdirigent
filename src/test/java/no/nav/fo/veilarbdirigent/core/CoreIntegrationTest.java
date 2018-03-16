@@ -41,7 +41,7 @@ class CoreIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeAll
     @BeforeClass
-    static void setupContext() throws NamingException {
+    static void setupContext() {
         setupContext(
                 CoreConfig.class,
                 DbConfig.class,

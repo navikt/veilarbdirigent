@@ -2,9 +2,9 @@ package no.nav.fo.veilarbdirigent.dao;
 
 import io.vavr.collection.List;
 import no.nav.fo.veilarbdirigent.TestUtils;
+import no.nav.fo.veilarbdirigent.config.IntegrasjonsTest;
 import no.nav.fo.veilarbdirigent.coreapi.Status;
 import no.nav.fo.veilarbdirigent.coreapi.Task;
-import no.nav.fo.veilarbdirigent.db.IntegrasjonsTest;
 import org.junit.jupiter.api.Test;
 
 import static java.time.LocalDateTime.now;
@@ -12,7 +12,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class TaskDAOTest extends IntegrasjonsTest {
 
-    TaskDAO dao = getBean(TaskDAO.class);
+    private TaskDAO dao = getBean(TaskDAO.class);
 
     @Test
     void persisting_task() {

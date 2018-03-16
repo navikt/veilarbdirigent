@@ -48,7 +48,7 @@ public class DbConfig {
     }
 
     @Bean
-    public Pingable dbPinger(final DataSource ds) {
+    public Pingable dbPinger(final JdbcTemplate jdbc) {
         HelsesjekkMetadata metadata = new HelsesjekkMetadata("db",
                 "Database: " + getRequiredProperty(VEILARBDIRIGENTDB_URL),
                 "Database for veilarbdirigent",
@@ -56,7 +56,7 @@ public class DbConfig {
 
         return () -> {
             try {
-                SqlUtils.select(ds, "dual", resultSet -> resultSet.getInt(1))
+                SqlUtils.select(jdbc, "dual", resultSet -> resultSet.getInt(1))
                         .column("count(1)")
                         .execute();
                 return Pingable.Ping.lyktes(metadata);

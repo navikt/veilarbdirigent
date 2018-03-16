@@ -1,23 +1,21 @@
 package no.nav.fo.veilarbdirigent.db;
 
-import lombok.val;
+import io.vavr.control.Option;
 import no.nav.dialogarena.config.fasit.DbCredentials;
 import no.nav.dialogarena.config.fasit.FasitUtils;
 import no.nav.dialogarena.config.fasit.TestEnvironment;
-
-import java.util.Optional;
 
 import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAME;
 import static no.nav.fo.veilarbdirigent.config.DbConfig.*;
 
 public class DatabaseTestContext {
     public static void setupContext(String miljo) {
-        val dbCredential = Optional.ofNullable(miljo)
+        Option<DbCredentials> dbCredential = Option.of(miljo)
                 .map(TestEnvironment::valueOf)
                 .map(testEnvironment -> FasitUtils.getDbCredentials(testEnvironment, APPLICATION_NAME));
 
-        if (dbCredential.isPresent()) {
-            setDataSourceProperties(dbCredential.get());
+        if (dbCredential.isDefined()) {
+            dbCredential.forEach(DatabaseTestContext::setDataSourceProperties);
         } else {
             setInMemoryDataSourceProperties();
         }

@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
 import java.util.Collections;
 
 @Configuration
@@ -20,7 +19,7 @@ public class OppfolgingFeedConfig {
     @Value("${veilarboppfolging.api.url}")
     private String host;
 
-    @Value("${feed.consumer.pollingrate.millis:10000}")
+    @Value("${feed.consumer.pollingrate.seconds:10}")
     private int polling;
 
     @Value("${feed.consumer.lock.timeout.millis:5000}")
@@ -29,8 +28,8 @@ public class OppfolgingFeedConfig {
     private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
 
     @Bean
-    public FeedDAO feedDAO(DataSource ds, JdbcTemplate jdbc) {
-        return new FeedDAO(ds, jdbc);
+    public FeedDAO feedDAO(JdbcTemplate jdbc) {
+        return new FeedDAO(jdbc);
     }
 
     @Bean

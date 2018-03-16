@@ -2,6 +2,7 @@ package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
 import no.nav.fo.veilarbdirigent.TestUtils;
+import no.nav.fo.veilarbdirigent.config.AbstractIntegrationTest;
 import no.nav.fo.veilarbdirigent.config.CoreConfig;
 import no.nav.fo.veilarbdirigent.config.DAOConfig;
 import no.nav.fo.veilarbdirigent.config.DbConfig;
@@ -10,7 +11,6 @@ import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
 import no.nav.fo.veilarbdirigent.coreapi.Status;
 import no.nav.fo.veilarbdirigent.coreapi.Task;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
-import no.nav.fo.veilarbdirigent.db.AbstractIntegrationTest;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

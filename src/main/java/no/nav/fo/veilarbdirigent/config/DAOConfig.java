@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.config;
 
-import net.javacrumbs.shedlock.core.*;
+import net.javacrumbs.shedlock.core.DefaultLockingTaskExecutor;
+import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider;
 import no.nav.fo.veilarbdirigent.dao.TaskDAO;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ public class DAOConfig {
     }
 
     @Bean
-    public TaskDAO taskDAO(DataSource ds, JdbcTemplate jdbc) {
-        return new TaskDAO(ds, jdbc);
+    public TaskDAO taskDAO(JdbcTemplate jdbc) {
+        return new TaskDAO(jdbc);
     }
 }

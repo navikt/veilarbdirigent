@@ -28,11 +28,17 @@ class ActuatorUtilsTest {
     }
 
     @Test
-    void plus_combination() {
-        LocalDateTime future = ActuatorUtils.relativeTime(now, "5u5d12t");
-        LocalDateTime future2 = ActuatorUtils.relativeTime(now, "5u 5d 12t");
+    void plus_months() {
+        LocalDateTime future = ActuatorUtils.relativeTime(now, "2m");
+        assertThat(future).isEqualByComparingTo(LocalDateTime.of(1970, 3, 1, 0, 0));
+    }
 
-        LocalDateTime expected = LocalDateTime.of(1970, 2, 10, 12, 0);
+    @Test
+    void plus_combination() {
+        LocalDateTime future = ActuatorUtils.relativeTime(now, "2m5u5d12t");
+        LocalDateTime future2 = ActuatorUtils.relativeTime(now, "2m 5u 5d 12t");
+
+        LocalDateTime expected = LocalDateTime.of(1970, 4, 10, 12, 0);
         assertThat(future).isEqualByComparingTo(expected);
         assertThat(future2).isEqualByComparingTo(expected);
     }

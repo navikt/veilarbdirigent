@@ -2,7 +2,7 @@ package no.nav.fo.veilarbdirigent.input.feed;
 
 import lombok.Builder;
 import lombok.Value;
-import no.nav.fo.veilarbdirigent.coreapi.Message;
+import no.nav.fo.veilarbdirigent.core.api.Message;
 
 import java.util.Date;
 

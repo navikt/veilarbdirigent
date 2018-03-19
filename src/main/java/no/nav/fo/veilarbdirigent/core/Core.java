@@ -1,18 +1,18 @@
 package no.nav.fo.veilarbdirigent.core;
 
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
-import no.nav.fo.veilarbdirigent.coreapi.*;
-import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.core.api.*;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.utils.TypedField;
+import no.nav.sbl.jdbc.Transactor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -20,58 +20,68 @@ import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 
 @Slf4j
 public class Core {
-    private final List<MessageHandler> handlers;
+    private List<MessageHandler> handlers = List.empty();
+    private Map<TaskType, Actuator> actuators = HashMap.empty();
+
     private final TaskDAO taskDAO;
+    private final ScheduledExecutorService scheduler;
     private final LockingTaskExecutor lock;
-    private final ScheduledExecutorService taskExecutor;
-    private final Map<String, Actuator> actuators;
+    private final Transactor transactor;
 
     public Core(
-            List<MessageHandler> handlers,
-            List<Actuator> actuators,
+            TaskDAO taskDAO,
+            ScheduledExecutorService scheduler,
             LockingTaskExecutor lock,
-            ScheduledExecutorService taskExecutor,
-            TaskDAO taskDAO
+            Transactor transactor
     ) {
-
-        List<Tuple2<String, Actuator>> actuatorList = List
-                .ofAll(actuators)
-                .map((actuator) -> Tuple.of(actuator.getType(), actuator));
-
-        this.handlers = handlers;
         this.taskDAO = taskDAO;
+        this.scheduler = scheduler;
         this.lock = lock;
-        this.taskExecutor = taskExecutor;
-        this.actuators = HashMap.ofEntries(actuatorList);
+        this.transactor = transactor;
     }
 
-    public void submit(Message message) {
-        List<Task> tasks = handlers.flatMap((handler) -> handler.handle(message));
+    public void registerHandler(MessageHandler handler) {
+        this.handlers = this.handlers.append(handler);
+    }
 
-        taskDAO.insert(tasks);
+    public void registerActuator(TaskType type, Actuator actuator) {
+        this.actuators = this.actuators.put(type, actuator);
+    }
 
-        taskExecutor.execute(this::runActuators);
+    @Transactional
+    public boolean submit(Message message) {
+        try {
+            List<Task> tasks = handlers.flatMap((handler) -> handler.handle(message));
+
+            taskDAO.insert(tasks);
+
+            scheduler.execute(this::runActuators);
+            return true;
+        } catch (Exception e) {
+            log.error("Error while handling message", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public boolean submitInTransaction(Message message) {
+        return submit(message);
     }
 
     @Scheduled(fixedDelay = 10000)
     public void runActuators() {
-        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasks().forEach(this::submit));
+        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasks().forEach(this::tryActuator));
     }
 
-    private void submit(Task task) {
-        Try.run(() -> this.submitTry(task))
-                .andThen(() -> taskDAO.setStateForTask(task, Status.OK))
-                .orElseRun((Throwable error) -> {
-                    log.info("Something went wrong in submit to CoreOutImpl", error);
-                    taskDAO.setStateForTask(task, Status.FAILED);
-                });
-    }
-
-    @SneakyThrows
     @SuppressWarnings("unchecked")
-    private void submitTry(Task task) {
-        Option<Actuator> maybeActuator = this.actuators.get(task.getType());
-        Actuator<?, ?> actuator = maybeActuator.getOrElseThrow(RuntimeException::new);
-        actuator.handle(task);
+    private void tryActuator(Task<?, ?> task) {
+        this.actuators.get(task.getType())
+                .forEach((actuator) -> transactor.inTransaction(() -> {
+                    taskDAO.setStatusForTask(task, Status.WORKING);
+
+                    Try.of(() -> actuator.handle(task))
+                            .onFailure((exception) -> taskDAO.setStatusForTask(task.withError(exception.toString()), Status.FAILED))
+                            .onSuccess((result) -> taskDAO.setStatusForTask(task.withResult(new TypedField(result)), Status.OK));
+                }));
     }
 }

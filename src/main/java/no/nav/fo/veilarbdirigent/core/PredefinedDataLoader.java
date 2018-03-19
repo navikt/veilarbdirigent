@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 @Slf4j
-public class TaskRepository {
+public class PredefinedDataLoader {
     private static Map<String, String> taskcontent;
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -40,10 +40,10 @@ public class TaskRepository {
     }
 
     private static Map<String, String> readAllFiles() {
-        return Option.of(TaskRepository.class.getClassLoader().getResource("taskdefinitions"))
+        return Option.of(PredefinedDataLoader.class.getClassLoader().getResource("taskdefinitions"))
                 .map(URL::getFile)
                 .map(File::new)
-                .map(TaskRepository::listFiles)
+                .map(PredefinedDataLoader::listFiles)
                 .getOrElse(List.empty())
                 .map((file) -> Tuple.of(findName(file), readFile(file).getOrElse((String) null)))
                 .toMap(Function.identity());

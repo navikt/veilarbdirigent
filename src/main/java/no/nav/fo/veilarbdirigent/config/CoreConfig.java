@@ -1,17 +1,14 @@
 package no.nav.fo.veilarbdirigent.config;
 
-import io.vavr.collection.List;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.core.Core;
-import no.nav.fo.veilarbdirigent.coreapi.Actuator;
-import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
-import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.sbl.jdbc.Transactor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,12 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @Configuration
 @EnableAsync
 @EnableScheduling
-public class CoreConfig implements SchedulingConfigurer {
-
-    @Override
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.setScheduler(taskExecutor());
-    }
+public class CoreConfig {
 
     @Bean(destroyMethod = "shutdown")
     public ScheduledExecutorService taskExecutor() {
@@ -32,20 +24,23 @@ public class CoreConfig implements SchedulingConfigurer {
     }
 
     @Bean
+    public Transactor transactor(PlatformTransactionManager transactionManager) {
+        return new Transactor(transactionManager);
+    }
+
+    @Bean
     public Core core(
-            java.util.List<MessageHandler> handlers,
-            java.util.List<Actuator> actuators,
+            TaskDAO taskDAO,
             LockingTaskExecutor lock,
-            ScheduledExecutorService taskScheduler,
-            TaskDAO taskDAO
+            ScheduledExecutorService scheduler,
+            Transactor transactor
     ) {
 
         return new Core(
-                List.ofAll(handlers),
-                List.ofAll(actuators),
+                taskDAO,
+                scheduler,
                 lock,
-                taskScheduler,
-                taskDAO
+                transactor
         );
     }
 }

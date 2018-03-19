@@ -1,4 +1,4 @@
-package no.nav.fo.veilarbdirigent.coreapi;
+package no.nav.fo.veilarbdirigent.core.api;
 
 import io.vavr.collection.List;
 

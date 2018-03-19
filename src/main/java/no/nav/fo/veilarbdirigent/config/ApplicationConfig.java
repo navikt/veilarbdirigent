@@ -2,11 +2,13 @@ package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.apiapp.ApiApplication;
 import no.nav.apiapp.config.ApiAppConfigurator;
-import no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConfig;
+import no.nav.sbl.rest.RestUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.client.Client;
 
 import static no.nav.apiapp.ApiApplication.Sone.FSS;
 
@@ -15,9 +17,9 @@ import static no.nav.apiapp.ApiApplication.Sone.FSS;
         CoreConfig.class,
         DbConfig.class,
         DAOConfig.class,
-        MessageHandlerConfig.class,
-        ActuatorConfig.class,
-        OppfolgingFeedConfig.class
+        HandlerConfig.class,
+        FeedConfig.class,
+        ServiceConfig.class
 })
 public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
@@ -46,4 +48,10 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
         apiAppConfigurator.issoLogin().sts();
 
     }
+
+    @Bean
+    public Client client() {
+        return RestUtils.createClient();
+    }
+
 }

@@ -17,12 +17,9 @@ prometheus:
   path: veilarbdirigent/internal/metrics
 fasitResources:
   used:
-  - alias: loadbalancer:veilarbdirigent
-    resourceType: loadbalancerconfig
   - alias: srvveilarbdirigent
     resourceType: credential
   - alias: veilarbdirigentDB
     resourceType: datasource
   - alias: veilArbOppfolgingAPI
-    mapToProperty: veilarboppfolging.api
     resourceType: restservice

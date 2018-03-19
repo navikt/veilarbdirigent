@@ -7,11 +7,11 @@ import no.nav.fo.veilarbdirigent.config.CoreConfig;
 import no.nav.fo.veilarbdirigent.config.DAOConfig;
 import no.nav.fo.veilarbdirigent.config.DbConfig;
 import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
-import no.nav.fo.veilarbdirigent.coreapi.Actuator;
-import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
-import no.nav.fo.veilarbdirigent.coreapi.Status;
-import no.nav.fo.veilarbdirigent.coreapi.Task;
-import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.core.api.Actuator;
+import no.nav.fo.veilarbdirigent.core.api.MessageHandler;
+import no.nav.fo.veilarbdirigent.core.api.Status;
+import no.nav.fo.veilarbdirigent.core.api.Task;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +62,7 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         List<Task> savedTasks = dao.fetchTasks();
         assertThat(savedTasks.length()).isEqualTo(4);
 
-        delay(200);
+        delay(2000);
 
         List<Task> nonCompletedTasks = dao.fetchTasks();
         assertThat(nonCompletedTasks.length()).isEqualTo(1);
@@ -83,15 +83,18 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
     static class TestConfig {
         @Bean
-        public Actuator actuator() {
+        public Actuator actuator(Core core) {
             Actuator mock = mock(Actuator.class);
-            when(mock.getType()).thenReturn(TestUtils.TASK_TYPE);
+
+            core.registerActuator(TestUtils.TASK_TYPE, mock);
             return mock;
         }
 
         @Bean
-        public MessageHandler messageHandler() {
-            return mock(MessageHandler.class);
+        public MessageHandler messageHandler(Core core) {
+            MessageHandler mock = mock(MessageHandler.class);
+            core.registerHandler(mock);
+            return mock;
         }
     }
 }

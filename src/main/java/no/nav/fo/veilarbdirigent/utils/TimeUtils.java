@@ -1,11 +1,11 @@
-package no.nav.fo.veilarbdirigent.actuators;
+package no.nav.fo.veilarbdirigent.utils;
 
 import java.time.LocalDateTime;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ActuatorUtils {
+public class TimeUtils {
     private static final String MONTHS = "m";
     private static final String WEEKS = "u";
     private static final String DAYS = "d";
@@ -22,6 +22,10 @@ public class ActuatorUtils {
         }
 
         return time;
+    }
+
+    public static LocalDateTime relativeTime(String relative) {
+        return relativeTime(LocalDateTime.now(), relative);
     }
 
     private static Function<LocalDateTime, LocalDateTime> createTimeFunction(String time) {
@@ -41,7 +45,8 @@ public class ActuatorUtils {
         };
     }
 
-    protected static LocalDateTime relativeTime(String relative) {
-        return relativeTime(LocalDateTime.now(), relative);
+    public static LocalDateTime exponentialBackoff(int attempts, LocalDateTime now) {
+        long secondsToWait = (long)Math.pow(2, attempts);
+        return now.plusSeconds(secondsToWait);
     }
 }

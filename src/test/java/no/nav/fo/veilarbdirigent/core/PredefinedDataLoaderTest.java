@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 
-class TaskRepositoryTest {
+class PredefinedDataLoaderTest {
     @Test
     void should_read_file_into_class() {
-        Option<AktivitetTestData> cvAktivitet = TaskRepository.get("test_cv_aktivitet", AktivitetTestData.class);
+        Option<AktivitetTestData> cvAktivitet = PredefinedDataLoader.get("test_cv_aktivitet", AktivitetTestData.class);
 
         assertThat(cvAktivitet.isSingleValued()).isTrue();
         assertThat(cvAktivitet.get().type).isEqualTo("TEST");
@@ -20,14 +20,14 @@ class TaskRepositoryTest {
 
     @Test
     void should_give_option_none_if_it_doesnt_exist() {
-        Option<AktivitetTestData> cvAktivitet = TaskRepository.get("fake-task", AktivitetTestData.class);
+        Option<AktivitetTestData> cvAktivitet = PredefinedDataLoader.get("fake-task", AktivitetTestData.class);
 
         assertThat(cvAktivitet.isEmpty()).isTrue();
     }
 
     @Test
     void should_give_option_none_if_marshalling_fails() {
-        Option<String> cvAktivitet = TaskRepository.get("test_cv_aktivitet", String.class);
+        Option<String> cvAktivitet = PredefinedDataLoader.get("test_cv_aktivitet", String.class);
 
         assertThat(cvAktivitet.isEmpty()).isTrue();
     }

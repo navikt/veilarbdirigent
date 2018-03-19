@@ -17,7 +17,10 @@ public class MainTest {
         ApiAppTest.setupTestContext();
         DatabaseTestContext.setupContext(getProperty("database"));
 
+        String securityTokenService = FasitUtils.getBaseUrl("securityTokenService");
         ServiceUser srvveilarbdirigent = FasitUtils.getServiceUser("srvveilarbdirigent", APPLICATION_NAME);
+
+        setProperty(SecurityConstants.STS_URL_KEY, securityTokenService);
 
         setProperty(SecurityConstants.SYSTEMUSER_USERNAME, srvveilarbdirigent.getUsername());
         setProperty(SecurityConstants.SYSTEMUSER_PASSWORD, srvveilarbdirigent.getPassword());

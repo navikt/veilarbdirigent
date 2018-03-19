@@ -2,7 +2,6 @@ import no.nav.brukerdialog.tools.SecurityConstants;
 import no.nav.dialogarena.config.fasit.FasitUtils;
 import no.nav.dialogarena.config.fasit.ServiceUser;
 import no.nav.fo.veilarbdirigent.config.DatabaseTestContext;
-import no.nav.sbl.dialogarena.common.cxf.StsSecurityConstants;
 import no.nav.testconfig.ApiAppTest;
 
 import static java.lang.System.getProperty;
@@ -21,7 +20,7 @@ public class MainTest {
         String securityTokenService = FasitUtils.getBaseUrl("securityTokenService");
         ServiceUser srvveilarbdirigent = FasitUtils.getServiceUser("srvveilarbdirigent", APPLICATION_NAME);
 
-        setProperty(StsSecurityConstants.STS_URL_KEY, securityTokenService);
+        setProperty(SecurityConstants.STS_URL_KEY, securityTokenService);
 
         setProperty(SecurityConstants.SYSTEMUSER_USERNAME, srvveilarbdirigent.getUsername());
         setProperty(SecurityConstants.SYSTEMUSER_PASSWORD, srvveilarbdirigent.getPassword());

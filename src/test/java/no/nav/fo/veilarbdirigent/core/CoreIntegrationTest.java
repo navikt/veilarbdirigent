@@ -6,6 +6,7 @@ import no.nav.fo.veilarbdirigent.config.AbstractIntegrationTest;
 import no.nav.fo.veilarbdirigent.config.CoreConfig;
 import no.nav.fo.veilarbdirigent.config.DAOConfig;
 import no.nav.fo.veilarbdirigent.config.DbConfig;
+import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
 import no.nav.fo.veilarbdirigent.coreapi.Actuator;
 import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
 import no.nav.fo.veilarbdirigent.coreapi.Status;
@@ -23,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class CoreIntegrationTest extends AbstractIntegrationTest {
+class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup {
 
     private Core core = getBean(Core.class);
     private TaskDAO dao = getBean(TaskDAO.class);

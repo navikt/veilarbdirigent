@@ -35,7 +35,7 @@ class OppfolgingFeedServiceTest {
     );
 
     @Test
-    void submits_the_recived_message_to_the_core() {
+    void submits_the_received_message_to_the_core() {
         oppfolgingFeedService.compute("dosn't matter", List.of(elements.head()));
         verify(core).submit(elements.head());
     }
@@ -47,7 +47,7 @@ class OppfolgingFeedServiceTest {
     }
 
     @Test
-    void tells_feedDao_to_update_last_recived_id_to_the_last_element_in_the_feed() {
+    void tells_feedDab_to_update_last_received_id_to_the_last_element_in_the_feed() {
         oppfolgingFeedService.compute("dosn't matter", elements);
         verify(feedDao).oppdaterSisteKjenteId(elements.last().getId());
     }

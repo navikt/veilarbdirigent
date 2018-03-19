@@ -3,6 +3,7 @@ package no.nav.fo.veilarbdirigent.dao;
 import io.vavr.collection.List;
 import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.config.IntegrasjonsTest;
+import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
 import no.nav.fo.veilarbdirigent.coreapi.Status;
 import no.nav.fo.veilarbdirigent.coreapi.Task;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-class TaskDAOTest extends IntegrasjonsTest {
+class TaskDAOTest extends IntegrasjonsTest implements TaskCleanup {
 
     private TaskDAO dao = getBean(TaskDAO.class);
 

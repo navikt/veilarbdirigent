@@ -1,4 +1,4 @@
-package no.nav.fo.veilarbdirigent.db;
+package no.nav.fo.veilarbdirigent.config;
 
 import io.vavr.control.Option;
 import no.nav.dialogarena.config.fasit.DbCredentials;

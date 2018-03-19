@@ -1,6 +1,5 @@
 package no.nav.fo.veilarbdirigent.config;
 
-import no.nav.fo.veilarbdirigent.db.DatabaseTestContext;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 

@@ -1,6 +1,6 @@
-package no.nav.fo.veilarbdirigent.actuators;
+package no.nav.fo.veilarbdirigent.utils;
 
-import no.nav.fo.veilarbdirigent.core.ActuatorUtils;
+import no.nav.fo.veilarbdirigent.utils.ActuatorUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

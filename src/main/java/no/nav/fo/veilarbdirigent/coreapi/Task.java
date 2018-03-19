@@ -3,6 +3,7 @@ package no.nav.fo.veilarbdirigent.coreapi;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.Wither;
+import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import java.time.LocalDateTime;
 
@@ -11,13 +12,13 @@ import java.time.LocalDateTime;
 @Wither
 public class Task<DATA, RESULT> {
     String id;
-    String type;
+    TaskType type;
     Status status;
     LocalDateTime created;
     int attempts;
     LocalDateTime nextAttempt;
     LocalDateTime lastAttempt;
-    DATA data;
-    RESULT result;
+    TypedField<DATA> data;
+    TypedField<RESULT> result;
     String error;
 }

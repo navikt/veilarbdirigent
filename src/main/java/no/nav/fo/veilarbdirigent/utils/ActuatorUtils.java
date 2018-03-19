@@ -1,4 +1,4 @@
-package no.nav.fo.veilarbdirigent.core;
+package no.nav.fo.veilarbdirigent.utils;
 
 import java.time.LocalDateTime;
 import java.util.function.Function;

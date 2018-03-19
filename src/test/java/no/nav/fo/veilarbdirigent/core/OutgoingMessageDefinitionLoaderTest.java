@@ -12,24 +12,24 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 class OutgoingMessageDefinitionLoaderTest {
     @Test
     void should_read_file_into_class() {
-        Option<OutgoingMessageDefinition<AktivitetTestData>> cvAktivitet = OutgoingMessageDefinitionLoader.get("test_cv_aktivitet", AktivitetTestData.class);
+        Option<AktivitetTestData> cvAktivitet = OutgoingMessageDefinitionLoader.get("test_cv_aktivitet", AktivitetTestData.class);
 
         assertThat(cvAktivitet.isSingleValued()).isTrue();
-        assertThat(cvAktivitet.get().getData().type).isEqualTo("TEST");
-        assertThat(cvAktivitet.get().getData().tittel).isEqualTo("Tittel");
-        assertThat(cvAktivitet.get().getData().hensikt).isEqualTo("Hensikt");
+        assertThat(cvAktivitet.get().type).isEqualTo("TEST");
+        assertThat(cvAktivitet.get().tittel).isEqualTo("Tittel");
+        assertThat(cvAktivitet.get().hensikt).isEqualTo("Hensikt");
     }
 
     @Test
     void should_give_option_none_if_it_doesnt_exist() {
-        Option<OutgoingMessageDefinition<AktivitetTestData>> cvAktivitet = OutgoingMessageDefinitionLoader.get("fake-task", AktivitetTestData.class);
+        Option<AktivitetTestData> cvAktivitet = OutgoingMessageDefinitionLoader.get("fake-task", AktivitetTestData.class);
 
         assertThat(cvAktivitet.isEmpty()).isTrue();
     }
 
     @Test
     void should_give_option_none_if_marshalling_fails() {
-        Option<OutgoingMessageDefinition<String>> cvAktivitet = OutgoingMessageDefinitionLoader.get("test_cv_aktivitet", String.class);
+        Option<String> cvAktivitet = OutgoingMessageDefinitionLoader.get("test_cv_aktivitet", String.class);
 
         assertThat(cvAktivitet.isEmpty()).isTrue();
     }

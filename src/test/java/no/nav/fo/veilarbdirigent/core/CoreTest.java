@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.concurrent.Executors;
 
@@ -47,12 +48,13 @@ class CoreTest {
     @SuppressWarnings("unchecked")
     void normal_path() {
         Core core = new Core(
-                List.of(handler),
-                List.of(actuator),
+                dao,
+                new ThreadPoolTaskScheduler(),
                 lock,
-                Executors.newScheduledThreadPool(1),
-                dao
+                null
         );
+        core.registerHandler(handler);
+        core.registerActuator(TestUtils.TASK_TYPE, actuator);
 
         Message message = new Message() {};
         core.submit(message);

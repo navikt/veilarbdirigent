@@ -19,7 +19,7 @@ public class OutgoingMessageDefinitionLoader {
     private static Map<String, String> taskcontent;
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static <T extends OutgoingMessageDefinition> Option<T> get(String name, Class<T> type) {
+    public static <T> Option<T> get(String name, Class<T> type) {
         if (taskcontent == null) {
             taskcontent = readAllFiles();
         }

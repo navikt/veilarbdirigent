@@ -2,6 +2,7 @@ package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.fo.veilarbdirigent.coreapi.Actuator;
 import no.nav.fo.veilarbdirigent.coreapi.Task;
+import no.nav.fo.veilarbdirigent.coreapi.TaskType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +19,8 @@ public class ActuatorConfig {
             }
 
             @Override
-            public String getType() {
-                return "String.class";
+            public TaskType getType() {
+                return new TaskType("String.class");
             }
         };
     }

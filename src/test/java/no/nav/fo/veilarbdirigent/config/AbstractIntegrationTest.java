@@ -1,24 +1,19 @@
 package no.nav.fo.veilarbdirigent.config;
 
 import lombok.SneakyThrows;
-import no.nav.fo.veilarbdirigent.db.DatabaseTestContext;
-import org.junit.After;
+import no.nav.fo.veilarbdirigent.config.databasecleanup.Cleanup;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import static java.lang.System.setProperty;
 
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest implements Cleanup {
     private static AnnotationConfigApplicationContext annotationConfigApplicationContext;
-    private static PlatformTransactionManager platformTransactionManager;
-    private TransactionStatus transactionStatus;
+    private JdbcTemplate jdbc = getBean(JdbcTemplate.class);
 
     @SneakyThrows
     protected static void setupContext(Class<?>... classes) {
@@ -30,8 +25,6 @@ public class AbstractIntegrationTest {
 
         annotationConfigApplicationContext = new AnnotationConfigApplicationContext(classes);
         annotationConfigApplicationContext.start();
-        platformTransactionManager = getBean(PlatformTransactionManager.class);
-
     }
 
     protected static <T> T getBean(Class<T> requiredType) {
@@ -44,20 +37,6 @@ public class AbstractIntegrationTest {
         annotationConfigApplicationContext.getAutowireCapableBeanFactory().autowireBean(this);
     }
 
-    @BeforeEach
-    @Before
-    public void startTransaksjon() {
-        transactionStatus = platformTransactionManager.getTransaction(new DefaultTransactionDefinition());
-    }
-
-    @AfterEach
-    @After
-    public void rollbackTransaksjon() {
-        if (platformTransactionManager != null && transactionStatus != null) {
-            platformTransactionManager.rollback(transactionStatus);
-        }
-    }
-
     @AfterAll
     @AfterClass
     public static void close() {
@@ -67,5 +46,10 @@ public class AbstractIntegrationTest {
             annotationConfigApplicationContext.destroy();
             annotationConfigApplicationContext = null;
         }
+    }
+
+    @Override
+    public JdbcTemplate getJdbc() {
+        return jdbc;
     }
 }

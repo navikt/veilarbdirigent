@@ -17,7 +17,8 @@ import static no.nav.apiapp.ApiApplication.Sone.FSS;
         DAOConfig.class,
         MessageHandlerConfig.class,
         ActuatorConfig.class,
-        OppfolgingFeedConfig.class
+        OppfolgingFeedConfig.class,
+        ServiceConfig.class
 })
 public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";

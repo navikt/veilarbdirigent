@@ -3,13 +3,11 @@ package no.nav.fo.veilarbdirigent.core;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
-import no.nav.fo.veilarbdirigent.coreapi.*;
-import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.core.api.*;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -17,8 +15,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.annotation.PostConstruct;
 
 import static no.nav.fo.veilarbdirigent.core.Utils.runInTransaction;
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;

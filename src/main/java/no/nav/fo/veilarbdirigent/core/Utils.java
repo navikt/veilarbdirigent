@@ -8,15 +8,15 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 
-public class Utils {
+class Utils {
 
-    public static void runWithLock(LockingTaskExecutor lock, String lockname, Runnable task) {
+    static void runWithLock(LockingTaskExecutor lock, String lockname, Runnable task) {
         Instant lockAtMostUntil = Instant.now().plusMillis(10000);
         LockConfiguration lockConfiguration = new LockConfiguration(lockname, lockAtMostUntil);
         lock.executeWithLock(task, lockConfiguration);
     }
 
-    public static void runInTransaction(TransactionTemplate template, Runnable runnable) {
+    static void runInTransaction(TransactionTemplate template, Runnable runnable) {
         template.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {

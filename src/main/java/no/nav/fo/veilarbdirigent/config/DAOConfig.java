@@ -3,7 +3,7 @@ package no.nav.fo.veilarbdirigent.config;
 import net.javacrumbs.shedlock.core.DefaultLockingTaskExecutor;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider;
-import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -16,7 +16,7 @@ import java.util.Collections;
 @Configuration
 public class OppfolgingFeedConfig {
 
-    @Value("${veilarboppfolging.api.url}")
+    @Value("${veilArbOppfolgingAPI.url}")
     private String host;
 
     @Value("${feed.consumer.pollingrate.seconds:10}")

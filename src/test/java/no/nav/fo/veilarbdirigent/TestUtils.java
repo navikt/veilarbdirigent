@@ -6,7 +6,12 @@ import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.api.TaskType;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
+import no.nav.sbl.jdbc.Transactor;
 import org.mockito.ArgumentCaptor;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
 
 public class TestUtils {
     public static TaskType TASK_TYPE = new TaskType("mock");
@@ -28,5 +33,24 @@ public class TestUtils {
     @SneakyThrows
     public static void delay(int millis) {
         Thread.sleep(millis);
+    }
+
+    public static Transactor getTransactor() {
+        return new Transactor(new PlatformTransactionManager() {
+            @Override
+            public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+                return null;
+            }
+
+            @Override
+            public void commit(TransactionStatus status) throws TransactionException {
+
+            }
+
+            @Override
+            public void rollback(TransactionStatus status) throws TransactionException {
+
+            }
+        });
     }
 }

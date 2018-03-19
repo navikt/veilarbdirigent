@@ -9,36 +9,35 @@ import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
+import no.nav.sbl.jdbc.Transactor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import static no.nav.fo.veilarbdirigent.core.Utils.runInTransaction;
+import java.util.concurrent.ScheduledExecutorService;
+
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 
 @Slf4j
 public class Core {
     private List<MessageHandler> handlers = List.empty();
     private Map<TaskType, Actuator> actuators = HashMap.empty();
-    private TransactionTemplate transactionTemplate;
 
     private final TaskDAO taskDAO;
-    private final ThreadPoolTaskScheduler scheduler;
+    private final ScheduledExecutorService scheduler;
     private final LockingTaskExecutor lock;
+    private final Transactor transactor;
 
     public Core(
             TaskDAO taskDAO,
-            ThreadPoolTaskScheduler scheduler,
+            ScheduledExecutorService scheduler,
             LockingTaskExecutor lock,
-            PlatformTransactionManager transactionManager
+            Transactor transactor
     ) {
         this.taskDAO = taskDAO;
         this.scheduler = scheduler;
         this.lock = lock;
-        this.transactionTemplate = new TransactionTemplate(transactionManager);
+        this.transactor = transactor;
     }
 
     public void registerHandler(MessageHandler handler) {
@@ -77,7 +76,7 @@ public class Core {
     @SuppressWarnings("unchecked")
     private void tryActuator(Task<?, ?> task) {
         this.actuators.get(task.getType())
-                .forEach((actuator) -> runInTransaction(transactionTemplate, () -> {
+                .forEach((actuator) -> transactor.inTransaction(() -> {
                     taskDAO.setStatusForTask(task, Status.WORKING);
 
                     Try.of(() -> actuator.handle(task))

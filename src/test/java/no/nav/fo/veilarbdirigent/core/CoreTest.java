@@ -8,15 +8,14 @@ import no.nav.fo.veilarbdirigent.core.api.Message;
 import no.nav.fo.veilarbdirigent.core.api.MessageHandler;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.sbl.jdbc.Transactor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.TransactionStatus;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +26,7 @@ class CoreTest {
     private Actuator actuator = mock(Actuator.class);
     private MessageHandler handler = mock(MessageHandler.class);
     private LockingTaskExecutor lock = (runnable, lockConfiguration) -> runnable.run();
+    private Transactor transactor = TestUtils.getTransactor();
 
     @BeforeEach
     public void setup() {
@@ -48,37 +48,22 @@ class CoreTest {
     @Test
     @SuppressWarnings("unchecked")
     void normal_path() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.initialize();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         Core core = new Core(
                 dao,
                 scheduler,
                 lock,
-                new PlatformTransactionManager() {
-                    @Override
-                    public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
-                        return null;
-                    }
-
-                    @Override
-                    public void commit(TransactionStatus status) throws TransactionException {
-
-                    }
-
-                    @Override
-                    public void rollback(TransactionStatus status) throws TransactionException {
-
-                    }
-                }
+                transactor
         );
         core.registerHandler(handler);
         core.registerActuator(TestUtils.TASK_TYPE, actuator);
 
-        Message message = new Message() {};
+        Message message = new Message() {
+        };
         core.submit(message);
 
-        TestUtils.delay(1000);
+        TestUtils.delay(200);
 
         ArgumentCaptor<List<Task>> captor = TestUtils.listArgumentCaptor(Task.class);
 

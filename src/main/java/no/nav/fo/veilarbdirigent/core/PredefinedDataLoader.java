@@ -1,4 +1,4 @@
-package no.nav.fo.veilarbdirigent.core.outgoingmessage;
+package no.nav.fo.veilarbdirigent.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.Tuple;
@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 @Slf4j
-public class OutgoingMessageDefinitionLoader {
+public class PredefinedDataLoader {
     private static Map<String, String> taskcontent;
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -40,10 +40,10 @@ public class OutgoingMessageDefinitionLoader {
     }
 
     private static Map<String, String> readAllFiles() {
-        return Option.of(OutgoingMessageDefinitionLoader.class.getClassLoader().getResource("taskdefinitions"))
+        return Option.of(PredefinedDataLoader.class.getClassLoader().getResource("taskdefinitions"))
                 .map(URL::getFile)
                 .map(File::new)
-                .map(OutgoingMessageDefinitionLoader::listFiles)
+                .map(PredefinedDataLoader::listFiles)
                 .getOrElse(List.empty())
                 .map((file) -> Tuple.of(findName(file), readFile(file).getOrElse((String) null)))
                 .toMap(Function.identity());

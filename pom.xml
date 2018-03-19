@@ -17,6 +17,7 @@
 
     <properties>
         <jackson.version>2.5.4</jackson.version><!-- Samme versjon som i BOM, burde legges dit -->
+        <javax.annotation.version>1.2</javax.annotation.version><!-- Samme versjon som i BOM, burde legges dit -->
     </properties>
 
     <dependencyManagement>
@@ -72,11 +73,28 @@
             <groupId>no.nav.sbl</groupId>
             <artifactId>util</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.sbl</groupId>
+            <artifactId>rest</artifactId>
+        </dependency>
 
         <!-- javax/spring -->
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>${javax.annotation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2.external</groupId>

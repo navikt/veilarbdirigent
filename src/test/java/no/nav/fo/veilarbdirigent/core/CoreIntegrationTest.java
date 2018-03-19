@@ -85,7 +85,6 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         @Bean
         public Actuator actuator(Core core) {
             Actuator mock = mock(Actuator.class);
-            when(mock.getType()).thenReturn(TestUtils.TASK_TYPE);
 
             core.registerActuator(TestUtils.TASK_TYPE, mock);
             return mock;

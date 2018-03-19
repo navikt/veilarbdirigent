@@ -1,15 +1,16 @@
 package no.nav.fo.veilarbdirigent.core.api;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Wither;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import java.time.LocalDateTime;
 
-@Value
-@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Wither
+@Builder
 public class Task<DATA, RESULT> {
     String id;
     TaskType type;

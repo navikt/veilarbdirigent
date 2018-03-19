@@ -13,6 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
 
 import java.util.concurrent.Executors;
 
@@ -47,11 +51,29 @@ class CoreTest {
     @Test
     @SuppressWarnings("unchecked")
     void normal_path() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.initialize();
+
         Core core = new Core(
                 dao,
-                new ThreadPoolTaskScheduler(),
+                scheduler,
                 lock,
-                null
+                new PlatformTransactionManager() {
+                    @Override
+                    public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+                        return null;
+                    }
+
+                    @Override
+                    public void commit(TransactionStatus status) throws TransactionException {
+
+                    }
+
+                    @Override
+                    public void rollback(TransactionStatus status) throws TransactionException {
+
+                    }
+                }
         );
         core.registerHandler(handler);
         core.registerActuator(TestUtils.TASK_TYPE, actuator);
@@ -59,7 +81,7 @@ class CoreTest {
         Message message = new Message() {};
         core.submit(message);
 
-        TestUtils.delay(100);
+        TestUtils.delay(1000);
 
         ArgumentCaptor<List<Task>> captor = TestUtils.listArgumentCaptor(Task.class);
 

@@ -62,7 +62,7 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         List<Task> savedTasks = dao.fetchTasks();
         assertThat(savedTasks.length()).isEqualTo(4);
 
-        delay(200);
+        delay(2000);
 
         List<Task> nonCompletedTasks = dao.fetchTasks();
         assertThat(nonCompletedTasks.length()).isEqualTo(1);

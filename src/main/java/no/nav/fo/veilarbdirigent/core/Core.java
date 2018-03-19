@@ -32,12 +32,6 @@ public class Core {
     private final TaskDAO taskDAO;
     private final ThreadPoolTaskScheduler scheduler;
     private final LockingTaskExecutor lock;
-    private final PlatformTransactionManager transactionManager;
-
-    @PostConstruct
-    public void setup() {
-        this.transactionTemplate = new TransactionTemplate(transactionManager);
-    }
 
     public Core(
             TaskDAO taskDAO,
@@ -48,7 +42,7 @@ public class Core {
         this.taskDAO = taskDAO;
         this.scheduler = scheduler;
         this.lock = lock;
-        this.transactionManager = transactionManager;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     public void registerHandler(MessageHandler handler) {

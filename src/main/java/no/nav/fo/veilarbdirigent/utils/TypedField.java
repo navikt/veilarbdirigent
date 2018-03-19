@@ -45,12 +45,8 @@ public class TypedField<ELEMENT> {
                 Class<?> aClass = Class.forName(obj.getOrDefault("class", "java.lang.String"));
                 String elementString = obj.get("element");
 
-                if (aClass == String.class) {
-                    return new TypedField<>(elementString);
-                } else {
-                    Object element = objectmapper.readValue(elementString, aClass);
-                    return new TypedField(element);
-                }
+                Object element = objectmapper.readValue(elementString, aClass);
+                return new TypedField(element);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 return null;

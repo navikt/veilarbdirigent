@@ -30,7 +30,7 @@ class TaskDAOTest extends IntegrasjonsTest implements TaskCleanup {
         Task task = tasksFromDb.get(0);
         assertThat(task.getId()).isEqualTo("id1");
         assertThat(task.getStatus()).isEqualTo(Status.PENDING);
-        assertThat(task.getData()).isEqualTo(data);
+        assertThat(task.getData().element).isEqualTo(data);
         assertThat(task.getCreated()).isBetween(now().minusSeconds(1), now().plusSeconds(1));
         assertThat(task.getNextAttempt()).isBetween(now().minusSeconds(1), now().plusSeconds(1));
     }

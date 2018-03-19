@@ -1,9 +1,9 @@
-package no.nav.fo.veilarbdirigent.dao;
+package no.nav.fo.veilarbdirigent.core.dao;
 
 import io.vavr.collection.List;
-import no.nav.fo.veilarbdirigent.coreapi.Status;
-import no.nav.fo.veilarbdirigent.coreapi.Task;
-import no.nav.fo.veilarbdirigent.coreapi.TaskType;
+import no.nav.fo.veilarbdirigent.core.api.Status;
+import no.nav.fo.veilarbdirigent.core.api.Task;
+import no.nav.fo.veilarbdirigent.core.api.TaskType;
 import no.nav.fo.veilarbdirigent.utils.SerializerUtils;
 import no.nav.fo.veilarbdirigent.utils.TimeUtils;
 import no.nav.sbl.sql.SqlUtils;

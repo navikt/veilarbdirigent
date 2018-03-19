@@ -3,11 +3,11 @@ package no.nav.fo.veilarbdirigent.core;
 import io.vavr.collection.List;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.TestUtils;
-import no.nav.fo.veilarbdirigent.coreapi.Actuator;
-import no.nav.fo.veilarbdirigent.coreapi.Message;
-import no.nav.fo.veilarbdirigent.coreapi.MessageHandler;
-import no.nav.fo.veilarbdirigent.coreapi.Task;
-import no.nav.fo.veilarbdirigent.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.core.api.Actuator;
+import no.nav.fo.veilarbdirigent.core.api.Message;
+import no.nav.fo.veilarbdirigent.core.api.MessageHandler;
+import no.nav.fo.veilarbdirigent.core.api.Task;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
-
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

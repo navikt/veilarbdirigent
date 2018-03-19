@@ -1,8 +1,8 @@
 package no.nav.fo.veilarbdirigent.config;
 
-import no.nav.fo.veilarbdirigent.coreapi.Actuator;
-import no.nav.fo.veilarbdirigent.coreapi.Task;
-import no.nav.fo.veilarbdirigent.coreapi.TaskType;
+import no.nav.fo.veilarbdirigent.core.api.Actuator;
+import no.nav.fo.veilarbdirigent.core.api.Task;
+import no.nav.fo.veilarbdirigent.core.api.TaskType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -4,8 +4,9 @@ import io.vavr.collection.List;
 import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.config.IntegrasjonsTest;
 import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
-import no.nav.fo.veilarbdirigent.coreapi.Status;
-import no.nav.fo.veilarbdirigent.coreapi.Task;
+import no.nav.fo.veilarbdirigent.core.api.Status;
+import no.nav.fo.veilarbdirigent.core.api.Task;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.junit.jupiter.api.Test;
 
 import static java.time.LocalDateTime.now;

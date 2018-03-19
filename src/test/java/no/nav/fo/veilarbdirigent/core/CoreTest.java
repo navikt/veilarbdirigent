@@ -36,7 +36,6 @@ class CoreTest {
         );
 
         when(handler.handle(any())).thenReturn(tasks);
-        when(actuator.getType()).thenReturn(TestUtils.TASK_TYPE);
         when(dao.fetchTasks()).thenReturn(tasks);
     }
 

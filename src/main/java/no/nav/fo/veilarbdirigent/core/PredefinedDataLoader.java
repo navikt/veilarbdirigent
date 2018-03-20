@@ -40,7 +40,7 @@ public class PredefinedDataLoader {
     }
 
     private static Map<String, String> readAllFiles() {
-        return Option.of(PredefinedDataLoader.class.getClassLoader().getResource("taskdefinitions"))
+        return Option.of(PredefinedDataLoader.class.getClassLoader().getResource("predefineddata"))
                 .map(URL::getFile)
                 .map(File::new)
                 .map(PredefinedDataLoader::listFiles)

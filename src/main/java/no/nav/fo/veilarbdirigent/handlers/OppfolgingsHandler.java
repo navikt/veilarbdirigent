@@ -33,6 +33,10 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
             return List.of(
                     new Task<>()
+                            .withId(String.valueOf(msg.getId()) + "jobbonsker")
+                            .withType(TYPE)
+                            .withData(new TypedField<>(new OppfolgingData(msg, "jobbonsker_aktivitet"))),
+                    new Task<>()
                             .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
                             .withType(TYPE)
                             .withData(new TypedField<>(new OppfolgingData(msg, "cv_aktivitet"))),

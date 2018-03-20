@@ -19,9 +19,21 @@ fasitResources:
   used:
   - alias: srvveilarbdirigent
     resourceType: credential
-  - alias: securityTokenService
-    resourceType: baseUrl
   - alias: veilarbdirigentDB
     resourceType: datasource
   - alias: veilArbOppfolgingAPI
     resourceType: restservice
+
+  # security resources
+  - alias: isso-rp-user
+    resourceType: credential
+  - alias: isso-host
+    resourceType: baseUrl
+  - alias: isso-jwks
+    resourceType: baseUrl
+  - alias: isso-issuer
+    resourceType: baseUrl
+  - alias: isso.isalive
+    resourceType: baseUrl
+  - alias: veilarblogin.redirect-url
+    resourceType: baseUrl

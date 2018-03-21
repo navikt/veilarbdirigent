@@ -6,5 +6,5 @@
   "lenke": "https://tjenester{miljo}.nav.no/sbl/nav_security_check?goto=/sbl/arbeid/endrePreferanser",
   "status": "BRUKER_ER_INTERESSERT",
   "fraDato": "{now}",
-  "tilDato": "{7d}"
+  "tilDato": "{now + 7d}"
 }

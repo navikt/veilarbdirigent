@@ -2,24 +2,30 @@ package no.nav.fo.veilarbdirigent.handlers;
 
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
+import no.nav.fo.veilarbaktivitet.domain.AktivitetStatus;
+import no.nav.fo.veilarbaktivitet.domain.AktivitetTypeDTO;
 import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.PredefinedDataLoader;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
-import no.nav.fo.veilarbdirigent.service.aktivitet.AktivitetData;
 import no.nav.fo.veilarbdirigent.service.aktivitet.VeilarbaktivitetService;
+import no.nav.fo.veilarbdirigent.utils.Extrapolator;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsHandler.OppfolgingData, AktivitetData> {
+import static no.nav.fo.veilarbdirigent.utils.SerializerUtils.deserializeToDate;
+
+public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsHandler.OppfolgingData, AktivitetDTO> {
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_AKTIVITET");
 
     @Inject
     Core core;
     @Inject
-    VeilarbaktivitetService service;
+    private VeilarbaktivitetService service;
+    private Extrapolator extrapolator = new Extrapolator();
 
     @PostConstruct
     public void register() {
@@ -56,7 +62,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     }
 
     @Override
-    public Task<OppfolgingsHandler.OppfolgingData, AktivitetData> handle(Task<OppfolgingsHandler.OppfolgingData, AktivitetData> task) {
+    public Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO> handle(Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO> task) {
         OppfolgingData data = task.getData().element;
         Option<AktivitetData> maybeAktivitetData = PredefinedDataLoader.get(data.predefineddataName, AktivitetData.class);
 
@@ -66,12 +72,40 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
 
         AktivitetData predefinertData = maybeAktivitetData.get();
 
-        return service.lagAktivitet(predefinertData)
+        return service.lagAktivitet(predefinertData.toDTO(extrapolator))
                 .toTry()
                 .map((result) -> task.withResult(new TypedField<>(result)))
                 .get();
     }
 
+    public static class AktivitetData {
+        public AktivitetTypeDTO type;
+        public String tittel;
+        public String beskrivelse;
+        public Long antallStillingerSokes;
+        public String avtaleOppfolging;
+        public String hensikt;
+        public String oppfolging;
+        public String lenke;
+        public AktivitetStatus status;
+        public String fraDato;
+        public String tilDato;
+
+        public AktivitetDTO toDTO(Extrapolator extrapolator) {
+            return new AktivitetDTO()
+                    .setType(type)
+                    .setTittel(tittel)
+                    .setBeskrivelse(extrapolator.extrapolate(beskrivelse))
+                    .setAntallStillingerSokes(antallStillingerSokes)
+                    .setAvtaleOppfolging(avtaleOppfolging)
+                    .setHensikt(extrapolator.extrapolate(hensikt))
+                    .setOppfolging(extrapolator.extrapolate(oppfolging))
+                    .setLenke(extrapolator.extrapolate(lenke))
+                    .setStatus(status)
+                    .setFraDato(deserializeToDate(extrapolator.extrapolate(fraDato)))
+                    .setTilDato(deserializeToDate(extrapolator.extrapolate(tilDato)));
+        }
+    }
 
     public static class OppfolgingData {
         public final OppfolgingDataFraFeed feedelement;

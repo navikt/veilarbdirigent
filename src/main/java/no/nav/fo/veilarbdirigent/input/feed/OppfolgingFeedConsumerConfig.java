@@ -5,37 +5,22 @@ import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.brukerdialog.security.oidc.OidcFeedOutInterceptor;
 import no.nav.fo.feed.consumer.FeedConsumer;
 import no.nav.fo.feed.consumer.FeedConsumerConfig;
-import no.nav.fo.veilarbdirigent.core.Core;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Collections;
 
+import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
+
 @Configuration
-public class OppfolgingFeedConfig {
+public class OppfolgingFeedConsumerConfig {
 
-    @Value("${veilArbOppfolgingAPI.url}")
-    private String host;
-
-    @Value("${feed.consumer.pollingrate.seconds:10}")
-    private int polling;
-
-    @Value("${feed.consumer.lock.timeout.millis:5000}")
-    private int lockTimeout;
+    public static final String VEILARBOPPFOLGINGAPI_URL_PROPERTY = "VEILARBOPPFOLGINGAPI_URL";
+    private static final String HOST = getRequiredProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY);
+    private static final int POLLING = 10;
+    private static final int LOCK_TIMEOUT_MILLIS = 5000;
 
     private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
-
-    @Bean
-    public FeedDAO feedDAO(JdbcTemplate jdbc) {
-        return new FeedDAO(jdbc);
-    }
-
-    @Bean
-    public OppfolgingFeedService oppfolgingFeedService(Core core, FeedDAO dao) {
-        return new OppfolgingFeedService(core, dao);
-    }
 
     @Bean
     public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service, LockingTaskExecutor lock) {
@@ -43,12 +28,12 @@ public class OppfolgingFeedConfig {
                 new FeedConsumerConfig.BaseConfig<>(
                         OppfolgingDataFraFeed.class,
                         () -> Long.toString(service.sisteKjenteId()),
-                        host,
+                        HOST,
                         OPPFOLGING_FEED_NAME
                 ),
-                new FeedConsumerConfig.SimplePollingConfig(polling)
+                new FeedConsumerConfig.SimplePollingConfig(POLLING)
         )
-                .lockExecutor(lock, lockTimeout)
+                .lockExecutor(lock, LOCK_TIMEOUT_MILLIS)
                 .callback((lastId, list) -> service.compute(lastId, List.ofAll(list)))
                 .interceptors(Collections.singletonList(new OidcFeedOutInterceptor()));
 

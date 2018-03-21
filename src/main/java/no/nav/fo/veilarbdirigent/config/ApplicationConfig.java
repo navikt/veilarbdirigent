@@ -2,13 +2,10 @@ package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.apiapp.ApiApplication;
 import no.nav.apiapp.config.ApiAppConfigurator;
-import no.nav.sbl.rest.RestUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.client.Client;
 
 import static no.nav.apiapp.ApiApplication.Sone.FSS;
 
@@ -45,13 +42,6 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
 
     @Override
     public void configure(ApiAppConfigurator apiAppConfigurator) {
-        apiAppConfigurator.issoLogin().sts();
-
+        apiAppConfigurator.issoLogin();
     }
-
-    @Bean
-    public Client client() {
-        return RestUtils.createClient();
-    }
-
 }

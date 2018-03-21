@@ -1,12 +1,16 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import no.nav.fo.veilarbdirigent.core.api.Message;
 
 import java.util.Date;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class OppfolgingDataFraFeed implements Message, Comparable<OppfolgingDataFraFeed> {
     long id;

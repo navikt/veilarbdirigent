@@ -4,6 +4,7 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.api.TaskType;
@@ -62,7 +63,7 @@ public class TaskDAO {
         );
     }
 
-    public HashMap<String, Integer> fetchStatusnumbers() {
+    public Map<String, Integer> fetchStatusnumbers() {
         Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toStatusnumbers)
                 .column("status")
                 .column("count(*) as num")

@@ -25,7 +25,7 @@ class TaskDAOTest extends IntegrasjonsTest implements TaskCleanup {
 
         dao.insert(tasks);
 
-        List<Task> tasksFromDb = dao.fetchTasks();
+        List<Task> tasksFromDb = dao.fetchTasksReadyForExecution();
         assertThat(tasksFromDb.length()).isEqualTo(1);
 
         Task task = tasksFromDb.get(0);

@@ -2,6 +2,7 @@ package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.apiapp.ApiApplication;
 import no.nav.apiapp.config.ApiAppConfigurator;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -18,6 +19,7 @@ import static no.nav.apiapp.ApiApplication.Sone.FSS;
         FeedConfig.class,
         ServiceConfig.class
 })
+@ComponentScan("no.nav.fo.veilarbdirigent.rest")
 public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
 

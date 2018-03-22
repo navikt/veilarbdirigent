@@ -36,7 +36,7 @@ class CoreTest {
         );
 
         when(handler.handle(any())).thenReturn(tasks);
-        when(dao.fetchTasks()).thenReturn(tasks);
+        when(dao.fetchTasksReadyForExecution()).thenReturn(tasks);
     }
 
     @AfterEach
@@ -71,7 +71,7 @@ class CoreTest {
         verify(dao, times(1)).insert(captor.capture());
 
         assertThat(captor.getValue().length()).isEqualTo(2);
-        verify(dao, times(1)).fetchTasks();
+        verify(dao, times(1)).fetchTasksReadyForExecution();
 
         verify(actuator, times(2)).handle(any(Task.class));
     }

@@ -12,7 +12,7 @@ import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.
 
 public class MainTest {
 
-    private static final String TEST_PORT = "8800";
+    private static final String TEST_PORT = "8890";
 
     public static void main(String[] args) throws Exception {
         setProperty("SERVICE_CALLS_HOME", "target/log");

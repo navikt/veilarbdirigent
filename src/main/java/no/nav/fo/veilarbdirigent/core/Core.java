@@ -70,7 +70,7 @@ public class Core {
 
     @Scheduled(fixedDelay = 10000)
     public void runActuators() {
-        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasks().forEach(this::tryActuator));
+        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasksReadyForExecution().forEach(this::tryActuator));
     }
 
     @SuppressWarnings("unchecked")

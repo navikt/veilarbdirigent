@@ -1,7 +1,9 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
 import io.vavr.collection.List;
+import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.core.Core;
+import no.nav.sbl.jdbc.Transactor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +18,8 @@ class OppfolgingFeedServiceTest {
 
     private Core core = mock(Core.class);
     private FeedDAO feedDao = mock(FeedDAO.class);
-    private OppfolgingFeedService oppfolgingFeedService = new OppfolgingFeedService(core, feedDao);
+    private Transactor transactor = TestUtils.getTransactor();
+    private OppfolgingFeedService oppfolgingFeedService = new OppfolgingFeedService(core, feedDao, transactor);
 
     private OppfolgingDataFraFeed newOppfolgingDataFraFeed(long id) {
         return OppfolgingDataFraFeed

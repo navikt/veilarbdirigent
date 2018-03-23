@@ -9,19 +9,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.time.Instant;
 
 class Utils {
-
     static void runWithLock(LockingTaskExecutor lock, String lockname, Runnable task) {
-        Instant lockAtMostUntil = Instant.now().plusMillis(10000);
+        Instant lockAtMostUntil = Instant.now().plusSeconds(120);
         LockConfiguration lockConfiguration = new LockConfiguration(lockname, lockAtMostUntil);
         lock.executeWithLock(task, lockConfiguration);
-    }
-
-    static void runInTransaction(TransactionTemplate template, Runnable runnable) {
-        template.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                runnable.run();
-            }
-        });
     }
 }

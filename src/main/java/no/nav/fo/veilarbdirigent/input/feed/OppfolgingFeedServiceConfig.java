@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
 import no.nav.fo.veilarbdirigent.core.Core;
+import no.nav.sbl.jdbc.Transactor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +14,7 @@ public class OppfolgingFeedServiceConfig {
     }
 
     @Bean
-    public OppfolgingFeedService oppfolgingFeedService(Core core, FeedDAO dao) {
-        return new OppfolgingFeedService(core, dao);
+    public OppfolgingFeedService oppfolgingFeedService(Core core, FeedDAO dao, Transactor transactor) {
+        return new OppfolgingFeedService(core, dao, transactor);
     }
 }

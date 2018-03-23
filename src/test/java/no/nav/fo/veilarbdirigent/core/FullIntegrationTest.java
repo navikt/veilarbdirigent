@@ -66,6 +66,8 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
 
+        TestUtils.delay(500);
+
         Map<String, Integer> status = dao.fetchStatusnumbers();
         assertThat(status.getOrElse("OK", 0)).isEqualTo(4);
         assertThat(status.getOrElse("FAILED", 0)).isEqualTo(0);

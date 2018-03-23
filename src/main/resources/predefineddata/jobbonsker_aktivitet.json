@@ -1,0 +1,10 @@
+{
+  "type": "EGEN",
+  "tittel": "Du må registrere dine jobbønsker på nav.no",
+  "hensikt": "Bli synlig for arbeidsgivere",
+  "oppfolging": "Når du har fullført aktiviteten, setter du aktiviteten til \"fullført\"",
+  "lenke": "https://tjenester{miljo}.nav.no/sbl/nav_security_check?goto=/sbl/arbeid/endrePreferanser",
+  "status": "BRUKER_ER_INTERESSERT",
+  "fraDato": "{now}",
+  "tilDato": "{now + 7d}"
+}

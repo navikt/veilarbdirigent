@@ -6,6 +6,7 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static no.nav.fo.veilarbdirigent.TestUtils.setupSecurity;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.service.aktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
 
 public class MainTest {
 
@@ -14,9 +15,10 @@ public class MainTest {
     public static void main(String[] args) throws Exception {
         setProperty("SERVICE_CALLS_HOME", "target/log");
         setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, "http://localhost:8080/veilarboppfolging/api");
+        setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, "http://localhost:8080/veilarbaktivitet/api");
 
         ApiAppTest.setupTestContext();
-        DatabaseTestContext.setupContext(getProperty("database"));
+        DatabaseTestContext.setupContext("T6");
 
         setupSecurity();
         String loginUrl = FasitUtils.getBaseUrl("veilarblogin.redirect-url", FasitUtils.Zone.FSS);

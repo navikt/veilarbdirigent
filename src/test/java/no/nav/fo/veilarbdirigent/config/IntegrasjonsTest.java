@@ -12,8 +12,8 @@ public class IntegrasjonsTest extends AbstractIntegrationTest {
     @BeforeClass
     public static void setupContext() {
         DatabaseTestContext.setupInMemoryContext();
-        System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, "http://localhost");
-        System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, "http://localhost");
+        System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, "http://localhost:1234");
+        System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, "http://localhost:12345");
         setupContext(
                 CoreConfig.class,
                 DbConfig.class,

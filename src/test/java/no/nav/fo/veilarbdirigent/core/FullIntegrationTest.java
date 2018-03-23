@@ -16,6 +16,7 @@ import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
 import no.nav.fo.veilarbdirigent.utils.SerializerUtils;
+import no.nav.sbl.util.EnvironmentUtils;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -47,6 +48,9 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
 
         System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
+
+        System.out.println("EnvironmentSetup: " + EnvironmentUtils.getRequiredProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY));
+        System.out.println("EnvironmentSetup: " + EnvironmentUtils.getRequiredProperty(VEILARBAKTIVITETAPI_URL_PROPERTY));
 
         setupContext(false, ApplicationConfig.class);
     }

@@ -48,7 +48,7 @@ public class Extrapolator {
         if (s == null || "".equals(s)) {
             return s;
         }
-
+      
         int last = 0;
         StringBuilder sb = new StringBuilder();
 

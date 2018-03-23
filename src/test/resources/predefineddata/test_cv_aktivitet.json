@@ -1,0 +1,11 @@
+{
+  "type": "TEST",
+  "tittel": "Tittel",
+  "hensikt": "Hensikt",
+  "oppfolging": "Når du har fullført aktiviteten, setter du aktiviteten til \"fullført\"",
+  "lenke": " https://tjenester{miljo}.nav.no/sbl/nav_security_check?goto=/sbl/arbeid/endreCv",
+  "status": "BRUKER_ER_INTERESSERT",
+  "fraDato": "{now}",
+  "tilDato": "{now + 7d}",
+  "extra-info": "Information..."
+}

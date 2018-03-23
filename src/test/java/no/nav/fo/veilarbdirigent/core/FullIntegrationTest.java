@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.asList;
@@ -72,10 +73,11 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
 
     @SneakyThrows
     private void takeAndVerifyReceiver() {
-        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(), AktivitetDTO.class);
+        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(10, TimeUnit.SECONDS), AktivitetDTO.class);
         assertThat(request._1).endsWith(AKTOR_ID);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tittel).isNotBlank();
+        System.out.println("VerifiedRequest " + request._3.tittel);
     }
 
     @SneakyThrows

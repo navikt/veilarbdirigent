@@ -57,7 +57,6 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
                             .withId(String.valueOf(msg.getId()) + "soke_jobber")
                             .withType(TYPE)
                             .withData(new TypedField<>(new OppfolgingData(msg, "soke_jobber_aktivitet")))
-
             );
         } else {
             return List.empty();

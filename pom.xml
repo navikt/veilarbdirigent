@@ -16,8 +16,8 @@
     <packaging>war</packaging>
 
     <properties>
-        <jackson.version>2.5.4</jackson.version><!-- Samme versjon som i BOM, burde legges dit -->
-        <javax.annotation.version>1.2</javax.annotation.version><!-- Samme versjon som i BOM, burde legges dit -->
+        <hikariCP.version>2.7.3</hikariCP.version>
+        <aktivitet.api.version>505.20180309.1654</aktivitet.api.version>
     </properties>
 
     <dependencyManagement>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.7.3</version>
+            <version>${hikariCP.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.sbl</groupId>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>no.nav.fo</groupId>
             <artifactId>veilarbaktivitet-api</artifactId>
-            <version>505.20180309.1654</version>
+            <version>${aktivitet.api.version}</version>
         </dependency>
         <dependency>
             <groupId>no.bekk.bekkopen</groupId>
@@ -91,7 +91,6 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>${javax.annotation.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -170,17 +169,14 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
 
         <!-- Test -->

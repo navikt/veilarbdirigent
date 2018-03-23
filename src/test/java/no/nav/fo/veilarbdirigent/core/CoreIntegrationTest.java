@@ -59,12 +59,12 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         throwExceptionOnTaskWithId(TASKS.get(2).getId());
         core.submit(null);
 
-        List<Task> savedTasks = dao.fetchTasks();
+        List<Task> savedTasks = dao.fetchTasksReadyForExecution();
         assertThat(savedTasks.length()).isEqualTo(4);
 
         delay(2000);
 
-        List<Task> nonCompletedTasks = dao.fetchTasks();
+        List<Task> nonCompletedTasks = dao.fetchTasksReadyForExecution();
         assertThat(nonCompletedTasks.length()).isEqualTo(1);
         assertThat(nonCompletedTasks.get(0).getId()).isEqualToIgnoringCase("id2");
         assertThat(nonCompletedTasks.get(0).getStatus()).isEqualByComparingTo(Status.FAILED);

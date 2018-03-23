@@ -1,6 +1,10 @@
 package no.nav.fo.veilarbdirigent.core.dao;
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.api.TaskType;
@@ -39,7 +43,7 @@ public class TaskDAO {
                 .execute();
     }
 
-    public List<Task> fetchTasks() {
+    public List<Task> fetchTasksReadyForExecution() {
         WhereClause statusCondition = WhereClause.equals("status", Status.FAILED.name())
                 .or(WhereClause.equals("status", Status.PENDING.name()));
         WhereClause timeCondition  = WhereClause.lteq("next_attempt", Timestamp.valueOf(LocalDateTime.now()));
@@ -49,6 +53,28 @@ public class TaskDAO {
                 .column("*")
                 .where(wc)
                 .executeToList());
+    }
+
+    public List<Task> fetchAllFailedTasks() {
+        return List.ofAll(SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toTask)
+                .column("*")
+                .where(WhereClause.equals("status", Status.FAILED.name()))
+                .executeToList()
+        );
+    }
+
+    public Map<String, Integer> fetchStatusnumbers() {
+        Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toStatusnumbers)
+                .column("status")
+                .column("count(*) as num")
+                .groupBy("status")
+                .execute();
+
+        if (result == null) {
+            return HashMap.empty();
+        }
+
+        return HashMap.ofEntries(result);
     }
 
     @SuppressWarnings("unchecked")
@@ -65,6 +91,10 @@ public class TaskDAO {
                 .result(SerializerUtils.deserialize(rs.getString("result")))
                 .error(rs.getString("error"))
                 .build();
+    }
+
+    private static Tuple2<String, Integer> toStatusnumbers(ResultSet rs) throws SQLException {
+        return Tuple.of(rs.getString("status"), rs.getInt("num"));
     }
 
     public int setStatusForTask(Task<?, ?> task, Status status) {

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class ServiceConfig {
 
     @Bean
-    public VeilarbaktivitetService actuator() {
+    public VeilarbaktivitetService veilarbaktivitetService() {
         return new VeilarbaktivitetService();
     }
 }

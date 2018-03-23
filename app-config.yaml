@@ -23,6 +23,8 @@ fasitResources:
     resourceType: datasource
   - alias: veilArbOppfolgingAPI
     resourceType: restservice
+  - alias: veilArbAktivitetAPI
+    resourceType: restservice
 
   # security resources
   - alias: isso-rp-user

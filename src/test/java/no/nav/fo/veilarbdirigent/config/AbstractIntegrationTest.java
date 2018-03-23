@@ -17,11 +17,18 @@ public abstract class AbstractIntegrationTest implements Cleanup {
 
     @SneakyThrows
     protected static void setupContext(Class<?>... classes) {
+        setupContext(true, classes);
+    }
+
+    @SneakyThrows
+    protected static void setupContext(boolean setSystemuser, Class<?>... classes) {
         DatabaseTestContext.setupInMemoryContext();
         MigrationUtils.createTables(DbConfig.getDataSource());
 
-        setProperty("no.nav.modig.security.systemuser.username", "username");
-        setProperty("no.nav.modig.security.systemuser.password", "password");
+        if (setSystemuser) {
+            setProperty("no.nav.modig.security.systemuser.username", "username");
+            setProperty("no.nav.modig.security.systemuser.password", "password");
+        }
 
         annotationConfigApplicationContext = new AnnotationConfigApplicationContext(classes);
         annotationConfigApplicationContext.start();

@@ -18,6 +18,7 @@
     <properties>
         <hikariCP.version>2.7.3</hikariCP.version>
         <aktivitet.api.version>505.20180309.1654</aktivitet.api.version>
+        <okhttp3.version>3.10.0</okhttp3.version>
     </properties>
 
     <dependencyManagement>
@@ -76,6 +77,10 @@
         <dependency>
             <groupId>no.nav.sbl</groupId>
             <artifactId>rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.sbl</groupId>
+            <artifactId>json</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.fo</groupId>
@@ -213,6 +218,24 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>${okhttp3.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp3.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+            <version>1.14.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

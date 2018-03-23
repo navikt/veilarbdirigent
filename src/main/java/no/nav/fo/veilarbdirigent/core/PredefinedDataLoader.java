@@ -1,12 +1,12 @@
 package no.nav.fo.veilarbdirigent.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.Tuple;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.fo.veilarbdirigent.utils.SerializerUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -17,7 +17,6 @@ import java.util.function.Function;
 @Slf4j
 public class PredefinedDataLoader {
     private static Map<String, String> taskcontent;
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static <T> Option<T> get(String name, Class<T> type) {
         if (taskcontent == null) {
@@ -32,7 +31,7 @@ public class PredefinedDataLoader {
 
     private static <T> Either<Exception, T> readvalue(String content, Class<T> type) {
         try {
-            return Either.right(mapper.readValue(content, type));
+            return Either.right(SerializerUtils.mapper.readValue(content, type));
         } catch (Exception e) {
             log.error("Parsing content", e);
             return Either.left(e);
@@ -40,7 +39,7 @@ public class PredefinedDataLoader {
     }
 
     private static Map<String, String> readAllFiles() {
-        return Option.of(PredefinedDataLoader.class.getClassLoader().getResource("predefineddata"))
+        return Option.of(PredefinedDataLoader.class.getResource("/predefineddata"))
                 .map(URL::getFile)
                 .map(File::new)
                 .map(PredefinedDataLoader::listFiles)

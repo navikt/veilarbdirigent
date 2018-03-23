@@ -51,6 +51,11 @@ class ExtrapolatorTest {
                 .isEqualTo(prep("https://tjenester-t6.nav.no/test"));
     }
 
+    @Test
+    void should_handle_null_strings() {
+        assertThat(extrapolator.extrapolate(null)).isEqualTo(null);
+    }
+
     private static String prep(String s) {
         return String.format("random data%s more random data", s);
     }

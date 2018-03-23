@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -18,7 +17,6 @@ import java.util.Map;
 @JsonSerialize(using = TypedField.Serializer.class)
 @JsonDeserialize(using = TypedField.Deserializer.class)
 public class TypedField<ELEMENT> {
-    private static final ObjectMapper objectmapper = new ObjectMapper();
     private static final TypeReference<Map<String, String>> SERIALIZED_TYPE = new TypeReference<Map<String, String>>() {
     };
 
@@ -45,7 +43,7 @@ public class TypedField<ELEMENT> {
                 Class<?> aClass = Class.forName(obj.getOrDefault("class", "java.lang.String"));
                 String elementString = obj.get("element");
 
-                Object element = objectmapper.readValue(elementString, aClass);
+                Object element = SerializerUtils.mapper.readValue(elementString, aClass);
                 return new TypedField(element);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -70,7 +68,7 @@ public class TypedField<ELEMENT> {
 
             jsonGenerator.writeStartObject();
             jsonGenerator.writeObjectField("class", elementClass);
-            jsonGenerator.writeObjectField("element", objectmapper.writeValueAsString(element));
+            jsonGenerator.writeObjectField("element", SerializerUtils.mapper.writeValueAsString(element));
             jsonGenerator.writeEndObject();
         }
     }

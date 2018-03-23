@@ -10,12 +10,12 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 class PredefinedDataLoaderTest {
     @Test
     void should_read_file_into_class() {
-        Option<AktivitetTestData> cvAktivitet = PredefinedDataLoader.get("test_cv_aktivitet", AktivitetTestData.class);
+        Option<AktivitetTestData> cvAktivitet = PredefinedDataLoader.get("cv_aktivitet", AktivitetTestData.class);
 
         assertThat(cvAktivitet.isSingleValued()).isTrue();
-        assertThat(cvAktivitet.get().type).isEqualTo("TEST");
-        assertThat(cvAktivitet.get().tittel).isEqualTo("Tittel");
-        assertThat(cvAktivitet.get().hensikt).isEqualTo("Hensikt");
+        assertThat(cvAktivitet.get().type).isNotBlank();
+        assertThat(cvAktivitet.get().tittel).isNotBlank();
+        assertThat(cvAktivitet.get().hensikt).isNotBlank();
     }
 
     @Test

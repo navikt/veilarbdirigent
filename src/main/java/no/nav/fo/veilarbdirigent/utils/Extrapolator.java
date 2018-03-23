@@ -45,6 +45,10 @@ public class Extrapolator {
     }
 
     public String extrapolate(String s) {
+        if (s == null || "".equals(s)) {
+            return s;
+        }
+      
         int last = 0;
         StringBuilder sb = new StringBuilder();
 

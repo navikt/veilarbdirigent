@@ -16,11 +16,15 @@ import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
 public class OppfolgingFeedConsumerConfig {
 
     public static final String VEILARBOPPFOLGINGAPI_URL_PROPERTY = "VEILARBOPPFOLGINGAPI_URL";
-    private static final String HOST = getRequiredProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY);
     private static final int POLLING = 10;
     private static final int LOCK_TIMEOUT_MILLIS = 5000;
-
     private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
+
+    private final String host;
+
+    public OppfolgingFeedConsumerConfig() {
+        host = getRequiredProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY);
+    }
 
     @Bean
     public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service, LockingTaskExecutor lock) {
@@ -28,7 +32,7 @@ public class OppfolgingFeedConsumerConfig {
                 new FeedConsumerConfig.BaseConfig<>(
                         OppfolgingDataFraFeed.class,
                         () -> Long.toString(service.sisteKjenteId()),
-                        HOST,
+                        host,
                         OPPFOLGING_FEED_NAME
                 ),
                 new FeedConsumerConfig.SimplePollingConfig(POLLING)

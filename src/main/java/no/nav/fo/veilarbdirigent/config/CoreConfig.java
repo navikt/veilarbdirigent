@@ -31,19 +31,8 @@ public class CoreConfig {
     }
 
     @Bean
-    public Core core(
-            TaskDAO taskDAO,
-            LockingTaskExecutor lock,
-            ScheduledExecutorService scheduler,
-            Transactor transactor
-    ) {
-
-        return new Core(
-                taskDAO,
-                scheduler,
-                lock,
-                transactor
-        );
+    public Core core(TaskDAO taskDAO, LockingTaskExecutor lock, ScheduledExecutorService scheduler, Transactor transactor) {
+        return new Core(taskDAO, scheduler, lock, transactor);
     }
 
     @Bean

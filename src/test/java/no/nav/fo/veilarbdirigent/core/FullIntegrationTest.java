@@ -50,9 +50,6 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
         System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
 
-        System.out.println("EnvironmentSetup: " + EnvironmentUtils.getRequiredProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY));
-        System.out.println("EnvironmentSetup: " + EnvironmentUtils.getRequiredProperty(VEILARBAKTIVITETAPI_URL_PROPERTY));
-
         setupContext(false, ApplicationConfig.class);
     }
 
@@ -79,7 +76,6 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
         assertThat(request._1).endsWith(AKTOR_ID);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tittel).isNotBlank();
-        System.out.println("VerifiedRequest " + request._3.tittel);
     }
 
     @SneakyThrows

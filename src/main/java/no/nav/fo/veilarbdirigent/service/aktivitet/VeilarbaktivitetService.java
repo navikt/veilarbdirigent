@@ -16,13 +16,17 @@ import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
 @Service
 public class VeilarbaktivitetService {
     public static final String VEILARBAKTIVITETAPI_URL_PROPERTY = "VEILARBAKTIVITETAPI_URL";
-    private static final String HOST = getRequiredProperty(VEILARBAKTIVITETAPI_URL_PROPERTY);
+    private final String host;
+
+    public VeilarbaktivitetService() {
+        this.host = getRequiredProperty(VEILARBAKTIVITETAPI_URL_PROPERTY);
+    }
 
     @Inject
     private Client client;
 
     public Either<String, AktivitetDTO> lagAktivitet(String aktorId, AktivitetDTO data) {
-        String url = String.format("%s/aktivitet/ny?aktorId=%s", HOST, aktorId);
+        String url = String.format("%s/aktivitet/ny?aktorId=%s", host, aktorId);
         Invocation.Builder request = client.target(url).request();
         Response post = request.post(Entity.entity(data, MediaType.APPLICATION_JSON));
 

@@ -2,6 +2,8 @@ package no.nav.fo.veilarbdirigent.handlers;
 
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetStatus;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetTypeDTO;
@@ -30,6 +32,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     @PostConstruct
     public void register() {
         core.registerHandler(this);
+        core.registerActuator(TYPE, this);
     }
 
 
@@ -72,7 +75,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
 
         AktivitetData predefinertData = maybeAktivitetData.get();
 
-        return service.lagAktivitet(predefinertData.toDTO(extrapolator))
+        return service.lagAktivitet(data.feedelement.getAktorId(), predefinertData.toDTO(extrapolator))
                 .toTry()
                 .map((result) -> task.withResult(new TypedField<>(result)))
                 .get();
@@ -107,13 +110,10 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
         }
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class OppfolgingData {
-        public final OppfolgingDataFraFeed feedelement;
-        public final String predefineddataName;
-
-        public OppfolgingData(OppfolgingDataFraFeed feedelement, String predefineddataName) {
-            this.feedelement = feedelement;
-            this.predefineddataName = predefineddataName;
-        }
+        public OppfolgingDataFraFeed feedelement;
+        public String predefineddataName;
     }
 }

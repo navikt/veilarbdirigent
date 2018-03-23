@@ -1,5 +1,6 @@
 package no.nav.fo.veilarbdirigent.input.feed;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OppfolgingDataFraFeed implements Message, Comparable<OppfolgingDataFraFeed> {
     long id;
     String aktorId;

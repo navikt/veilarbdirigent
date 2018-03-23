@@ -51,7 +51,9 @@ public class Core {
     @Transactional
     public boolean submit(Message message) {
         try {
-            List<Task> tasks = handlers.flatMap((handler) -> handler.handle(message));
+            List<Task> tasks = handlers
+                    .flatMap((handler) -> handler.handle(message))
+                    .map((task) -> task.withStatus(Status.PENDING));
 
             taskDAO.insert(tasks);
 

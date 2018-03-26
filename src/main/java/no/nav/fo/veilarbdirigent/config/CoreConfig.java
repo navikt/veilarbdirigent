@@ -1,6 +1,8 @@
 package no.nav.fo.veilarbdirigent.config;
 
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
+import no.nav.brukerdialog.security.oidc.OidcFeedOutInterceptor;
+import no.nav.brukerdialog.security.oidc.SystemUserTokenProvider;
 import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.sbl.jdbc.Transactor;
@@ -12,6 +14,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -37,7 +42,18 @@ public class CoreConfig {
 
     @Bean
     public Client client() {
-        return RestUtils.createClient();
+        Client client = RestUtils.createClient();
+        client.register(new SystemUserOidcTokenProviderFilter());
+        return client;
+    }
+
+    private static class SystemUserOidcTokenProviderFilter implements ClientRequestFilter {
+        private SystemUserTokenProvider systemUserTokenProvider = new SystemUserTokenProvider();
+
+        @Override
+        public void filter(ClientRequestContext clientRequestContext) throws IOException {
+            clientRequestContext.getHeaders().putSingle("Authorization", "Bearer " + systemUserTokenProvider.getToken());
+        }
     }
 
 }

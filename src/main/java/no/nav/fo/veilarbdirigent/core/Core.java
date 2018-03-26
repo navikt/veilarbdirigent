@@ -82,7 +82,10 @@ public class Core {
                     taskDAO.setStatusForTask(task, Status.WORKING);
 
                     Try.of(() -> actuator.handle(task))
-                            .onFailure((exception) -> taskDAO.setStatusForTask(task.withError(exception.toString()), Status.FAILED))
+                            .onFailure((exception) -> {
+                                log.error(exception.getMessage(), exception);
+                                taskDAO.setStatusForTask(task.withError(exception.toString()), Status.FAILED);
+                            })
                             .onSuccess((result) -> taskDAO.setStatusForTask(task.withResult(new TypedField(result)), Status.OK));
                 }));
     }

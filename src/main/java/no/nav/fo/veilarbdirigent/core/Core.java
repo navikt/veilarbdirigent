@@ -3,13 +3,11 @@ package no.nav.fo.veilarbdirigent.core;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
-import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
-import no.nav.fo.veilarbdirigent.utils.TypedField;
 import no.nav.sbl.jdbc.Transactor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Propagation;
@@ -73,28 +71,25 @@ public class Core {
 
     @Scheduled(fixedDelay = 10000)
     public void runActuators() {
-        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasksReadyForExecution().forEach(this::tryActuator));
+        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasksReadyForExecution().forEach(this::tryActuators));
     }
 
     @SuppressWarnings("unchecked")
-    private void tryActuator(Task<?, ?> task) {
-        this.actuators.get(task.getType())
-                .forEach((actuator) -> transactor.inTransaction(() -> {
-                    taskDAO.setStatusForTask(task, Status.WORKING);
-
-                    Try.of(() -> actuator.handle(task))
-                            .onFailure((exception) -> {
-                                log.error(exception.getMessage(), exception);
-                                taskDAO.setStatusForTask(task.withError(exception.toString()), Status.FAILED);
-                            })
-                            .onSuccess(result -> updateTaskWithResult(task, result));
-                }));
+    private void tryActuators(Task<?, ?> task) {
+        this.actuators.get(task.getType()).forEach((actuator) -> tryActuator(actuator, task));
     }
 
-    @SuppressWarnings("unchecked")
-    private void updateTaskWithResult(Task<?, ?> task, Either<String, Task<?, ?>> result){
-        result
-                .map(res -> taskDAO.setStatusForTask(task.withResult(new TypedField(res)), Status.OK))
-                .mapLeft(error -> taskDAO.setStatusForTask(task.withError(error.substring(0, 1000)), Status.FAILED));
+    private <DATA, RESULT> void tryActuator(Actuator<DATA, RESULT> actuator, Task<DATA, RESULT> task) {
+        transactor.inTransaction(() -> {
+            taskDAO.setStatusForTask(task, Status.WORKING);
+            Try.of(() -> actuator.handle(task))
+                    .flatMap(either -> either.toTry(either::getLeft))
+                    .onFailure(throwable -> {
+                        log.error(throwable.getMessage(), throwable);
+                        taskDAO.setStatusForTask(task.withError(throwable.toString()), Status.FAILED);
+                    })
+                    .onSuccess(result -> taskDAO.setStatusForTask(result, Status.OK));
+        });
     }
+
 }

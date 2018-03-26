@@ -65,7 +65,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     }
 
     @Override
-    public Either<String, Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO>> handle(Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO> task) {
+    public Either<Throwable, Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO>> handle(Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO> task) {
         OppfolgingData data = task.getData().element;
         Option<AktivitetData> maybeAktivitetData = PredefinedDataLoader.get(data.predefineddataName, AktivitetData.class);
 

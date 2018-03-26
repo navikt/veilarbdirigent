@@ -25,7 +25,7 @@ public class VeilarbaktivitetService {
     @Inject
     private Client client;
 
-    public Either<String, AktivitetDTO> lagAktivitet(String aktorId, AktivitetDTO data) {
+    public Either<Throwable, AktivitetDTO> lagAktivitet(String aktorId, AktivitetDTO data) {
         String url = String.format("%s/aktivitet/ny?aktorId=%s", host, aktorId);
         Invocation.Builder request = client.target(url).request();
         Response post = request.post(Entity.entity(data, MediaType.APPLICATION_JSON));
@@ -35,7 +35,7 @@ public class VeilarbaktivitetService {
             return Either.right(response);
         } else {
             String message = post.readEntity(String.class);
-            return Either.left(message);
+            return Either.left(new RuntimeException(message));
         }
     }
 }

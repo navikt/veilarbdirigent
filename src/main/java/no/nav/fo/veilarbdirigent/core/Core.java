@@ -3,6 +3,7 @@ package no.nav.fo.veilarbdirigent.core;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
+import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
@@ -86,7 +87,14 @@ public class Core {
                                 log.error(exception.getMessage(), exception);
                                 taskDAO.setStatusForTask(task.withError(exception.toString()), Status.FAILED);
                             })
-                            .onSuccess((result) -> taskDAO.setStatusForTask(task.withResult(new TypedField(result)), Status.OK));
+                            .onSuccess(result -> updateTaskWithResult(task, result));
                 }));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateTaskWithResult(Task<?, ?> task, Either<String, Task<?, ?>> result){
+        result
+                .map(res -> taskDAO.setStatusForTask(task.withResult(new TypedField(res)), Status.OK))
+                .mapLeft(error -> taskDAO.setStatusForTask(task.withError(error.substring(0, 1000)), Status.FAILED));
     }
 }

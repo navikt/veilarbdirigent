@@ -8,12 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.utils.TypedField;
 import no.nav.sbl.jdbc.Transactor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
 
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 
@@ -82,13 +84,17 @@ public class Core {
     private <DATA, RESULT> void tryActuator(Actuator<DATA, RESULT> actuator, Task<DATA, RESULT> task) {
         transactor.inTransaction(() -> {
             taskDAO.setStatusForTask(task, Status.WORKING);
-            Try.of(() -> actuator.handle(task))
-                    .flatMap(either -> either.toTry(either::getLeft))
+            Try.of(() -> actuator.handle(task.getData().element))
+                    .flatMap(Function.identity())
                     .onFailure(throwable -> {
                         log.error(throwable.getMessage(), throwable);
-                        taskDAO.setStatusForTask(task.withError(throwable.toString()), Status.FAILED);
+                        Task taskWithError = task.withError(throwable.toString());
+                        taskDAO.setStatusForTask(taskWithError, Status.FAILED);
                     })
-                    .onSuccess(result -> taskDAO.setStatusForTask(result, Status.OK));
+                    .onSuccess(result -> {
+                        Task taskWithResult = task.withResult(new TypedField<>(result));
+                        taskDAO.setStatusForTask(taskWithResult, Status.OK);
+                    });
         });
     }
 

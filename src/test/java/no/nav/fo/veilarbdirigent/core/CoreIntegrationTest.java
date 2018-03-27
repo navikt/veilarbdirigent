@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
+import io.vavr.control.Try;
 import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.config.AbstractIntegrationTest;
 import no.nav.fo.veilarbdirigent.config.CoreConfig;
@@ -32,10 +33,10 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     private Actuator actuator = getBean(Actuator.class);
 
     private static final List<Task> TASKS = List.of(
-            TestUtils.createTask("id0", "data"),
-            TestUtils.createTask("id1", "data"),
-            TestUtils.createTask("id2", "data"),
-            TestUtils.createTask("id3", "data")
+            TestUtils.createTask("id0", "data1"),
+            TestUtils.createTask("id1", "data2"),
+            TestUtils.createTask("id2", "data3"),
+            TestUtils.createTask("id3", "data4")
     );
 
     @BeforeAll
@@ -56,7 +57,11 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
     @Test
     void core_should_transform_messages_to_tasks_save_them_and_execute_them() {
-        throwExceptionOnTaskWithId(TASKS.get(2).getId());
+        mockHandleResult(
+                TASKS.get(2).getData().element.toString(),
+                TASKS.get(3).getData().element.toString()
+        );
+
         core.submit(null);
 
         List<Task> savedTasks = dao.fetchTasksReadyForExecution();
@@ -65,19 +70,22 @@ class CoreIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         delay(2000);
 
         List<Task> nonCompletedTasks = dao.fetchTasksReadyForExecution();
-        assertThat(nonCompletedTasks.length()).isEqualTo(1);
-        assertThat(nonCompletedTasks.get(0).getId()).isEqualToIgnoringCase("id2");
+        assertThat(nonCompletedTasks.length()).isEqualTo(2);
         assertThat(nonCompletedTasks.get(0).getStatus()).isEqualByComparingTo(Status.FAILED);
     }
 
+
     @SuppressWarnings("unchecked")
-    private void throwExceptionOnTaskWithId(String taskId) {
+    private void mockHandleResult(String exceptionCase, String failureCase) {
         when(actuator.handle(any())).thenAnswer(a -> {
-            Task task = (Task) a.getArguments()[0];
-            if (taskId.equals(task.getId())) {
+            String data = (String) a.getArguments()[0];
+            if (exceptionCase.equals(data)) {
                 throw new RuntimeException();
             }
-            return task;
+            else if (failureCase.equals(data)) {
+                return Try.failure(new RuntimeException());
+            }
+            return Try.success(data);
         });
     }
 

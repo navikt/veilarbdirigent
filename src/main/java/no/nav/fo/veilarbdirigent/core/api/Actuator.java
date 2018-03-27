@@ -1,7 +1,7 @@
 package no.nav.fo.veilarbdirigent.core.api;
 
-import io.vavr.control.Either;
+import io.vavr.control.Try;
 
 public interface Actuator<DATA, RESULT> {
-    public Either<Throwable, Task<DATA, RESULT>> handle(Task<DATA, RESULT> task);
+    public Try<RESULT> handle(DATA data);
 }

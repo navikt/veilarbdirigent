@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.core;
 
 import io.vavr.collection.List;
+import io.vavr.control.Try;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.core.api.Actuator;
@@ -29,6 +30,7 @@ class CoreTest {
     private Transactor transactor = TestUtils.getTransactor();
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     public void setup() {
         List<Task> tasks = List.of(
                 TestUtils.createTask("id1", "data"),
@@ -36,6 +38,7 @@ class CoreTest {
         );
 
         when(handler.handle(any())).thenReturn(tasks);
+        when(actuator.handle(any())).thenReturn(Try.success("data"));
         when(dao.fetchTasksReadyForExecution()).thenReturn(tasks);
     }
 
@@ -73,6 +76,6 @@ class CoreTest {
         assertThat(captor.getValue().length()).isEqualTo(2);
         verify(dao, times(1)).fetchTasksReadyForExecution();
 
-        verify(actuator, times(2)).handle(any(Task.class));
+        verify(actuator, times(2)).handle(any());
     }
 }

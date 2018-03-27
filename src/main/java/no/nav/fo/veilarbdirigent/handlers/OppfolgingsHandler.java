@@ -1,8 +1,8 @@
 package no.nav.fo.veilarbdirigent.handlers;
 
 import io.vavr.collection.List;
-import io.vavr.control.Either;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
@@ -65,8 +65,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     }
 
     @Override
-    public Either<Throwable, Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO>> handle(Task<OppfolgingsHandler.OppfolgingData, AktivitetDTO> task) {
-        OppfolgingData data = task.getData().element;
+    public Try<AktivitetDTO> handle(OppfolgingsHandler.OppfolgingData data) {
         Option<AktivitetData> maybeAktivitetData = PredefinedDataLoader.get(data.predefineddataName, AktivitetData.class);
 
         if (maybeAktivitetData.isEmpty()) {
@@ -75,8 +74,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
 
         AktivitetData predefinertData = maybeAktivitetData.get();
 
-        return service.lagAktivitet(data.feedelement.getAktorId(), predefinertData.toDTO(extrapolator))
-                .map((result) -> task.withResult(new TypedField<>(result)));
+        return service.lagAktivitet(data.feedelement.getAktorId(), predefinertData.toDTO(extrapolator));
     }
 
     public static class AktivitetData {

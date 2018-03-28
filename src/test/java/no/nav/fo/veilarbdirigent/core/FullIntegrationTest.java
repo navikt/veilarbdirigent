@@ -1,6 +1,5 @@
 package no.nav.fo.veilarbdirigent.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.collection.Map;
@@ -16,7 +15,6 @@ import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
 import no.nav.fo.veilarbdirigent.utils.SerializerUtils;
-import no.nav.sbl.util.EnvironmentUtils;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -62,8 +60,6 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
-
-        TestUtils.delay(500);
 
         Map<String, Integer> status = dao.fetchStatusnumbers();
         assertThat(status.getOrElse("OK", 0)).isEqualTo(4);

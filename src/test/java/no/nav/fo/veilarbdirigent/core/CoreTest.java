@@ -4,10 +4,8 @@ import io.vavr.collection.List;
 import io.vavr.control.Try;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.TestUtils;
-import no.nav.fo.veilarbdirigent.core.api.Actuator;
-import no.nav.fo.veilarbdirigent.core.api.Message;
-import no.nav.fo.veilarbdirigent.core.api.MessageHandler;
-import no.nav.fo.veilarbdirigent.core.api.Task;
+import no.nav.fo.veilarbdirigent.config.CurrentThreadSceduler;
+import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.sbl.jdbc.Transactor;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -28,18 +25,32 @@ class CoreTest {
     private MessageHandler handler = mock(MessageHandler.class);
     private LockingTaskExecutor lock = (runnable, lockConfiguration) -> runnable.run();
     private Transactor transactor = TestUtils.getTransactor();
+    private ScheduledExecutorService scheduler = new CurrentThreadSceduler();
+
+    private static final List<Task> TASKS = List.of(
+            TestUtils.createTask("id0", "data1"),
+            TestUtils.createTask("id1", "data2"),
+            TestUtils.createTask("id3", "data3"),
+            TestUtils.createTask("id4", "data4")
+            );
+
+    private Core core;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
     public void setup() {
-        List<Task> tasks = List.of(
-                TestUtils.createTask("id1", "data"),
-                TestUtils.createTask("id2", "data")
+        when(handler.handle(any())).thenReturn(TASKS);
+        when(dao.fetchTasksReadyForExecution()).thenReturn(TASKS);
+
+        core = new Core(
+                dao,
+                scheduler,
+                lock,
+                transactor
         );
 
-        when(handler.handle(any())).thenReturn(tasks);
-        when(actuator.handle(any())).thenReturn(Try.success("data"));
-        when(dao.fetchTasksReadyForExecution()).thenReturn(tasks);
+        core.registerHandler(handler);
+        core.registerActuator(TestUtils.TASK_TYPE, actuator);
     }
 
     @AfterEach
@@ -48,34 +59,54 @@ class CoreTest {
         reset(dao);
     }
 
+
     @Test
     @SuppressWarnings("unchecked")
-    void normal_path() {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-        Core core = new Core(
-                dao,
-                scheduler,
-                lock,
-                transactor
-        );
-        core.registerHandler(handler);
-        core.registerActuator(TestUtils.TASK_TYPE, actuator);
+    void should_transform_messages_to_tasks_and_try_to_execute_them() {
+        when(actuator.handle(any())).thenReturn(Try.success("data"));
 
         Message message = new Message() {
         };
         core.submit(message);
-
-        TestUtils.delay(200);
 
         ArgumentCaptor<List<Task>> captor = TestUtils.listArgumentCaptor(Task.class);
 
         verify(handler, times(1)).handle(any(Message.class));
         verify(dao, times(1)).insert(captor.capture());
 
-        assertThat(captor.getValue().length()).isEqualTo(2);
+        assertThat(captor.getValue().length()).isEqualTo(4);
         verify(dao, times(1)).fetchTasksReadyForExecution();
 
-        verify(actuator, times(2)).handle(any());
+        verify(actuator, times(4)).handle(any());
+        verify(dao, times(4)).setStatusForTask(any(Task.class), eq(Status.OK));
     }
+
+
+    @Test
+    void core_should_handle_when_tasks_fail() {
+        mockHandleResult(
+                TASKS.get(0).getData().element.toString(),
+                TASKS.get(1).getData().element.toString()
+        );
+
+        core.submit(null);
+        verify(dao, times(2)).setStatusForTask(any(Task.class), eq(Status.FAILED));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void mockHandleResult(String exceptionCase, String failureCase) {
+        when(actuator.handle(any())).thenAnswer(a -> {
+            String data = (String) a.getArguments()[0];
+            if (exceptionCase.equals(data)) {
+                throw new RuntimeException();
+            }
+            else if (failureCase.equals(data)) {
+                return Try.failure(new RuntimeException());
+            }
+            return Try.success(data);
+        });
+    }
+
+
+
 }

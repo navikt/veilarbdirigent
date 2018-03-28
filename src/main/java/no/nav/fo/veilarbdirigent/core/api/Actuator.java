@@ -1,5 +1,7 @@
 package no.nav.fo.veilarbdirigent.core.api;
 
+import io.vavr.control.Try;
+
 public interface Actuator<DATA, RESULT> {
-    public Task<DATA, RESULT> handle(Task<DATA, RESULT> task);
+    public Try<RESULT> handle(DATA data);
 }

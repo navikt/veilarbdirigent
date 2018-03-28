@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
 
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 
@@ -72,18 +73,29 @@ public class Core {
 
     @Scheduled(fixedDelay = 10000)
     public void runActuators() {
-        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasksReadyForExecution().forEach(this::tryActuator));
+        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasksReadyForExecution().forEach(this::tryActuators));
     }
 
     @SuppressWarnings("unchecked")
-    private void tryActuator(Task<?, ?> task) {
-        this.actuators.get(task.getType())
-                .forEach((actuator) -> transactor.inTransaction(() -> {
-                    taskDAO.setStatusForTask(task, Status.WORKING);
-
-                    Try.of(() -> actuator.handle(task))
-                            .onFailure((exception) -> taskDAO.setStatusForTask(task.withError(exception.toString()), Status.FAILED))
-                            .onSuccess((result) -> taskDAO.setStatusForTask(task.withResult(new TypedField(result)), Status.OK));
-                }));
+    private void tryActuators(Task<?, ?> task) {
+        this.actuators.get(task.getType()).forEach((actuator) -> tryActuator(actuator, task));
     }
+
+    private <DATA, RESULT> void tryActuator(Actuator<DATA, RESULT> actuator, Task<DATA, RESULT> task) {
+        transactor.inTransaction(() -> {
+            taskDAO.setStatusForTask(task, Status.WORKING);
+            Try.of(() -> actuator.handle(task.getData().element))
+                    .flatMap(Function.identity())
+                    .onFailure(throwable -> {
+                        log.error(throwable.getMessage(), throwable);
+                        Task taskWithError = task.withError(throwable.toString());
+                        taskDAO.setStatusForTask(taskWithError, Status.FAILED);
+                    })
+                    .onSuccess(result -> {
+                        Task taskWithResult = task.withResult(new TypedField<>(result));
+                        taskDAO.setStatusForTask(taskWithResult, Status.OK);
+                    });
+        });
+    }
+
 }

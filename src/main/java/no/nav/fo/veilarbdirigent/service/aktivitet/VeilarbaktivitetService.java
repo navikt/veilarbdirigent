@@ -1,6 +1,6 @@
 package no.nav.fo.veilarbdirigent.service.aktivitet;
 
-import io.vavr.control.Either;
+import io.vavr.control.Try;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +18,30 @@ public class VeilarbaktivitetService {
     public static final String VEILARBAKTIVITETAPI_URL_PROPERTY = "VEILARBAKTIVITETAPI_URL";
     private final String host;
 
+    @Inject
+    private Client client;
+
     public VeilarbaktivitetService() {
         this.host = getRequiredProperty(VEILARBAKTIVITETAPI_URL_PROPERTY);
     }
 
-    @Inject
-    private Client client;
+    public static class VeilArbAktivitetServiceException extends Exception {
+        VeilArbAktivitetServiceException(String msg) {
+            super(msg);
+        }
+    }
 
-    public Either<String, AktivitetDTO> lagAktivitet(String aktorId, AktivitetDTO data) {
+    public Try<AktivitetDTO> lagAktivitet(String aktorId, AktivitetDTO data) {
         String url = String.format("%s/aktivitet/ny?aktorId=%s", host, aktorId);
         Invocation.Builder request = client.target(url).request();
         Response post = request.post(Entity.entity(data, MediaType.APPLICATION_JSON));
 
         if (post.getStatus() >= 200 && post.getStatus() < 300) {
             AktivitetDTO response = post.readEntity(AktivitetDTO.class);
-            return Either.right(response);
+            return Try.success(response);
         } else {
             String message = post.readEntity(String.class);
-            return Either.left(message);
+            return Try.failure(new VeilArbAktivitetServiceException(message));
         }
     }
 }

@@ -46,8 +46,7 @@ public class TypedField<ELEMENT> {
                 Object element = SerializerUtils.mapper.readValue(elementString, aClass);
                 return new TypedField(element);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
         }
     }

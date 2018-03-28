@@ -17,6 +17,7 @@ import static no.nav.apiapp.ApiApplication.Sone.FSS;
         DAOConfig.class,
         HandlerConfig.class,
         FeedConfig.class,
+        ClientConfig.class,
         ServiceConfig.class
 })
 @ComponentScan("no.nav.fo.veilarbdirigent.rest")

@@ -19,6 +19,7 @@ public class IntegrasjonsTest extends AbstractIntegrationTest {
                 DbConfig.class,
                 DAOConfig.class,
                 HandlerConfig.class,
+                ClientTestConfig.class,
                 ServiceConfig.class,
                 OppfolgingFeedServiceConfig.class
         );

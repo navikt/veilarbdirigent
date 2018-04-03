@@ -1,4 +1,4 @@
-package no.nav.fo.veilarbdirigent.service.aktivitet;
+package no.nav.fo.veilarbdirigent.output.veilarbaktivitet;
 
 import io.vavr.control.Try;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;

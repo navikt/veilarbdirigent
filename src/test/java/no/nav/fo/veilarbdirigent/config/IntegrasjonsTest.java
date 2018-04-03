@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
-import static no.nav.fo.veilarbdirigent.service.aktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
 
 public class IntegrasjonsTest extends AbstractIntegrationTest {
     @BeforeAll

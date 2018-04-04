@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.Arrays.asList;
 import static no.nav.fo.veilarbdirigent.TestUtils.delay;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
-import static no.nav.fo.veilarbdirigent.service.aktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup {

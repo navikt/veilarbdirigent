@@ -12,7 +12,7 @@ import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.PredefinedDataLoader;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
-import no.nav.fo.veilarbdirigent.service.aktivitet.VeilarbaktivitetService;
+import no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService;
 import no.nav.fo.veilarbdirigent.utils.Extrapolator;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 
@@ -41,6 +41,11 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     public List<Task> handle(Message message) {
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
+
+            if (!msg.isSelvgaende()){
+                return List.empty();
+            }
+
             return List.of(
                     new Task<>()
                             .withId(String.valueOf(msg.getId()) + "jobbonsker")

@@ -3,6 +3,7 @@ package no.nav.fo.veilarbdirigent.core;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
@@ -56,6 +57,7 @@ public class Core {
                     .flatMap((handler) -> handler.handle(message))
                     .map((task) -> task.withStatus(Status.PENDING));
 
+            log.info("Message translated to {} tasks", tasks.length());
             taskDAO.insert(tasks);
 
             scheduler.execute(this::runActuators);
@@ -73,12 +75,20 @@ public class Core {
 
     @Scheduled(fixedDelay = 10000)
     public void runActuators() {
-        runWithLock(lock, "runActuators", () -> taskDAO.fetchTasksReadyForExecution().forEach(this::tryActuators));
+        runWithLock(lock, "runActuators", () -> {
+            List<Task> tasks = taskDAO.fetchTasksReadyForExecution();
+            log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
+            tasks.forEach(this::tryActuators);
+        });
     }
 
     @SuppressWarnings("unchecked")
     private void tryActuators(Task<?, ?> task) {
-        this.actuators.get(task.getType()).forEach((actuator) -> tryActuator(actuator, task));
+        Option<Actuator> maybeActuator = this.actuators.get(task.getType());
+        maybeActuator.forEach((actuator) -> {
+            log.info("Trying to run Actuator:{} on Task:{}", task.getType().getType(), task.getId());
+            tryActuator(actuator, task);
+        });
     }
 
     private <DATA, RESULT> void tryActuator(Actuator<DATA, RESULT> actuator, Task<DATA, RESULT> task) {
@@ -92,6 +102,7 @@ public class Core {
                         taskDAO.setStatusForTask(taskWithError, Status.FAILED);
                     })
                     .onSuccess(result -> {
+                        log.info("Task:{} completed successfully", task.getId());
                         Task taskWithResult = task.withResult(new TypedField<>(result));
                         taskDAO.setStatusForTask(taskWithResult, Status.OK);
                     });

@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedServiceConfig;
+import no.nav.fo.veilarbdirigent.output.OutputConfig;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -20,7 +21,7 @@ public class IntegrasjonsTest extends AbstractIntegrationTest {
                 DAOConfig.class,
                 HandlerConfig.class,
                 ClientTestConfig.class,
-                ServiceConfig.class,
+                OutputConfig.class,
                 OppfolgingFeedServiceConfig.class
         );
     }

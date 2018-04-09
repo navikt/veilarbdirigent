@@ -3,7 +3,7 @@ package no.nav.fo.veilarbdirigent.input.rest;
 import no.nav.fo.veilarbdirigent.core.Core;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -24,7 +24,7 @@ public class BusyController {
         this.core = core;
     }
 
-    @GET
+    @POST
     @Path("/new")
     public String makeBusyTask() {
         BusyMessage msg = new BusyMessage();

@@ -2,7 +2,11 @@ package no.nav.fo.veilarbdirigent.config;
 
 import no.nav.apiapp.ApiApplication;
 import no.nav.apiapp.config.ApiAppConfigurator;
-import org.springframework.context.annotation.ComponentScan;
+import no.nav.fo.veilarbdirigent.admin.AdminController;
+import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.fo.veilarbdirigent.input.InputConfig;
+import no.nav.fo.veilarbdirigent.output.OutputConfig;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -16,11 +20,10 @@ import static no.nav.apiapp.ApiApplication.Sone.FSS;
         DbConfig.class,
         DAOConfig.class,
         HandlerConfig.class,
-        FeedConfig.class,
         ClientConfig.class,
-        ServiceConfig.class
+        InputConfig.class,
+        OutputConfig.class
 })
-@ComponentScan("no.nav.fo.veilarbdirigent.rest")
 public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
 
@@ -46,5 +49,10 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     @Override
     public void configure(ApiAppConfigurator apiAppConfigurator) {
         apiAppConfigurator.issoLogin();
+    }
+
+    @Bean
+    public AdminController adminController(TaskDAO dao){
+        return new AdminController(dao);
     }
 }

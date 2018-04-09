@@ -1,10 +1,9 @@
-package no.nav.fo.veilarbdirigent.rest;
+package no.nav.fo.veilarbdirigent.admin;
 
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,8 +15,11 @@ import java.util.Map;
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminController {
-    @Inject
-    private TaskDAO dao;
+    private final TaskDAO dao;
+
+    public AdminController(TaskDAO dao) {
+        this.dao = dao;
+    }
 
     @GET
     public List<Task> data() {

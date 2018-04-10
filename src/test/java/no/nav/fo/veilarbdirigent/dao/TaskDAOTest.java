@@ -8,6 +8,7 @@ import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Java6Assertions.assertThat;

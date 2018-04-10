@@ -60,7 +60,6 @@ public class Core {
             log.info("Message translated to {} tasks", tasks.length());
             taskDAO.insert(tasks);
 
-            scheduler.execute(this::runActuators);
             return true;
         } catch (Exception e) {
             log.error("Error while handling message", e);
@@ -73,8 +72,12 @@ public class Core {
         return submit(message);
     }
 
+    public void forceScheduled() {
+        scheduler.execute(this::runActuators);
+    }
+
     @Scheduled(fixedDelay = 10000)
-    public void runActuators() {
+    void runActuators() {
         runWithLock(lock, "runActuators", () -> {
             List<Task> tasks = taskDAO.fetchTasksReadyForExecution();
             log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());

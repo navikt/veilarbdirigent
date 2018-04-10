@@ -40,13 +40,13 @@ class OppfolgingFeedServiceTest {
     @Test
     void submits_the_received_message_to_the_core() {
         oppfolgingFeedService.compute("dosn't matter", List.of(elements.head()));
-        verify(core).submit(elements.head());
+        verify(core).submitInTransaction(elements.head());
     }
 
     @Test
     void submits_each_message_to_core() {
         oppfolgingFeedService.compute("dosn't matter", elements);
-        verify(core, times(elements.length())).submit(any());
+        verify(core, times(elements.length())).submitInTransaction(any());
     }
 
     @Test
@@ -58,10 +58,10 @@ class OppfolgingFeedServiceTest {
 
     @Test
     void stops_executing_when_a_message_fails() {
-        doThrow(new RuntimeException()).when(core).submit(elements.get(1));
+        doThrow(new RuntimeException()).when(core).submitInTransaction(elements.get(1));
         assertThrows(RuntimeException.class, () -> oppfolgingFeedService.compute("dosn't matter", elements));
 
-        verify(core, times(2)).submit(any());
+        verify(core, times(2)).submitInTransaction(any());
         verify(feedDao, times(1)).oppdaterSisteKjenteId(anyLong());
     }
 }

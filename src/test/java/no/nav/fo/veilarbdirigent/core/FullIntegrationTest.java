@@ -75,7 +75,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
     @SneakyThrows
     private void takeAndVerifyReceiver() {
-        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(20, TimeUnit.SECONDS), AktivitetDTO.class);
+        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(5, TimeUnit.SECONDS), AktivitetDTO.class);
         assertThat(request._1).endsWith(AKTOR_ID);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tittel).isNotBlank();

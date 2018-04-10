@@ -23,18 +23,18 @@ import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.util.Arrays.asList;
 import static no.nav.fo.veilarbdirigent.TestUtils.delay;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-public class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup {
+class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup {
 
-    public static final String AKTOR_ID = "123412341234";
+    private static final String AKTOR_ID = "123412341234";
     private static MockWebServer providerServer;
     private static MockWebServer receiverServer;
 
@@ -71,7 +71,7 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
 
     @SneakyThrows
     private void takeAndVerifyReceiver() {
-        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(10, TimeUnit.SECONDS), AktivitetDTO.class);
+        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(20, TimeUnit.SECONDS), AktivitetDTO.class);
         assertThat(request._1).endsWith(AKTOR_ID);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tittel).isNotBlank();
@@ -86,7 +86,7 @@ public class FullIntegrationTest extends AbstractIntegrationTest implements Task
 
         FeedResponse<OppfolgingDataFraFeed> response = new FeedResponse<>();
         response.setNextPageId("1000");
-        response.setElements(asList(element));
+        response.setElements(Collections.singletonList(element));
 
         String json = SerializerUtils.mapper.writeValueAsString(response);
 

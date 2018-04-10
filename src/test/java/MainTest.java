@@ -2,6 +2,7 @@ import no.nav.dialogarena.config.fasit.FasitUtils;
 import no.nav.fo.veilarbdirigent.config.DatabaseTestContext;
 import no.nav.testconfig.ApiAppTest;
 
+import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static no.nav.fo.veilarbdirigent.TestUtils.setupSecurity;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
@@ -17,7 +18,7 @@ public class MainTest {
         setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, "http://localhost:8080/veilarbaktivitet/api");
 
         ApiAppTest.setupTestContext();
-        DatabaseTestContext.setupContext("T6");
+        DatabaseTestContext.setupContext(getProperty("database"));
 
         setupSecurity();
         String loginUrl = FasitUtils.getBaseUrl("veilarblogin.redirect-url", FasitUtils.Zone.FSS);

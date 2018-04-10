@@ -5,8 +5,6 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 /*
    This is a service to create busy tasks. These do nothing and simply validates that the internal flow works
@@ -15,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 
 @Service
 @Path("/busy")
-@Produces(MediaType.APPLICATION_JSON)
 public class BusyController {
 
     private final Core core;

@@ -19,6 +19,11 @@
         <hikariCP.version>2.7.3</hikariCP.version>
         <aktivitet.api.version>505.20180309.1654</aktivitet.api.version>
         <okhttp3.version>3.10.0</okhttp3.version>
+        <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.coverage.exclusions>
+            **/java/Main.java,
+            **/*Config.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <dependencyManagement>

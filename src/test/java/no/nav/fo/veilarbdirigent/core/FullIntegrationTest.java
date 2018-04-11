@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static no.nav.fo.veilarbdirigent.TestUtils.delay;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERKAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -37,6 +38,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     private static final String AKTOR_ID = "123412341234";
     private static MockWebServer providerServer;
     private static MockWebServer receiverServer;
+    private static MockWebServer malverkServer;
 
     @BeforeAll
     @BeforeClass
@@ -45,9 +47,11 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         System.setProperty("oidc-redirect.url", FasitUtils.getBaseUrl("veilarblogin.redirect-url", FasitUtils.Zone.FSS));
         providerServer = setupFeedProvider();
         receiverServer = setupReceiverSystem();
+        malverkServer = setupMalverkService();
 
         System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
+        System.setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
 
         setupContext(false, ApplicationConfig.class);
     }
@@ -71,7 +75,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
     @SneakyThrows
     private void takeAndVerifyReceiver() {
-        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(20, TimeUnit.SECONDS), AktivitetDTO.class);
+        Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(5, TimeUnit.SECONDS), AktivitetDTO.class);
         assertThat(request._1).endsWith(AKTOR_ID);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tittel).isNotBlank();
@@ -118,6 +122,26 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         };
 
         server.setDispatcher(dispatcher);
+        return server;
+    }
+
+    @SneakyThrows
+    private static MockWebServer setupMalverkService() {
+        MockWebServer server = new MockWebServer();
+
+        AktivitetDTO response = new AktivitetDTO();
+        String json = SerializerUtils.mapper.writeValueAsString(response);
+
+        server.setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest recordedRequest) throws InterruptedException {
+                return new MockResponse()
+                        .setHeader("Content-Type", "application/json")
+                        .setResponseCode(200)
+                        .setBody(json);
+            }
+        });
+
         return server;
     }
 

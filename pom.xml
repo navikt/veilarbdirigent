@@ -92,10 +92,6 @@
             <artifactId>veilarbaktivitet-api</artifactId>
             <version>${aktivitet.api.version}</version>
         </dependency>
-        <dependency>
-            <groupId>no.bekk.bekkopen</groupId>
-            <artifactId>nocommons</artifactId>
-        </dependency>
 
         <!-- javax/spring -->
         <dependency>

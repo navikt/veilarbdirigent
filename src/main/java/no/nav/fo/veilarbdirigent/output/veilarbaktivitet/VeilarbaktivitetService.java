@@ -31,7 +31,7 @@ public class VeilarbaktivitetService {
         }
     }
 
-    public Try<AktivitetDTO> lagAktivitet(String aktorId, AktivitetDTO data) {
+    public Try<AktivitetDTO> lagAktivitet(String aktorId, String data) {
         String url = String.format("%s/aktivitet/ny?aktorId=%s", host, aktorId);
         Invocation.Builder request = client.target(url).request();
         Response post = request.post(Entity.entity(data, MediaType.APPLICATION_JSON));

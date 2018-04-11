@@ -14,6 +14,7 @@ import no.nav.sbl.sql.SqlUtils;
 import no.nav.sbl.sql.UpdateQuery;
 import no.nav.sbl.sql.where.WhereClause;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;

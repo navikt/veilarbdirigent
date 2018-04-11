@@ -23,10 +23,17 @@ public class OppfolgingFeedService {
     }
 
     void compute(String lastEntryId, List<OppfolgingDataFraFeed> elements) {
-        elements.forEach((element) -> transactor.inTransaction(() -> {
+        elements.forEach((element) -> {
+            submitToCore(element);
+            core.forceScheduled();
+        });
+    }
+
+    private void submitToCore(OppfolgingDataFraFeed element) {
+        transactor.inTransaction(() -> {
             log.info("Submitting feed message with id: {}", element.id);
-            core.submit(element);
+            core.submitInTransaction(element);
             feedDAO.oppdaterSisteKjenteId(element.getId());
-        }));
+        });
     }
 }

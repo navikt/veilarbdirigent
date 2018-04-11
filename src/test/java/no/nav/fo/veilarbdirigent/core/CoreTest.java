@@ -68,6 +68,7 @@ class CoreTest {
         Message message = new Message() {
         };
         core.submit(message);
+        core.forceScheduled();
 
         ArgumentCaptor<List<Task>> captor = TestUtils.listArgumentCaptor(Task.class);
 
@@ -90,6 +91,7 @@ class CoreTest {
         );
 
         core.submit(null);
+        core.forceScheduled();
         verify(dao, times(2)).setStatusForTask(any(Task.class), eq(Status.FAILED));
     }
 

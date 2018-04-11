@@ -30,6 +30,8 @@ fasitResources:
     resourceType: restservice
   - alias: veilArbAktivitetAPI
     resourceType: restservice
+  - alias: veilarbmalverkAPI
+    resourceType: restservice
 
   # security resources
   - alias: isso-rp-user

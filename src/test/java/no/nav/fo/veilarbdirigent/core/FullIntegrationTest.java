@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static no.nav.fo.veilarbdirigent.TestUtils.delay;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
-import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERK_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERKAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -51,7 +51,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
         System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
-        System.setProperty(VEILARBMALVERK_URL_PROPERTY, malverkServer.url("").toString());
+        System.setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
 
         setupContext(false, ApplicationConfig.class);
     }

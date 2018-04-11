@@ -12,14 +12,14 @@ import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
 @Service
 @Slf4j
 public class MalverkService {
-    public static final String VEILARBMALVERK_URL_PROPERTY = "VEILARBMALVERK_URL";
+    public static final String VEILARBMALVERKAPI_URL_PROPERTY = "VEILARBMALVERKAPI_URL";
     private final String host;
 
     @Inject
     private Client client;
 
     public MalverkService() {
-        this.host = getRequiredProperty(VEILARBMALVERK_URL_PROPERTY);
+        this.host = getRequiredProperty(VEILARBMALVERKAPI_URL_PROPERTY);
     }
 
     public Try<String> hentMal(String name) {

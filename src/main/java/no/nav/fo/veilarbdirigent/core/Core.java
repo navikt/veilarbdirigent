@@ -10,6 +10,7 @@ import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
+import no.nav.metrics.Event;
 import no.nav.sbl.jdbc.Transactor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,6 +20,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
+import static no.nav.fo.veilarbdirigent.utils.MetricsUtils.metricName;
+import static no.nav.metrics.MetricsFactory.createEvent;
 
 @Slf4j
 public class Core {
@@ -52,18 +55,25 @@ public class Core {
 
     @Transactional
     public boolean submit(Message message) {
+        Event event = createEvent(metricName("submit"));
         try {
             List<Task> tasks = handlers
                     .flatMap((handler) -> handler.handle(message))
                     .map((task) -> task.withStatus(Status.PENDING));
 
+
             log.info("Message translated to {} tasks", tasks.length());
             taskDAO.insert(tasks);
+            event.addFieldToReport("taskCount", tasks.size());
+            event.setSuccess();
 
             return true;
         } catch (Exception e) {
             log.error("Error while handling message", e);
+            event.setFailed();
             throw new RuntimeException(e);
+        } finally {
+            event.report();
         }
     }
 
@@ -81,6 +91,8 @@ public class Core {
         runWithLock(lock, "runActuators", () -> {
             List<Task> tasks = taskDAO.fetchTasksReadyForExecution();
             log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
+
+            createEvent(metricName("runActuators")).addFieldToReport("count", tasks.size()).report();
             tasks.forEach(this::tryActuators);
         });
     }
@@ -97,17 +109,20 @@ public class Core {
     private <DATA, RESULT> void tryActuator(Actuator<DATA, RESULT> actuator, Task<DATA, RESULT> task) {
         transactor.inTransaction(() -> {
             taskDAO.setStatusForTask(task, Status.WORKING);
+            Event event = createEvent(metricName("tryActuator")).addFieldToReport("type", task.getType());
             Try.of(() -> actuator.handle(task.getData().element))
                     .flatMap(Function.identity())
                     .onFailure(throwable -> {
                         log.error(throwable.getMessage(), throwable);
                         Task taskWithError = task.withError(throwable.toString());
                         taskDAO.setStatusForTask(taskWithError, Status.FAILED);
+                        event.setFailed().report();
                     })
                     .onSuccess(result -> {
                         log.info("Task:{} completed successfully", task.getId());
                         Task taskWithResult = task.withResult(new TypedField<>(result));
                         taskDAO.setStatusForTask(taskWithResult, Status.OK);
+                        event.setSuccess().report();
                     });
         });
     }

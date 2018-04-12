@@ -78,6 +78,15 @@ public class TaskDAO {
         return HashMap.ofEntries(result);
     }
 
+    @Transactional
+    public int runNow(String taskId) {
+        return SqlUtils.update(jdbc, TASK_TABLE)
+            .set("attempts", 0)
+            .set("next_attempt", Timestamp.valueOf(LocalDateTime.now()))
+            .whereEquals("id", taskId)
+            .execute();
+    }
+
     @SuppressWarnings("unchecked")
     private static Task toTask(ResultSet rs) throws SQLException {
         return Task.builder()

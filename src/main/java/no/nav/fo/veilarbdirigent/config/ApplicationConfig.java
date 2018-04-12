@@ -3,6 +3,7 @@ package no.nav.fo.veilarbdirigent.config;
 import no.nav.apiapp.ApiApplication;
 import no.nav.apiapp.config.ApiAppConfigurator;
 import no.nav.fo.veilarbdirigent.admin.AdminController;
+import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.input.InputConfig;
 import no.nav.fo.veilarbdirigent.output.OutputConfig;
@@ -52,7 +53,7 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     }
 
     @Bean
-    public AdminController adminController(TaskDAO dao){
-        return new AdminController(dao);
+    public AdminController adminController(Core core, TaskDAO dao){
+        return new AdminController(core, dao);
     }
 }

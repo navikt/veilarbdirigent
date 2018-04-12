@@ -46,16 +46,6 @@
             <artifactId>api-app</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikariCP.version}</version>
-        </dependency>
-        <dependency>
             <groupId>no.nav.sbl</groupId>
             <artifactId>jdbc</artifactId>
         </dependency>
@@ -86,6 +76,10 @@
         <dependency>
             <groupId>no.nav.sbl</groupId>
             <artifactId>json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav</groupId>
+            <artifactId>metrics</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.fo</groupId>
@@ -129,6 +123,16 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikariCP.version}</version>
         </dependency>
 
         <!-- Logging -->

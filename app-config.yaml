@@ -17,6 +17,9 @@ prometheus:
   path: veilarbdirigent/internal/metrics
 fasitResources:
   used:
+  - alias: appdynamics
+    resourceType: applicationproperties
+
   # custom veilarbdirigent props
   - alias: srvveilarbdirigent
     resourceType: credential

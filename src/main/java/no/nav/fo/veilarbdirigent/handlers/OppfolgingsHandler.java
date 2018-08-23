@@ -46,7 +46,8 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
                 return List.empty();
             }
 
-            // The order is important
+            // The order decides in what order the tasks are executed. This the required order.
+            // The last activity created is the first shown in he same column.
             return List.of(
                     new Task<>()
                             .withId(String.valueOf(msg.getId()) + "mia")

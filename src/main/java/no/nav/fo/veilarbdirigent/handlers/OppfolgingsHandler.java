@@ -25,6 +25,9 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     @Inject
     private MalverkService malverk;
 
+    private final String IVURD = "IVURD";
+    private final String BKART = "BKART";
+
     @PostConstruct
     public void register() {
         core.registerHandler(this);
@@ -37,19 +40,20 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
 
-            if (!msg.isSelvgaende()) {
+            boolean erNyRegistrert = IVURD.equals(msg.getInnsatsgruppe()) || BKART.equals(msg.getInnsatsgruppe());
+            if (!erNyRegistrert) {
                 return List.empty();
             }
 
             return List.of(
                     new Task<>()
-                            .withId(String.valueOf(msg.getId()) + "jobbonsker")
-                            .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "jobbonsker_aktivitet"))),
-                    new Task<>()
                             .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
                             .withType(TYPE)
                             .withData(new TypedField<>(new OppfolgingData(msg, "cv_aktivitet"))),
+                    new Task<>()
+                            .withId(String.valueOf(msg.getId()) + "jobbonsker")
+                            .withType(TYPE)
+                            .withData(new TypedField<>(new OppfolgingData(msg, "jobbonsker_aktivitet"))),
                     new Task<>()
                             .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
                             .withType(TYPE)
@@ -57,7 +61,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
                     new Task<>()
                             .withId(String.valueOf(msg.getId()) + "soke_jobber")
                             .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "soke_jobber_aktivitet")))
+                            .withData(new TypedField<>(new OppfolgingData(msg, "mulighet_i_arbeidsmarkedet_aktivitet")))
             );
         } else {
             return List.empty();

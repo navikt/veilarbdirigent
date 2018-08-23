@@ -15,6 +15,9 @@ healthcheck:
 prometheus:
   enabled: true
   path: veilarbdirigent/internal/metrics
+resources:
+  limits:
+    cpu: 3
 fasitResources:
   used:
   - alias: appdynamics
@@ -49,3 +52,4 @@ fasitResources:
     resourceType: baseUrl
   - alias: veilarblogin.redirect-url
     resourceType: baseUrl
+team: oppfolging

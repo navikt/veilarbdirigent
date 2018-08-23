@@ -46,7 +46,12 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
                 return List.empty();
             }
 
+            // The order is important
             return List.of(
+                    new Task<>()
+                            .withId(String.valueOf(msg.getId()) + "mia")
+                            .withType(TYPE)
+                            .withData(new TypedField<>(new OppfolgingData(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
                     new Task<>()
                             .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
                             .withType(TYPE)
@@ -59,10 +64,6 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
                             .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
                             .withType(TYPE)
                             .withData(new TypedField<>(new OppfolgingData(msg, "jobbsokerkompetanse_aktivitet"))),
-                    new Task<>()
-                            .withId(String.valueOf(msg.getId()) + "soke_jobber")
-                            .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "mulighet_i_arbeidsmarkedet_aktivitet")))
             );
         } else {
             return List.empty();

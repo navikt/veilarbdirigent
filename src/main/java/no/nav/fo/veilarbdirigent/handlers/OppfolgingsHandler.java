@@ -25,8 +25,9 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
     @Inject
     private MalverkService malverk;
 
-    private final String IVURD = "IVURD";
-    private final String BKART = "BKART";
+    private final List<String> registeringForslag = List.of("STANDARD_INNSATS",
+            "SITUASJONSBESTEMT_INNSATS",
+            "BEHOV_FOR_ARBEIDSEVNEVURDERING");
 
     @PostConstruct
     public void register() {
@@ -40,7 +41,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
 
-            boolean erNyRegistrert = IVURD.equals(msg.getInnsatsgruppe()) || BKART.equals(msg.getInnsatsgruppe());
+            boolean erNyRegistrert = registeringForslag.contains(msg.getInnsatsgruppe());
             if (!erNyRegistrert) {
                 return List.empty();
             }

@@ -41,7 +41,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
 
-            boolean erNyRegistrert = registeringForslag.contains(msg.getInnsatsgruppe());
+            boolean erNyRegistrert = registeringForslag.contains(msg.getForeslattInnsatsgruppe());
             if (!erNyRegistrert) {
                 return List.empty();
             }

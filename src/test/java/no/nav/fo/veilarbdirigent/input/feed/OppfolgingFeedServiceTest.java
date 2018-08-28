@@ -27,7 +27,6 @@ class OppfolgingFeedServiceTest {
                 .id(id)
                 .aktorId("123")
                 .opprettet(new Date())
-                .selvgaende(true)
                 .build();
     }
 

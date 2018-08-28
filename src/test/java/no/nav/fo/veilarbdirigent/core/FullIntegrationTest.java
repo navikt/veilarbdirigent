@@ -86,7 +86,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         MockWebServer server = new MockWebServer();
         FeedElement<OppfolgingDataFraFeed> element = new FeedElement<>();
         element.setId("1000");
-        element.setElement(new OppfolgingDataFraFeed(1000, AKTOR_ID, true,
+        element.setElement(new OppfolgingDataFraFeed(1000, AKTOR_ID,
                 "BEHOV_FOR_ARBEIDSEVNEVURDERING", null));
 
         FeedResponse<OppfolgingDataFraFeed> response = new FeedResponse<>();

@@ -17,8 +17,7 @@ import java.util.Date;
 public class OppfolgingDataFraFeed implements Message, Comparable<OppfolgingDataFraFeed> {
     long id;
     String aktorId;
-    boolean selvgaende; // this isn't used any more
-    private String innsatsgruppe;
+    String foreslattInnsatsgruppe;
     Date opprettet;
 
     @Override

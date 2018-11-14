@@ -1,5 +1,6 @@
 # ref https://raw.githubusercontent.com/nais/naisd/master/nais_example.yaml
 image: docker.adeo.no:5000/fo/veilarbdirigent
+team: oppfolging
 replicas:
   min: 2
   max: 2
@@ -10,7 +11,7 @@ healthcheck:
     path: veilarbdirigent/internal/isAlive
     initialDelay: 60
   readiness:
-    path: veilarbdirigent/internal/selftest
+    path: veilarbdirigent/internal/isReady
     initialDelay: 60
 prometheus:
   enabled: true
@@ -51,5 +52,7 @@ fasitResources:
   - alias: isso.isalive
     resourceType: baseUrl
   - alias: veilarblogin.redirect-url
-    resourceType: baseUrl
-team: oppfolging
+    resourceType: restservice
+
+alertProfiles:
+  - common-java-modules

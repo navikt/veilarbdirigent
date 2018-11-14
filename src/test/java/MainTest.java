@@ -1,13 +1,16 @@
-import no.nav.dialogarena.config.fasit.FasitUtils;
 import no.nav.fo.veilarbdirigent.config.DatabaseTestContext;
 import no.nav.testconfig.ApiAppTest;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static no.nav.dialogarena.config.fasit.FasitUtils.getDefaultEnvironment;
+import static no.nav.dialogarena.config.fasit.FasitUtils.getRestService;
 import static no.nav.fo.veilarbdirigent.TestUtils.setupSecurity;
+import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAME;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERKAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
+import static no.nav.testconfig.ApiAppTest.Config.builder;
 
 public class MainTest {
 
@@ -19,11 +22,11 @@ public class MainTest {
         setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, "http://localhost:8080/veilarbaktivitet/api");
         setProperty(VEILARBMALVERKAPI_URL_PROPERTY, "http://localhost:8080/veilarbmalverk/api");
 
-        ApiAppTest.setupTestContext();
+        ApiAppTest.setupTestContext(builder().applicationName(APPLICATION_NAME).build());
         DatabaseTestContext.setupContext(getProperty("database"));
 
         setupSecurity();
-        String loginUrl = FasitUtils.getBaseUrl("veilarblogin.redirect-url", FasitUtils.Zone.FSS);
+        String loginUrl = getRestService("veilarblogin.redirect-url", getDefaultEnvironment()).getUrl();
         setProperty(Main.REDIRECT_URL_PROPERTY, loginUrl);
         Main.main(TEST_PORT);
     }

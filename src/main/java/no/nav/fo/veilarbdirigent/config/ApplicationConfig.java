@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Import;
 
 import javax.servlet.ServletContext;
 
-import static no.nav.apiapp.ApiApplication.Sone.FSS;
-
 @Configuration
 @Import({
         CoreConfig.class,
@@ -29,18 +27,8 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
 
     @Override
-    public Sone getSone() {
-        return FSS;
-    }
-
-    @Override
     public boolean brukSTSHelsesjekk() {
         return false;
-    }
-
-    @Override
-    public String getApplicationName() {
-        return APPLICATION_NAME;
     }
 
     @Override
@@ -53,7 +41,7 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     }
 
     @Bean
-    public AdminController adminController(Core core, TaskDAO dao){
+    public AdminController adminController(Core core, TaskDAO dao) {
         return new AdminController(core, dao);
     }
 }

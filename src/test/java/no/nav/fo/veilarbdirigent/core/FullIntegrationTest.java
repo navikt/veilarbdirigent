@@ -4,7 +4,6 @@ import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.collection.Map;
 import lombok.SneakyThrows;
-import no.nav.dialogarena.config.fasit.FasitUtils;
 import no.nav.fo.feed.common.FeedElement;
 import no.nav.fo.feed.common.FeedResponse;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
@@ -15,6 +14,7 @@ import no.nav.fo.veilarbdirigent.config.databasecleanup.TaskCleanup;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
 import no.nav.fo.veilarbdirigent.utils.SerializerUtils;
+import no.nav.testconfig.ApiAppTest;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -27,10 +27,15 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.System.setProperty;
+import static no.nav.dialogarena.config.fasit.FasitUtils.getDefaultEnvironment;
+import static no.nav.dialogarena.config.fasit.FasitUtils.getRestService;
 import static no.nav.fo.veilarbdirigent.TestUtils.delay;
+import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAME;
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERKAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
+import static no.nav.testconfig.ApiAppTest.Config.builder;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup {
@@ -44,15 +49,16 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     @BeforeAll
     @BeforeClass
     static void setupContext() {
+        ApiAppTest.setupTestContext(builder().applicationName(APPLICATION_NAME).build());
         TestUtils.setupSecurity();
-        System.setProperty("oidc-redirect.url", FasitUtils.getBaseUrl("veilarblogin.redirect-url", FasitUtils.Zone.FSS));
+        setProperty("oidc-redirect.url", getRestService("veilarblogin.redirect-url", getDefaultEnvironment()).getUrl());
         providerServer = setupFeedProvider();
         receiverServer = setupReceiverSystem();
         malverkServer = setupMalverkService();
 
-        System.setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
-        System.setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
-        System.setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
+        setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
+        setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
+        setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
 
         setupContext(false, ApplicationConfig.class);
     }
@@ -132,6 +138,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         MockWebServer server = new MockWebServer();
 
         AktivitetDTO response = new AktivitetDTO();
+        response.setTittel("tittel");
         String json = SerializerUtils.mapper.writeValueAsString(response);
 
         server.setDispatcher(new Dispatcher() {

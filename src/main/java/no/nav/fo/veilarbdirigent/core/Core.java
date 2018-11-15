@@ -12,13 +12,13 @@ import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 import no.nav.metrics.Event;
 import no.nav.sbl.jdbc.Transactor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 import static no.nav.fo.veilarbdirigent.utils.MetricsUtils.metricName;
 import static no.nav.metrics.MetricsFactory.createEvent;
@@ -43,6 +43,8 @@ public class Core {
         this.scheduler = scheduler;
         this.lock = lock;
         this.transactor = transactor;
+
+        scheduler.scheduleWithFixedDelay(this::runActuators,0,10, SECONDS);
     }
 
     public void registerHandler(MessageHandler handler) {
@@ -86,7 +88,6 @@ public class Core {
         scheduler.execute(this::runActuators);
     }
 
-    @Scheduled(fixedDelay = 10000)
     void runActuators() {
         runWithLock(lock, "runActuators", () -> {
             List<Task> tasks = taskDAO.fetchTasksReadyForExecution();

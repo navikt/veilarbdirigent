@@ -41,6 +41,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup {
 
     private static final String AKTOR_ID = "123412341234";
+    private static final String AUTOMATISK_QUERYPARAM = "&automatisk=true";
     private static MockWebServer providerServer;
     private static MockWebServer receiverServer;
     private static MockWebServer malverkServer;
@@ -82,7 +83,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     @SneakyThrows
     private void takeAndVerifyReceiver() {
         Tuple3<String, String, AktivitetDTO> request = getData(receiverServer.takeRequest(5, TimeUnit.SECONDS), AktivitetDTO.class);
-        assertThat(request._1).endsWith(AKTOR_ID);
+        assertThat(request._1).endsWith(AKTOR_ID + AUTOMATISK_QUERYPARAM);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tittel).isNotBlank();
     }

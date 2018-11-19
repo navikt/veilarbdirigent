@@ -29,6 +29,8 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
             "SITUASJONSBESTEMT_INNSATS",
             "BEHOV_FOR_ARBEIDSEVNEVURDERING");
 
+    private final List<String> brukerGrupper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
+
     @PostConstruct
     public void register() {
         core.registerHandler(this);
@@ -41,34 +43,40 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
 
+            boolean erNySykmeldtBrukerRegistrert = brukerGrupper.contains(msg.getBrukergruppe());
             boolean erNyRegistrert = registeringForslag.contains(msg.getForeslattInnsatsgruppe());
-            if (!erNyRegistrert) {
-                return List.empty();
+
+            if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
+                return aktivitetListe(msg);
             }
 
-            // The order decides in what order the tasks are executed. This the required order.
-            // The last activity created is the first shown in he same column.
-            return List.of(
-                    new Task<>()
-                            .withId(String.valueOf(msg.getId()) + "mia")
-                            .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
-                    new Task<>()
-                            .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
-                            .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "cv_aktivitet"))),
-                    new Task<>()
-                            .withId(String.valueOf(msg.getId()) + "jobbonsker")
-                            .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "jobbonsker_aktivitet"))),
-                    new Task<>()
-                            .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
-                            .withType(TYPE)
-                            .withData(new TypedField<>(new OppfolgingData(msg, "jobbsokerkompetanse_aktivitet")))
-            );
+            return List.empty();
         } else {
             return List.empty();
         }
+    }
+
+    private List<Task> aktivitetListe(OppfolgingDataFraFeed msg) {
+        // The order decides in what order the tasks are executed. This the required order.
+        // The last activity created is the first shown in he same column.
+        return List.of(
+                new Task<>()
+                        .withId(String.valueOf(msg.getId()) + "mia")
+                        .withType(TYPE)
+                        .withData(new TypedField<>(new OppfolgingData(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
+                new Task<>()
+                        .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
+                        .withType(TYPE)
+                        .withData(new TypedField<>(new OppfolgingData(msg, "cv_aktivitet"))),
+                new Task<>()
+                        .withId(String.valueOf(msg.getId()) + "jobbonsker")
+                        .withType(TYPE)
+                        .withData(new TypedField<>(new OppfolgingData(msg, "jobbonsker_aktivitet"))),
+                new Task<>()
+                        .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
+                        .withType(TYPE)
+                        .withData(new TypedField<>(new OppfolgingData(msg, "jobbsokerkompetanse_aktivitet")))
+        );
     }
 
     @Override

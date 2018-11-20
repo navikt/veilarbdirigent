@@ -35,6 +35,7 @@ import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAM
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERKAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbdialogService.VEILARBDIALOGAPI_URL_PROPERTY;
 import static no.nav.testconfig.ApiAppTest.Config.builder;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -58,6 +59,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
         setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
+        setProperty(VEILARBDIALOGAPI_URL_PROPERTY, receiverServer.url("").toString()); // todo lage test for dialog
         setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
 
         setupContext(false, ApplicationConfig.class);

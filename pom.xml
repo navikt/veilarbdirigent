@@ -18,6 +18,7 @@
     <properties>
         <hikariCP.version>2.7.3</hikariCP.version>
         <aktivitet.api.version>505.20180309.1654</aktivitet.api.version>
+        <dialog.api.version>457.20181112.1429</dialog.api.version>
         <okhttp3.version>3.10.0</okhttp3.version>
         <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.coverage.exclusions>
@@ -85,6 +86,11 @@
             <groupId>no.nav.fo</groupId>
             <artifactId>veilarbaktivitet-api</artifactId>
             <version>${aktivitet.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.fo</groupId>
+            <artifactId>veilarbdialog-api</artifactId>
+            <version>${dialog.api.version}</version>
         </dependency>
 
         <!-- javax/spring -->

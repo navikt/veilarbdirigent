@@ -10,6 +10,7 @@ import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAM
 import static no.nav.fo.veilarbdirigent.input.feed.OppfolgingFeedConsumerConfig.VEILARBOPPFOLGINGAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService.VEILARBMALVERKAPI_URL_PROPERTY;
 import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService.VEILARBAKTIVITETAPI_URL_PROPERTY;
+import static no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbdialogService.VEILARBDIALOGAPI_URL_PROPERTY;
 import static no.nav.testconfig.ApiAppTest.Config.builder;
 
 public class MainTest {
@@ -21,6 +22,7 @@ public class MainTest {
         setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, "http://localhost:8080/veilarboppfolging/api");
         setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, "http://localhost:8080/veilarbaktivitet/api");
         setProperty(VEILARBMALVERKAPI_URL_PROPERTY, "http://localhost:8080/veilarbmalverk/api");
+        setProperty(VEILARBDIALOGAPI_URL_PROPERTY, "http://localhost:8080/veilarbdialog/api");
 
         ApiAppTest.setupTestContext(builder().applicationName(APPLICATION_NAME).build());
         DatabaseTestContext.setupContext(getProperty("database"));

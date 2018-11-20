@@ -29,7 +29,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
             "SITUASJONSBESTEMT_INNSATS",
             "BEHOV_FOR_ARBEIDSEVNEVURDERING");
 
-    private final List<String> brukerGrupper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
+    private final List<String> sykmeldtBrukerTyper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
 
     @PostConstruct
     public void register() {
@@ -43,7 +43,7 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
 
-            boolean erNySykmeldtBrukerRegistrert = brukerGrupper.contains(msg.getBrukergruppe());
+            boolean erNySykmeldtBrukerRegistrert = sykmeldtBrukerTyper.contains(msg.getSykmeldtBrukerType());
             boolean erNyRegistrert = registeringForslag.contains(msg.getForeslattInnsatsgruppe());
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {

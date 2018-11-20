@@ -19,7 +19,7 @@ public class OppfolgingDataFraFeed implements Message, Comparable<OppfolgingData
     String aktorId;
     String foreslattInnsatsgruppe;
     Date opprettet;
-    String brukergruppe;
+    String sykmeldtBrukerType;
 
     @Override
     public int compareTo(OppfolgingDataFraFeed o) {

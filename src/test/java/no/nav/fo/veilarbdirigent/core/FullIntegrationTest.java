@@ -62,7 +62,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
 
         setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
-        setProperty(VEILARBDIALOGAPI_URL_PROPERTY, dialogreceiverServer.url("").toString()); // todo lage test for dialog
+        setProperty(VEILARBDIALOGAPI_URL_PROPERTY, dialogreceiverServer.url("").toString());
         setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
 
         setupContext(false, ApplicationConfig.class);

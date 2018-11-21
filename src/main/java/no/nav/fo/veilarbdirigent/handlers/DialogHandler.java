@@ -57,8 +57,10 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
 
     @Override
     public Try<NyHenvendelseDTO> handle(DialogHandler.OppfolgingData data) {
-        // TODO endre tekst, evt flytt ut veilarbmalverk
-        return service.lagDialog("{\"overskrift\":\"test dialog\",\"ikkeFerdigbehandlet\":true,\"tekst\":\"test dialog\"}\n");
+        return service.lagDialog("{\n" +
+                "  \"overskrift\": \"Hei!\",\n" +
+                "  \"tekst\": \"Hei!\\nDu har svart at du trenger mer veiledning nå som retten til sykepenger nærmer seg slutten. Her kan du kommunisere med NAV-veilederen din. Du kan stille spørsmål eller informere om behovene dine.\"\n" +
+                "}");
     }
 
     @NoArgsConstructor

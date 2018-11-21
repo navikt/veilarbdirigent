@@ -15,11 +15,11 @@ import no.nav.fo.veilarbdirigent.utils.TypedField;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsHandler.OppfolgingData, AktivitetDTO> {
+public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandler.OppfolgingDataMedMal, AktivitetDTO> {
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_AKTIVITET");
 
     @Inject
-    Core core;
+    private Core core;
     @Inject
     private VeilarbaktivitetService service;
     @Inject
@@ -63,31 +63,31 @@ public class OppfolgingsHandler implements MessageHandler, Actuator<OppfolgingsH
                 new Task<>()
                         .withId(String.valueOf(msg.getId()) + "mia")
                         .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingData(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
+                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
                 new Task<>()
                         .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
                         .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingData(msg, "cv_aktivitet"))),
+                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "cv_aktivitet"))),
                 new Task<>()
                         .withId(String.valueOf(msg.getId()) + "jobbonsker")
                         .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingData(msg, "jobbonsker_aktivitet"))),
+                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "jobbonsker_aktivitet"))),
                 new Task<>()
                         .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
                         .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingData(msg, "jobbsokerkompetanse_aktivitet")))
+                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "jobbsokerkompetanse_aktivitet")))
         );
     }
 
     @Override
-    public Try<AktivitetDTO> handle(OppfolgingsHandler.OppfolgingData data) {
+    public Try<AktivitetDTO> handle(OppfolgingDataMedMal data) {
         return malverk.hentMal(data.predefineddataName)
                 .flatMap((template) -> service.lagAktivitet(data.feedelement.getAktorId(), template));
     }
 
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OppfolgingData {
+    public static class OppfolgingDataMedMal {
         public OppfolgingDataFraFeed feedelement;
         public String predefineddataName;
     }

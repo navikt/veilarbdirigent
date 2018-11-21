@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import no.nav.fo.feed.common.FeedElement;
 import no.nav.fo.feed.common.FeedResponse;
 import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
+import no.nav.fo.veilarbdialog.domain.NyHenvendelseDTO;
 import no.nav.fo.veilarbdirigent.TestUtils;
 import no.nav.fo.veilarbdirigent.config.AbstractIntegrationTest;
 import no.nav.fo.veilarbdirigent.config.ApplicationConfig;
@@ -45,6 +46,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     private static final String AUTOMATISK_QUERYPARAM = "&automatisk=true";
     private static MockWebServer providerServer;
     private static MockWebServer receiverServer;
+    private static MockWebServer dialogreceiverServer;
     private static MockWebServer malverkServer;
 
     @BeforeAll
@@ -55,11 +57,12 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         setProperty("oidc-redirect.url", getRestService("veilarblogin.redirect-url", getDefaultEnvironment()).getUrl());
         providerServer = setupFeedProvider();
         receiverServer = setupReceiverSystem();
+        dialogreceiverServer = setupDialogReceiverSystem();
         malverkServer = setupMalverkService();
 
         setProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY, providerServer.url("").toString());
         setProperty(VEILARBAKTIVITETAPI_URL_PROPERTY, receiverServer.url("").toString());
-        setProperty(VEILARBDIALOGAPI_URL_PROPERTY, receiverServer.url("").toString()); // todo lage test for dialog
+        setProperty(VEILARBDIALOGAPI_URL_PROPERTY, dialogreceiverServer.url("").toString()); // todo lage test for dialog
         setProperty(VEILARBMALVERKAPI_URL_PROPERTY, malverkServer.url("").toString());
 
         setupContext(false, ApplicationConfig.class);
@@ -74,11 +77,12 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
+        takeAndVerifyDialogReceiver();
 
         delay(100);
 
         Map<String, Integer> status = dao.fetchStatusnumbers();
-        assertThat(status.getOrElse("OK", 0)).isEqualTo(4);
+        assertThat(status.getOrElse("OK", 0)).isEqualTo(5);
         assertThat(status.getOrElse("FAILED", 0)).isEqualTo(0);
     }
 
@@ -91,12 +95,20 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     }
 
     @SneakyThrows
+    private void takeAndVerifyDialogReceiver() {
+        Tuple3<String, String, NyHenvendelseDTO> request = getData(dialogreceiverServer.takeRequest(5, TimeUnit.SECONDS), NyHenvendelseDTO.class);
+        assertThat(request._1).endsWith("/");
+        assertThat(request._2).isEqualTo("POST");
+        assertThat(request._3.tekst).isNotBlank();
+    }
+
+    @SneakyThrows
     private static MockWebServer setupFeedProvider() {
         MockWebServer server = new MockWebServer();
         FeedElement<OppfolgingDataFraFeed> element = new FeedElement<>();
         element.setId("1000");
         element.setElement(new OppfolgingDataFraFeed(1000, AKTOR_ID,
-                "BEHOV_FOR_ARBEIDSEVNEVURDERING", null, null));
+                "BEHOV_FOR_ARBEIDSEVNEVURDERING", null, "SKAL_TIL_NY_ARBEIDSGIVER"));
 
         FeedResponse<OppfolgingDataFraFeed> response = new FeedResponse<>();
         response.setNextPageId("1000");
@@ -128,6 +140,29 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
                         .setHeader("Content-Type", "application/json")
                         .setResponseCode(200)
                         .setBody(SerializerUtils.mapper.writeValueAsString(aktivitetDTO));
+            }
+        };
+
+        server.setDispatcher(dispatcher);
+        return server;
+    }
+
+    @SneakyThrows
+    private static MockWebServer setupDialogReceiverSystem() {
+        MockWebServer server = new MockWebServer();
+        Dispatcher dispatcher = new Dispatcher() {
+            AtomicInteger id = new AtomicInteger(1);
+
+            @Override
+            @SneakyThrows
+            public MockResponse dispatch(RecordedRequest request) {
+                NyHenvendelseDTO nyHenvendelseDTO = SerializerUtils.mapper.readValue(request.getBody().clone().readUtf8(), NyHenvendelseDTO.class);
+                nyHenvendelseDTO.setDialogId(String.format("000%d", id.incrementAndGet()));
+
+                return new MockResponse()
+                        .setHeader("Content-Type", "application/json")
+                        .setResponseCode(200)
+                        .setBody(SerializerUtils.mapper.writeValueAsString(nyHenvendelseDTO));
             }
         };
 

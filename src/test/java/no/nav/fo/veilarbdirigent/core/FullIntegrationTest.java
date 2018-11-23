@@ -97,7 +97,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
     @SneakyThrows
     private void takeAndVerifyDialogReceiver() {
         Tuple3<String, String, NyHenvendelseDTO> request = getData(dialogreceiverServer.takeRequest(5, TimeUnit.SECONDS), NyHenvendelseDTO.class);
-        assertThat(request._1).endsWith("/");
+        assertThat(request._1).endsWith(AKTOR_ID);
         assertThat(request._2).isEqualTo("POST");
         assertThat(request._3.tekst).isNotBlank();
     }

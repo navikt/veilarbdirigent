@@ -32,8 +32,8 @@ public class VeilarbdialogService {
         }
     }
 
-    public Try<NyHenvendelseDTO> lagDialog(String data) {
-        String url = String.format("%s/dialog/", host);
+    public Try<NyHenvendelseDTO> lagDialog(String aktorId, String data) {
+        String url = String.format("%s/dialog?aktorId=%s", host, aktorId);
         Invocation.Builder request = client.target(url).request();
         Response post = request.post(Entity.entity(data, MediaType.APPLICATION_JSON));
 

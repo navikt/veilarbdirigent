@@ -58,7 +58,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
     @Override
     public Try<NyHenvendelseDTO> handle(DialogHandler.OppfolgingData data) {
         return service.lagDialog(data.feedelement.getAktorId(), "{\n" +
-                "\"overskrift\": \"Hei!\",\n" +
+                "\"overskrift\": \"Skriv en melding til veilederen din\",\n" +
                 "\"tekst\": \"Hei!\\nDu har svart at du trenger mer veiledning nå som retten til sykepenger " +
                 "nærmer seg slutten. Her kan du kommunisere med NAV-veilederen din. Du kan stille spørsmål eller " +
                 "informere om behovene dine.\"\n" +

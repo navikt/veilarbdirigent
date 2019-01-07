@@ -17,7 +17,7 @@ public class OppfolgingFeedConsumerConfig {
 
     public static final String VEILARBOPPFOLGINGAPI_URL_PROPERTY = "VEILARBOPPFOLGINGAPI_URL";
     private static final int POLLING = 10;
-    private static final int LOCK_TIMEOUT_MILLIS = 5000;
+    private static final int LOCK_TIMEOUT_MILLIS = 120_000;
     private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
 
     private final String host;

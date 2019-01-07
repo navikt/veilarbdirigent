@@ -23,7 +23,7 @@ import javax.servlet.ServletContext;
         InputConfig.class,
         OutputConfig.class
 })
-public class ApplicationConfig implements ApiApplication.NaisApiApplication {
+public class ApplicationConfig implements ApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
 
     @Override

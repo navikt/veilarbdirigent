@@ -25,6 +25,7 @@ import static no.nav.metrics.MetricsFactory.createEvent;
 
 @Slf4j
 public class Core {
+    private static final int LIMIT = 100;
     private List<MessageHandler> handlers = List.empty();
     private Map<TaskType, Actuator> actuators = HashMap.empty();
 
@@ -80,21 +81,25 @@ public class Core {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public boolean submitInTransaction(Message message) {
-        return submit(message);
+    public void submitInTransaction(Message message) {
+        submit(message);
     }
 
     public void forceScheduled() {
         scheduler.execute(this::runActuators);
     }
 
-    void runActuators() {
+    private void runActuators() {
         runWithLock(lock, "runActuators", () -> {
-            List<Task> tasks = taskDAO.fetchTasksReadyForExecution();
+            List<Task> tasks = taskDAO.fetchTasksReadyForExecution(LIMIT);
             log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
 
             createEvent(metricName("runActuators")).addFieldToReport("count", tasks.size()).report();
             tasks.forEach(this::tryActuators);
+            if(tasks.length() >= LIMIT){
+                //This was a big batch. Try to start the next schedule at once
+                forceScheduled();
+            }
         });
     }
 

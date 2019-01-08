@@ -12,9 +12,9 @@ import no.nav.fo.veilarbdirigent.utils.SerializerUtils;
 import no.nav.fo.veilarbdirigent.utils.TimeUtils;
 import no.nav.sbl.sql.SqlUtils;
 import no.nav.sbl.sql.UpdateQuery;
+import no.nav.sbl.sql.order.OrderClause;
 import no.nav.sbl.sql.where.WhereClause;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
@@ -44,15 +44,18 @@ public class TaskDAO {
                 .execute();
     }
 
-    public List<Task> fetchTasksReadyForExecution() {
+    public List<Task> fetchTasksReadyForExecution(int limit) {
         WhereClause statusCondition = WhereClause.equals("status", Status.FAILED.name())
                 .or(WhereClause.equals("status", Status.PENDING.name()));
         WhereClause timeCondition  = WhereClause.lteq("next_attempt", Timestamp.valueOf(LocalDateTime.now()));
         WhereClause wc = timeCondition.and(statusCondition);
+        OrderClause or = OrderClause.asc("created");
 
         return List.ofAll(SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toTask)
                 .column("*")
                 .where(wc)
+                .orderBy(or)
+                .limit(limit)
                 .executeToList());
     }
 

@@ -8,7 +8,6 @@ import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.annotation.Transactional;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -26,7 +25,7 @@ class TaskDAOTest extends IntegrasjonsTest implements TaskCleanup {
 
         dao.insert(tasks);
 
-        List<Task> tasksFromDb = dao.fetchTasksReadyForExecution();
+        List<Task> tasksFromDb = dao.fetchTasksReadyForExecution(100);
         assertThat(tasksFromDb.length()).isEqualTo(1);
 
         Task task = tasksFromDb.get(0);

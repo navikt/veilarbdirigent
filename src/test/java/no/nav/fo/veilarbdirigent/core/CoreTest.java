@@ -38,9 +38,9 @@ class CoreTest {
 
     @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setup() {
+    void setup() {
         when(handler.handle(any())).thenReturn(TASKS);
-        when(dao.fetchTasksReadyForExecution()).thenReturn(TASKS);
+        when(dao.fetchTasksReadyForExecution(100)).thenReturn(TASKS);
 
         core = new Core(
                 dao,
@@ -54,7 +54,7 @@ class CoreTest {
     }
 
     @AfterEach
-    public void teardown() {
+    void teardown() {
         reset(handler);
         reset(dao);
     }
@@ -76,7 +76,7 @@ class CoreTest {
         verify(dao, times(1)).insert(captor.capture());
 
         assertThat(captor.getValue().length()).isEqualTo(4);
-        verify(dao, times(1)).fetchTasksReadyForExecution();
+        verify(dao, times(1)).fetchTasksReadyForExecution(100);
 
         verify(actuator, times(4)).handle(any());
         verify(dao, times(4)).setStatusForTask(any(Task.class), eq(Status.OK));

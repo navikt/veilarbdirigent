@@ -12,7 +12,6 @@ import no.nav.fo.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 import no.nav.metrics.Event;
 import no.nav.sbl.jdbc.Transactor;
-import org.slf4j.MDC;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static no.nav.fo.veilarbdirigent.core.Utils.runInMappedDiagnosticContext;
 import static no.nav.fo.veilarbdirigent.core.Utils.runWithLock;
 import static no.nav.fo.veilarbdirigent.utils.MetricsUtils.metricName;
 import static no.nav.metrics.MetricsFactory.createEvent;
@@ -47,7 +47,7 @@ public class Core {
         this.lock = lock;
         this.transactor = transactor;
 
-        scheduler.scheduleWithFixedDelay(this::runActuators,0,10, SECONDS);
+        scheduler.scheduleWithFixedDelay(this::runActuators, 0, 10, SECONDS);
     }
 
     public void registerHandler(MessageHandler handler) {
@@ -88,40 +88,39 @@ public class Core {
     }
 
     public void forceScheduled() {
-        scheduler.execute(this::runActuators);
+        scheduler.execute(this::runActuatorsInMDC);
+    }
+
+    private void runActuatorsInMDC() {
+        runInMappedDiagnosticContext("runActuators", UUID.randomUUID().toString(), this::runActuators);
     }
 
     private void runActuators() {
-        MDC.put("runActuators", UUID.randomUUID().toString());
-
         runWithLock(lock, "runActuators", () -> {
             List<Task> tasks = taskDAO.fetchTasksReadyForExecution(LIMIT);
             log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
 
             createEvent(metricName("runActuators")).addFieldToReport("count", tasks.size()).report();
-            tasks.forEach(this::tryActuators);
-            if(tasks.length() >= LIMIT){
-                log.info("Tasks was equal to limit. Start next schedule at one");
-
-                //This was a big batch. Try to start the next schedule at once
+            tasks.forEach(this::tryActuatorsInMDC);
+            if (tasks.length() >= LIMIT) {
+                log.info("Tasks was equal to limit. Start next schedule at once");
                 forceScheduled();
             }
         });
-
-        MDC.remove("runActuators");
     }
+
+    private void tryActuatorsInMDC(Task<?, ?> task) {
+        runInMappedDiagnosticContext("taskId", task.getId(), () -> tryActuators(task));
+    }
+
 
     @SuppressWarnings("unchecked")
     private void tryActuators(Task<?, ?> task) {
-        MDC.put("taskId", task.getId());
-
         Option<Actuator> maybeActuator = this.actuators.get(task.getType());
         maybeActuator.forEach((actuator) -> {
             log.info("Trying to run Actuator:{} on Task:{}", task.getType().getType(), task.getId());
             tryActuator(actuator, task);
         });
-
-        MDC.remove("taskId");
     }
 
     private <DATA, RESULT> void tryActuator(Actuator<DATA, RESULT> actuator, Task<DATA, RESULT> task) {

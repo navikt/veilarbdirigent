@@ -1,6 +1,8 @@
 package no.nav.fo.veilarbdirigent.handlers;
 
+import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,38 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             "SKAL_TIL_SAMME_ARBEIDSGIVER"
     );
 
+    private static final String behovForArbeidsevnevurdering = "BEHOV_FOR_ARBEIDSEVNEVURDERING";
+    private static final String sykemeldtDialog = "sykemeldt_dialog";
+    private static final String arbeidsevnevurderingDialog = "arbeidsevnevurdering_dialog";
+
+    private static final String sykemeldtJson = "{\n" +
+            "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
+            "\"tekst\": \"Hei!\n" +
+            "Du har svart at du trenger mer veiledning nå som retten til sykepenger nærmer seg slutten. Vi vil veilede deg videre og trenger derfor å vite litt mer.\n" +
+            "Du kan velge om du vil fortelle om situasjonen din \n" +
+            "• i et møte med veilederen din på NAV-kontoret\n" +
+            "• i en telefonsamtale\n" +
+            "• her i dialogen\n" +
+            "Skriv svaret ditt i feltet over. Hvis du velger \"her i dialogen\", kan du fortelle mer allerede nå." +
+            "}";
+
+    private static final String arbeidsevnevurderingJson = "{\n" +
+            "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
+            "\"tekst\": \"Hei!\n" +
+            "Du har svart at du har utfordringer som hindrer deg i å søke eller være i jobb. Vi vil veilede deg videre og trenger derfor å vite litt mer.\n" +
+            "Du kan velge om du vil fortelle om situasjonen din \n" +
+            "• i et møte med veilederen din på NAV-kontoret\n" +
+            "• i en telefonsamtale\n" +
+            "• her i dialogen\n" +
+            "Skriv svaret ditt i feltet over. Hvis du velger \"her i dialogen\", kan du fortelle mer allerede nå." +
+            "}";
+
+    private static final HashMap<String, String> meldinger = HashMap.ofEntries(
+            Map.entry(sykemeldtDialog, sykemeldtJson),
+            Map.entry(arbeidsevnevurderingDialog, arbeidsevnevurderingJson)
+    );
+
+
     @PostConstruct
     public void register() {
         core.registerHandler(this);
@@ -45,7 +79,13 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
                         new Task<>()
                                 .withId(String.valueOf(msg.getId()) + "dialog")
                                 .withType(TYPE)
-                                .withData(new TypedField<>(new OppfolgingData(msg))));
+                                .withData(new TypedField<>(new OppfolgingData(msg, sykemeldtDialog))));
+            } else if (behovForArbeidsevnevurdering.equals(msg.getForeslattInnsatsgruppe())) {
+                return List.of(
+                        new Task<>()
+                                .withId(String.valueOf(msg.getId()) + "dialog")
+                                .withType(TYPE)
+                                .withData(new TypedField<>(new OppfolgingData(msg, arbeidsevnevurderingDialog))));
             }
 
             return List.empty();
@@ -57,17 +97,17 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
 
     @Override
     public Try<NyHenvendelseDTO> handle(DialogHandler.OppfolgingData data) {
-        return service.lagDialog(data.feedelement.getAktorId(), "{\n" +
-                "\"overskrift\": \"Skriv en melding til veilederen din\",\n" +
-                "\"tekst\": \"Hei!\\nDu har svart at du trenger mer veiledning nå som retten til sykepenger " +
-                "nærmer seg slutten. Her kan du kommunisere med NAV-veilederen din. Du kan stille spørsmål eller " +
-                "informere om behovene dine.\"\n" +
-                "}");
+        String dialogJson = meldinger
+                .get(data.meldingsName)
+                .getOrElse(sykemeldtJson);
+
+        return service.lagDialog(data.feedelement.getAktorId(), dialogJson);
     }
 
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OppfolgingData {
         public OppfolgingDataFraFeed feedelement;
+        public String meldingsName;
     }
 }

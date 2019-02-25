@@ -35,24 +35,24 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
 
     private static final String sykemeldtJson = "{\n" +
             "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
-            "\"tekst\": \"Hei!\n" +
-            "Du har svart at du trenger mer veiledning nå som retten til sykepenger nærmer seg slutten. Vi vil veilede deg videre og trenger derfor å vite litt mer.\n" +
-            "Du kan velge om du vil fortelle om situasjonen din \n" +
-            "• i et møte med veilederen din på NAV-kontoret\n" +
-            "• i en telefonsamtale\n" +
-            "• her i dialogen\n" +
-            "Skriv svaret ditt i feltet over. Hvis du velger \"her i dialogen\", kan du fortelle mer allerede nå." +
+            "\"tekst\": \"Hei!\\n" +
+            "Du har svart at du trenger mer veiledning nå som retten til sykepenger nærmer seg slutten. Vi vil veilede deg videre og trenger derfor å vite litt mer.\\n" +
+            "Du kan velge om du vil fortelle om situasjonen din \\n" +
+            "• i et møte med veilederen din på NAV-kontoret\\n" +
+            "• i en telefonsamtale\\n" +
+            "• her i dialogen\\n" +
+            "Skriv svaret ditt i feltet over. Hvis du velger \\\"her i dialogen\\\", kan du fortelle mer allerede nå.\"\n" +
             "}";
 
     private static final String arbeidsevnevurderingJson = "{\n" +
             "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
-            "\"tekst\": \"Hei!\n" +
-            "Du har svart at du har utfordringer som hindrer deg i å søke eller være i jobb. Vi vil veilede deg videre og trenger derfor å vite litt mer.\n" +
-            "Du kan velge om du vil fortelle om situasjonen din \n" +
-            "• i et møte med veilederen din på NAV-kontoret\n" +
-            "• i en telefonsamtale\n" +
-            "• her i dialogen\n" +
-            "Skriv svaret ditt i feltet over. Hvis du velger \"her i dialogen\", kan du fortelle mer allerede nå." +
+            "\"tekst\": \"Hei!\\n" +
+            "Du har svart at du har utfordringer som hindrer deg i å søke eller være i jobb. Vi vil veilede deg videre og trenger derfor å vite litt mer.\\n" +
+            "Du kan velge om du vil fortelle om situasjonen din \\n" +
+            "• i et møte med veilederen din på NAV-kontoret\\n" +
+            "• i en telefonsamtale\\n" +
+            "• her i dialogen\\n" +
+            "Skriv svaret ditt i feltet over. Hvis du velger \\\"her i dialogen\\\", kan du fortelle mer allerede nå.\"\n" +
             "}";
 
     private static final HashMap<String, String> meldinger = HashMap.ofEntries(
@@ -77,13 +77,13 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             if (erNySykmeldtBrukerRegistrert) {
                 return List.of(
                         new Task<>()
-                                .withId(String.valueOf(msg.getId()) + "dialog")
+                                .withId(String.valueOf(msg.getId()) + "sykemeldtDialog")
                                 .withType(TYPE)
                                 .withData(new TypedField<>(new OppfolgingData(msg, sykemeldtDialog))));
             } else if (behovForArbeidsevnevurdering.equals(msg.getForeslattInnsatsgruppe())) {
                 return List.of(
                         new Task<>()
-                                .withId(String.valueOf(msg.getId()) + "dialog")
+                                .withId(String.valueOf(msg.getId()) + "arbeidsevneDialog")
                                 .withType(TYPE)
                                 .withData(new TypedField<>(new OppfolgingData(msg, arbeidsevnevurderingDialog))));
             }

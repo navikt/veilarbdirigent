@@ -28,10 +28,16 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             "SKAL_TIL_NY_ARBEIDSGIVER",
             "SKAL_TIL_SAMME_ARBEIDSGIVER"
     );
+    private final List<String> ingenHelsehindringerTyper = List.of(
+            "STANDARD_INNSATS",
+            "SITUASJONSBESTEMT_INNSATS"
+    );
 
     private static final String behovForArbeidsevnevurdering = "BEHOV_FOR_ARBEIDSEVNEVURDERING";
     private static final String sykemeldtDialog = "sykemeldt_dialog";
     private static final String arbeidsevnevurderingDialog = "arbeidsevnevurdering_dialog";
+    private static final String behovsvurderingDialog = "behovsvurdering_dialog";
+
 
     private static final String sykemeldtJson = "{\n" +
             "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
@@ -55,9 +61,17 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             "Skriv svaret ditt i feltet over. Hvis du velger \\\"her i dialogen\\\", kan du fortelle mer allerede nå.\"\n" +
             "}";
 
+    private static final String behovsvurderingJson = "{\n" +
+            "\"overskrift\": \"Mitt behov for veiledning\",\n" +
+            "\"tekst\": \"Hei!\\n" +
+            "Du er registrert som arbeidssøker og NAV trenger å bli kjent med ditt behov for hjelp fra oss, slik at vi kan gi deg riktig veiledning.\\n" +
+            "Hva mener du? Klik her og vurder hva du selv tenker https://behovsvurdering.nav.no\"\n" +
+            "}";
+
     private static final HashMap<String, String> meldinger = HashMap.ofEntries(
             Map.entry(sykemeldtDialog, sykemeldtJson),
-            Map.entry(arbeidsevnevurderingDialog, arbeidsevnevurderingJson)
+            Map.entry(arbeidsevnevurderingDialog, arbeidsevnevurderingJson),
+            Map.entry(behovsvurderingDialog, behovsvurderingJson)
     );
 
 
@@ -86,6 +100,12 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
                                 .withId(String.valueOf(msg.getId()) + "arbeidsevneDialog")
                                 .withType(TYPE)
                                 .withData(new TypedField<>(new OppfolgingData(msg, arbeidsevnevurderingDialog))));
+            } else if(ingenHelsehindringerTyper.contains(msg.getForeslattInnsatsgruppe())){
+                return List.of(
+                        new Task<>()
+                                .withId(String.valueOf(msg.getId() + "behovsvurderingDialog"))
+                                .withType(TYPE)
+                                .withData(new TypedField<>(new OppfolgingData(msg, behovsvurderingDialog))));
             }
 
             return List.empty();

@@ -65,13 +65,9 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
                         .withType(TYPE)
                         .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
                 new Task<>()
-                        .withId(String.valueOf(msg.getId()) + "cv_aktivitet")
+                        .withId(String.valueOf(msg.getId()) + "cv_jobbprofil_aktivitet")
                         .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "cv_aktivitet"))),
-                new Task<>()
-                        .withId(String.valueOf(msg.getId()) + "jobbonsker")
-                        .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "jobbonsker_aktivitet"))),
+                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "cv_jobbprofil_aktivitet"))),
                 new Task<>()
                         .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
                         .withType(TYPE)

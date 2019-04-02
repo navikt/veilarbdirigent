@@ -76,7 +76,6 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
         takeAndVerifyReceiver();
-        takeAndVerifyReceiver();
         takeAndVerifyDialogReceiver();
 
         delay(100);

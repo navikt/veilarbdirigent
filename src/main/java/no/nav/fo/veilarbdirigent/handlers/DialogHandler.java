@@ -100,13 +100,14 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
                                 .withId(String.valueOf(msg.getId()) + "arbeidsevneDialog")
                                 .withType(TYPE)
                                 .withData(new TypedField<>(new OppfolgingData(msg, arbeidsevnevurderingDialog))));
-            } else if(ingenHelsehindringerTyper.contains(msg.getForeslattInnsatsgruppe())){
-                return List.of(
-                        new Task<>()
-                                .withId(String.valueOf(msg.getId() + "behovsvurderingDialog"))
-                                .withType(TYPE)
-                                .withData(new TypedField<>(new OppfolgingData(msg, behovsvurderingDialog))));
             }
+//            else if(ingenHelsehindringerTyper.contains(msg.getForeslattInnsatsgruppe())){
+//                return List.of(
+//                        new Task<>()
+//                                .withId(String.valueOf(msg.getId() + "behovsvurderingDialog"))
+//                                .withType(TYPE)
+//                                .withData(new TypedField<>(new OppfolgingData(msg, behovsvurderingDialog))));
+//            }
 
             return List.empty();
         } else {

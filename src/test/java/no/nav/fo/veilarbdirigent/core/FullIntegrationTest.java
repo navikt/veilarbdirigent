@@ -81,7 +81,7 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         delay(100);
 
         Map<String, Integer> status = dao.fetchStatusnumbers();
-        assertThat(status.getOrElse("OK", 0)).isEqualTo(5);
+        assertThat(status.getOrElse("OK", 0)).isEqualTo(4);
         assertThat(status.getOrElse("FAILED", 0)).isEqualTo(0);
     }
 

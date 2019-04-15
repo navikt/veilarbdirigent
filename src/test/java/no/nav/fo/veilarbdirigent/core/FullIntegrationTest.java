@@ -107,7 +107,8 @@ class FullIntegrationTest extends AbstractIntegrationTest implements TaskCleanup
         FeedElement<OppfolgingDataFraFeed> element = new FeedElement<>();
         element.setId("1000");
         element.setElement(new OppfolgingDataFraFeed(1000, AKTOR_ID,
-                "BEHOV_FOR_ARBEIDSEVNEVURDERING", null, "SKAL_TIL_NY_ARBEIDSGIVER"));
+                "BEHOV_FOR_ARBEIDSEVNEVURDERING", null,
+                "SKAL_TIL_NY_ARBEIDSGIVER", false));
 
         FeedResponse<OppfolgingDataFraFeed> response = new FeedResponse<>();
         response.setNextPageId("1000");

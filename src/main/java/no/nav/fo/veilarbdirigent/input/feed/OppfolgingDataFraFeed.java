@@ -20,6 +20,7 @@ public class OppfolgingDataFraFeed implements Message, Comparable<OppfolgingData
     String foreslattInnsatsgruppe;
     Date opprettet;
     String sykmeldtBrukerType;
+    Boolean erManuell;
 
     @Override
     public int compareTo(OppfolgingDataFraFeed o) {

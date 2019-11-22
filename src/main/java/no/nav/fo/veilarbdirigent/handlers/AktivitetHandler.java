@@ -60,11 +60,7 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
         // The order decides in what order the tasks are executed. This the required order.
         // The last activity created is the first shown in he same column.
         return List.of(
-                new Task<>()
-                        .withId(String.valueOf(msg.getId()) + "mia")
-                        .withType(TYPE)
-                        .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "mulighet_i_arbeidsmarkedet_aktivitet"))),
-                new Task<>()
+               new Task<>()
                         .withId(String.valueOf(msg.getId()) + "cv_jobbprofil_aktivitet")
                         .withType(TYPE)
                         .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "cv_jobbprofil_aktivitet"))),

@@ -1,4 +1,4 @@
-package no.nav.fo.veilarbdirigent.output.veilarbaktivitet;
+package no.nav.fo.veilarbdirigent.output.services;
 
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;

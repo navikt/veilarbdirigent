@@ -10,9 +10,9 @@ Microservice som dirigerer oppgaver mellom ulike FO-applikasjoner.
 - Utførelsene av oppgavene er forskjellig basert på oppgave typen. Det kan være disse blir oversatt til utgående bedskjeder og sendt til andre systemer. Resultat av utførelsen av oppgaven blir alltid lagret og status oppdatert, både når ting funker og feiler. 
 
 
-# Komme i gang
+### Komme i gang
 
-```
+```sh
 # bygge
 mvn clean install 
 
@@ -26,10 +26,6 @@ mvn test
 
 ---
 
-# Henvendelser
+### Kontakt og spørsmål
 
 Spørsmål knyttet til koden eller prosjektet kan stilles via issues her på github.
-
-## For NAV-ansatte
-
-Interne henvendelser kan sendes via Slack i kanalen #team-oppfølging.

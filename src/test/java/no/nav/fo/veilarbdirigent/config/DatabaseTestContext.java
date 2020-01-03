@@ -1,9 +1,9 @@
 package no.nav.fo.veilarbdirigent.config;
 
 import io.vavr.control.Option;
-import no.nav.dialogarena.config.fasit.DbCredentials;
-import no.nav.dialogarena.config.fasit.FasitUtils;
-import no.nav.dialogarena.config.fasit.TestEnvironment;
+import no.nav.fasit.DbCredentials;
+import no.nav.fasit.FasitUtils;
+import no.nav.fasit.TestEnvironment;
 
 import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAME;
 import static no.nav.fo.veilarbdirigent.config.DbConfig.*;

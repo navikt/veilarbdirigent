@@ -4,18 +4,17 @@ import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
 import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
-import no.nav.fo.veilarbdirigent.output.veilarbaktivitet.MalverkService;
-import no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbaktivitetService;
+import no.nav.fo.veilarbdirigent.output.services.MalverkService;
+import no.nav.fo.veilarbdirigent.output.services.VeilarbaktivitetService;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandler.OppfolgingDataMedMal, AktivitetDTO> {
+public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandler.OppfolgingDataMedMal, String> {
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_AKTIVITET");
 
     @Inject
@@ -72,7 +71,7 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
     }
 
     @Override
-    public Try<AktivitetDTO> handle(OppfolgingDataMedMal data) {
+    public Try<String> handle(OppfolgingDataMedMal data) {
         return malverk.hentMal(data.predefineddataName)
                 .flatMap((template) -> service.lagAktivitet(data.feedelement.getAktorId(), template));
     }

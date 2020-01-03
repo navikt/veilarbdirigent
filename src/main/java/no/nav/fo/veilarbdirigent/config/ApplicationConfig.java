@@ -26,10 +26,6 @@ import javax.servlet.ServletContext;
 public class ApplicationConfig implements ApiApplication {
     public static final String APPLICATION_NAME = "veilarbdirigent";
 
-    @Override
-    public boolean brukSTSHelsesjekk() {
-        return false;
-    }
 
     @Override
     public void startup(ServletContext servletContext) {

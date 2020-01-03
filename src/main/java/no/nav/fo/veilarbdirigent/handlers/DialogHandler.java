@@ -6,17 +6,16 @@ import io.vavr.collection.Map;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import no.nav.fo.veilarbdialog.domain.NyHenvendelseDTO;
 import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
-import no.nav.fo.veilarbdirigent.output.veilarbaktivitet.VeilarbdialogService;
+import no.nav.fo.veilarbdirigent.output.services.VeilarbdialogService;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-public class DialogHandler implements MessageHandler, Actuator<DialogHandler.OppfolgingData, NyHenvendelseDTO> {
+public class DialogHandler implements MessageHandler, Actuator<DialogHandler.OppfolgingData, String> {
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_DIALOG");
 
     @Inject
@@ -97,7 +96,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
 
 
     @Override
-    public Try<NyHenvendelseDTO> handle(DialogHandler.OppfolgingData data) {
+    public Try<String> handle(DialogHandler.OppfolgingData data) {
         String dialogJson = meldinger
                 .get(data.meldingsName)
                 .getOrElse(sykemeldtJson);

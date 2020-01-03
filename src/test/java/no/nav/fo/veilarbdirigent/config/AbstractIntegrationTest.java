@@ -50,7 +50,6 @@ public abstract class AbstractIntegrationTest implements Cleanup {
         if (annotationConfigApplicationContext != null) {
             annotationConfigApplicationContext.stop();
             annotationConfigApplicationContext.close();
-            annotationConfigApplicationContext.destroy();
             annotationConfigApplicationContext = null;
         }
     }

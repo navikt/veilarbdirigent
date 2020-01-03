@@ -1,8 +1,6 @@
-package no.nav.fo.veilarbdirigent.output.veilarbaktivitet;
+package no.nav.fo.veilarbdirigent.output.services;
 
 import io.vavr.control.Try;
-import no.nav.fo.veilarbaktivitet.domain.AktivitetDTO;
-import no.nav.fo.veilarbdialog.domain.NyHenvendelseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -32,13 +30,13 @@ public class VeilarbdialogService {
         }
     }
 
-    public Try<NyHenvendelseDTO> lagDialog(String aktorId, String data) {
+    public Try<String> lagDialog(String aktorId, String data) {
         String url = String.format("%s/dialog?aktorId=%s", host, aktorId);
         Invocation.Builder request = client.target(url).request();
         Response post = request.post(Entity.entity(data, MediaType.APPLICATION_JSON));
 
         if (post.getStatus() >= 200 && post.getStatus() < 300) {
-            NyHenvendelseDTO response = post.readEntity(NyHenvendelseDTO.class);
+            String response = post.readEntity(String.class);
             return Try.success(response);
         } else {
             String message = post.readEntity(String.class);

@@ -1,5 +1,6 @@
 VeilarbDirigent
 ================
+[![CircleCI](https://circleci.com/gh/navikt/veilarbdirigent.svg?style=svg)](https://circleci.com/gh/navikt/veilarbdirigent)
 
 Microservice som dirigerer oppgaver mellom ulike FO-applikasjoner. 
 

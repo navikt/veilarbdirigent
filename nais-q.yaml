@@ -46,7 +46,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/service_user
       - kvPath: /kv/preprod/fss/veilarbdirigent/{{namespace}}
         mountPath: /var/run/secrets/nais.io/vault
-  webproxy: true
   env:
     - APPDYNAMICS_AGENT_ACCOUNT_NAME
     - APPDYNAMICS_CONTROLLER_HOST_NAME

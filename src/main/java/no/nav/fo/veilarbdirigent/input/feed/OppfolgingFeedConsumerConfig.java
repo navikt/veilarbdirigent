@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
+import java.util.function.Supplier;
 
 import static no.nav.sbl.util.EnvironmentUtils.getOptionalProperty;
-import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
 
 @Configuration
 public class OppfolgingFeedConsumerConfig {
@@ -25,8 +25,8 @@ public class OppfolgingFeedConsumerConfig {
     private final String host;
 
     public OppfolgingFeedConsumerConfig() {
-        String naisUrl = UrlUtils.clusterUrlForApplication("veilarboppfolging") + "/veilarboppfolging/api";
-        host = getOptionalProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY).orElse(naisUrl);
+        Supplier<String> naisUrl = () -> UrlUtils.clusterUrlForApplication("veilarboppfolging") + "/veilarboppfolging/api";
+        host = getOptionalProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY).orElseGet(naisUrl);
     }
 
     @Bean

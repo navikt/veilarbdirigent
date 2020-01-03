@@ -10,6 +10,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.function.Supplier;
 
 import static no.nav.sbl.util.EnvironmentUtils.getOptionalProperty;
 
@@ -22,8 +23,8 @@ public class VeilarbaktivitetService {
     private Client client;
 
     public VeilarbaktivitetService() {
-        String naisUrl = UrlUtils.clusterUrlForApplication("veilarbaktivitet") + "/veilarbaktivitet/api";
-        this.host = getOptionalProperty(VEILARBAKTIVITETAPI_URL_PROPERTY).orElse(naisUrl);
+        Supplier<String> naisUrl =  () -> UrlUtils.clusterUrlForApplication("veilarbaktivitet") + "/veilarbaktivitet/api";
+        this.host = getOptionalProperty(VEILARBAKTIVITETAPI_URL_PROPERTY).orElseGet(naisUrl);
     }
 
     public static class VeilArbAktivitetServiceException extends Exception {

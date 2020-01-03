@@ -1,6 +1,7 @@
 package no.nav.fo.veilarbdirigent.output.services;
 
 import io.vavr.control.Try;
+import no.nav.apiapp.util.UrlUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -10,7 +11,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
+import static no.nav.sbl.util.EnvironmentUtils.getOptionalProperty;
 
 @Service
 public class VeilarbdialogService {
@@ -21,7 +22,8 @@ public class VeilarbdialogService {
     private Client client;
 
     public VeilarbdialogService() {
-        this.host = getRequiredProperty(VEILARBDIALOGAPI_URL_PROPERTY);
+        String naisUrl = UrlUtils.clusterUrlForApplication("veilarbdialog") + "/veilarbdialog/api";
+        this.host = getOptionalProperty(VEILARBDIALOGAPI_URL_PROPERTY).orElse(naisUrl);
     }
 
     public static class VeilArbDialogServiceException extends Exception {

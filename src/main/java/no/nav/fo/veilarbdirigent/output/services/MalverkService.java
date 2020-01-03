@@ -2,12 +2,13 @@ package no.nav.fo.veilarbdirigent.output.services;
 
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.apiapp.util.UrlUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 
-import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
+import static no.nav.sbl.util.EnvironmentUtils.getOptionalProperty;
 
 @Service
 @Slf4j
@@ -19,7 +20,8 @@ public class MalverkService {
     private Client client;
 
     public MalverkService() {
-        this.host = getRequiredProperty(VEILARBMALVERKAPI_URL_PROPERTY);
+        String naisUrl = UrlUtils.clusterUrlForApplication("veilarbmalverk") + "/veilarbmalverk/api";
+        this.host = getOptionalProperty(VEILARBMALVERKAPI_URL_PROPERTY).orElse(naisUrl);
     }
 
     public Try<String> hentMal(String name) {

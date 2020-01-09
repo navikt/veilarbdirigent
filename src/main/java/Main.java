@@ -17,8 +17,6 @@ public class Main {
     public static final String REDIRECT_URL_PROPERTY = "VEILARBLOGIN_REDIRECT_URL_URL";
 
     public static void main(String... args) {
-        readFromConfigMap();
-
         NaisUtils.Credentials serviceUser = getCredentials("service_user");
 
         //CXF
@@ -37,22 +35,6 @@ public class Main {
 
         MigrationUtils.createTables(DbConfig.getDataSource());
         ApiApp.runApp(ApplicationConfig.class, args);
-    }
-
-
-    private static void readFromConfigMap() {
-        NaisUtils.addConfigMapToEnv("pto-config",
-                "SECURITYTOKENSERVICE_URL",
-                "ISSO_HOST_URL",
-                "ISSO_JWKS_URL",
-                "ISSO_ISSUER_URL",
-                "ISSO_ISALIVE_URL",
-                "VEILARBLOGIN_REDIRECT_URL_DESCRIPTION",
-                "VEILARBLOGIN_REDIRECT_URL_URL",
-                "LOGINSERVICE_OIDC_CALLBACKURI",
-                "LOGINSERVICE_OIDC_DISCOVERYURI",
-                "SECURITY_TOKEN_SERVICE_OPENID_CONFIGURATION_URL"
-        );
     }
 
 }

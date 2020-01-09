@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.common</groupId>
         <artifactId>mor-pom</artifactId>
-        <version>2019.01.07.10.09</version>
+        <version>1.2020.01.07-16.15-300a924a10d4</version>
     </parent>
 
     <groupId>no.nav.fo</groupId>
@@ -17,14 +17,7 @@
 
     <properties>
         <hikariCP.version>2.7.3</hikariCP.version>
-        <aktivitet.api.version>505.20180309.1654</aktivitet.api.version>
-        <dialog.api.version>457.20181112.1429</dialog.api.version>
         <okhttp3.version>3.10.0</okhttp3.version>
-        <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
-        <sonar.coverage.exclusions>
-            **/java/Main.java,
-            **/*Config.java
-        </sonar.coverage.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -32,7 +25,7 @@
             <dependency>
                 <groupId>no.nav.common</groupId>
                 <artifactId>bom</artifactId>
-                <version>2019.01.07.10.09</version>
+                <version>${project.parent.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -82,16 +75,6 @@
             <groupId>no.nav.common</groupId>
             <artifactId>metrics</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.fo</groupId>
-            <artifactId>veilarbaktivitet-api</artifactId>
-            <version>${aktivitet.api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.fo</groupId>
-            <artifactId>veilarbdialog-api</artifactId>
-            <version>${dialog.api.version}</version>
-        </dependency>
 
         <!-- javax/spring -->
         <dependency>
@@ -131,8 +114,8 @@
             <artifactId>spring-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
+            <groupId>com.oracle.ojdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>

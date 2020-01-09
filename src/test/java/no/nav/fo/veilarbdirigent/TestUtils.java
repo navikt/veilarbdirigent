@@ -4,8 +4,8 @@ import io.vavr.collection.List;
 import lombok.SneakyThrows;
 import no.nav.brukerdialog.security.Constants;
 import no.nav.brukerdialog.tools.SecurityConstants;
-import no.nav.dialogarena.config.fasit.FasitUtils;
-import no.nav.dialogarena.config.fasit.ServiceUser;
+import no.nav.fasit.FasitUtils;
+import no.nav.fasit.ServiceUser;
 import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.api.TaskType;
@@ -62,20 +62,16 @@ public class TestUtils {
     }
 
     public static void setupSecurity(){
-        String issoHost = FasitUtils.getBaseUrl("isso-host");
-        String issoJWS = FasitUtils.getBaseUrl("isso-jwks");
-        String issoISSUER = FasitUtils.getBaseUrl("isso-issuer");
-        String issoIsAlive = FasitUtils.getBaseUrl("isso.isalive", FasitUtils.Zone.FSS);
-        ServiceUser srvveilarbdirigent = FasitUtils.getServiceUser("srvveilarbdirigent", APPLICATION_NAME);
-        ServiceUser isso_rp_user = FasitUtils.getServiceUser("isso-rp-user", APPLICATION_NAME);
+        setProperty(Constants.ISSO_HOST_URL_PROPERTY_NAME, "https://localhost:6218");
+        setProperty(Constants.ISSO_RP_USER_USERNAME_PROPERTY_NAME, "123");
+        setProperty(Constants.ISSO_RP_USER_PASSWORD_PROPERTY_NAME, "123");
+        setProperty(Constants.ISSO_JWKS_URL_PROPERTY_NAME, "https://localhost:6218");
+        setProperty(Constants.ISSO_ISSUER_URL_PROPERTY_NAME, "https://localhost:6218");
+        setProperty(Constants.ISSO_ISALIVE_URL_PROPERTY_NAME, "https://localhost:6218");
+        setProperty(SecurityConstants.SYSTEMUSER_USERNAME, "112");
+        setProperty(SecurityConstants.SYSTEMUSER_PASSWORD, "123");
 
-        setProperty(Constants.ISSO_HOST_URL_PROPERTY_NAME, issoHost);
-        setProperty(Constants.ISSO_RP_USER_USERNAME_PROPERTY_NAME, isso_rp_user.getUsername());
-        setProperty(Constants.ISSO_RP_USER_PASSWORD_PROPERTY_NAME, isso_rp_user.getPassword());
-        setProperty(Constants.ISSO_JWKS_URL_PROPERTY_NAME, issoJWS);
-        setProperty(Constants.ISSO_ISSUER_URL_PROPERTY_NAME, issoISSUER);
-        setProperty(Constants.ISSO_ISALIVE_URL_PROPERTY_NAME, issoIsAlive);
-        setProperty(SecurityConstants.SYSTEMUSER_USERNAME, srvveilarbdirigent.getUsername());
-        setProperty(SecurityConstants.SYSTEMUSER_PASSWORD, srvveilarbdirigent.getPassword());
+        setProperty("oidc-redirect.url", "https://localhost:6218");
+
     }
 }

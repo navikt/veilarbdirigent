@@ -2,6 +2,7 @@ package no.nav.fo.veilarbdirigent.input.feed;
 
 import io.vavr.collection.List;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
+import no.nav.apiapp.util.UrlUtils;
 import no.nav.brukerdialog.security.oidc.OidcFeedOutInterceptor;
 import no.nav.fo.feed.consumer.FeedConsumer;
 import no.nav.fo.feed.consumer.FeedConsumerConfig;
@@ -9,8 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
+import java.util.function.Supplier;
 
-import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
+import static no.nav.sbl.util.EnvironmentUtils.getOptionalProperty;
 
 @Configuration
 public class OppfolgingFeedConsumerConfig {
@@ -23,7 +25,8 @@ public class OppfolgingFeedConsumerConfig {
     private final String host;
 
     public OppfolgingFeedConsumerConfig() {
-        host = getRequiredProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY);
+        Supplier<String> naisUrl = () -> UrlUtils.clusterUrlForApplication("veilarboppfolging") + "/veilarboppfolging/api";
+        host = getOptionalProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY).orElseGet(naisUrl);
     }
 
     @Bean

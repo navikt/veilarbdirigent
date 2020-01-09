@@ -39,7 +39,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /oracle/data/prod/creds/veilarbdirigent-user
+      - kvPath: /oracle/data/prod/creds/veilarbdirigent_p-user
         mountPath: /var/run/secrets/nais.io/oracle_creds
       - kvPath: /serviceuser/data/prod/srvveilarbdirigent
         mountPath: /var/run/secrets/nais.io/service_user

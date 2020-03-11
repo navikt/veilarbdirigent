@@ -14,6 +14,9 @@ import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
 
 public class DialogHandler implements MessageHandler, Actuator<DialogHandler.OppfolgingData, String> {
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_DIALOG");
@@ -71,6 +74,16 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
     public List<Task> handle(Message message) {
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
+
+
+            // creating a Calendar object
+            Calendar c = Calendar.getInstance();
+            c.set(2020, Calendar.MARCH, 12, 0, 0, 0);
+            Date turnOfDate = c.getTime();
+
+            if (Optional.ofNullable(msg.getOpprettet()).map(d -> d.after(turnOfDate)).orElse(true)){
+                return List.empty();
+            }
 
             boolean erNySykmeldtBrukerRegistrert = sykmeldtBrukerTyper.contains(msg.getSykmeldtBrukerType());
 

@@ -4,12 +4,11 @@ import io.vavr.collection.List;
 import lombok.SneakyThrows;
 import no.nav.brukerdialog.security.Constants;
 import no.nav.brukerdialog.tools.SecurityConstants;
-import no.nav.fasit.FasitUtils;
-import no.nav.fasit.ServiceUser;
 import no.nav.fo.veilarbdirigent.core.api.Status;
 import no.nav.fo.veilarbdirigent.core.api.Task;
 import no.nav.fo.veilarbdirigent.core.api.TaskType;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
+import no.nav.sbl.dialogarena.common.cxf.StsSecurityConstants;
 import no.nav.sbl.jdbc.Transactor;
 import org.mockito.ArgumentCaptor;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -18,7 +17,6 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 
 import static java.lang.System.setProperty;
-import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.APPLICATION_NAME;
 
 public class TestUtils {
     public static TaskType TASK_TYPE = new TaskType("mock");
@@ -72,6 +70,7 @@ public class TestUtils {
         setProperty(SecurityConstants.SYSTEMUSER_PASSWORD, "123");
 
         setProperty("oidc-redirect.url", "https://localhost:6218");
+        setProperty(StsSecurityConstants.STS_URL_KEY, "https://localhost:6218");
 
     }
 }

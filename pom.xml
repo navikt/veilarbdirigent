@@ -75,6 +75,10 @@
             <groupId>no.nav.common</groupId>
             <artifactId>metrics</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>aktor-klient</artifactId>
+        </dependency>
 
         <!-- javax/spring -->
         <dependency>

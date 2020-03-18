@@ -8,6 +8,9 @@ import no.nav.sbl.dialogarena.common.cxf.StsSecurityConstants;
 
 import static no.nav.brukerdialog.security.Constants.OIDC_REDIRECT_URL_PROPERTY_NAME;
 import static no.nav.common.utils.NaisUtils.getCredentials;
+import static no.nav.dialogarena.aktor.AktorConfig.AKTOER_ENDPOINT_URL;
+import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.AKTOER_V2_ENDPOINTURL;
+import static no.nav.fo.veilarbdirigent.config.ApplicationConfig.SECURITYTOKENSERVICE_URL;
 import static no.nav.fo.veilarbdirigent.config.DbConfig.VEILARBDIRIGENTDB_PASSWORD;
 import static no.nav.fo.veilarbdirigent.config.DbConfig.VEILARBDIRIGENTDB_USERNAME;
 import static no.nav.sbl.util.EnvironmentUtils.getRequiredProperty;
@@ -32,6 +35,10 @@ public class Main {
         NaisUtils.Credentials oracleCreds = getCredentials("oracle_creds");
         System.setProperty(VEILARBDIRIGENTDB_USERNAME, oracleCreds.username);
         System.setProperty(VEILARBDIRIGENTDB_PASSWORD, oracleCreds.password);
+
+        System.setProperty(AKTOER_ENDPOINT_URL, getRequiredProperty(AKTOER_V2_ENDPOINTURL));
+        System.setProperty(StsSecurityConstants.STS_URL_KEY, getRequiredProperty(SECURITYTOKENSERVICE_URL));
+
 
         MigrationUtils.createTables(DbConfig.getDataSource());
         ApiApp.runApp(ApplicationConfig.class, args);

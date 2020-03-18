@@ -1,67 +1,53 @@
 package no.nav.fo.veilarbdirigent.handlers;
 
-import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
-import io.vavr.collection.Map;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
+import no.nav.fo.veilarbdirigent.output.domain.Besvarelse;
+import no.nav.fo.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
+import no.nav.fo.veilarbdirigent.output.domain.DinSituasjonSvar;
+import no.nav.fo.veilarbdirigent.output.domain.OrdinaerBrukerRegistrering;
 import no.nav.fo.veilarbdirigent.output.services.VeilarbdialogService;
+import no.nav.fo.veilarbdirigent.output.services.VeilarbregisteringService;
 import no.nav.fo.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
 
 public class DialogHandler implements MessageHandler, Actuator<DialogHandler.OppfolgingData, String> {
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_DIALOG");
 
     @Inject
     Core core;
+
+    @Inject
+    private VeilarbregisteringService veilarbregisteringService;
+
     @Inject
     private VeilarbdialogService service;
 
-    private final List<String> sykmeldtBrukerTyper = List.of(
-            "SKAL_TIL_NY_ARBEIDSGIVER",
-            "SKAL_TIL_SAMME_ARBEIDSGIVER"
-    );
+    private static final String permitertDialog = "kanskje_permitert_dialog";
 
-    private static final String behovForArbeidsevnevurdering = "BEHOV_FOR_ARBEIDSEVNEVURDERING";
-    private static final String sykemeldtDialog = "sykemeldt_dialog";
-    private static final String arbeidsevnevurderingDialog = "arbeidsevnevurdering_dialog";
-
-
-    private static final String sykemeldtJson = "{\n" +
-            "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
+    private static final String permitertJson = "{\n" +
+            "\"overskrift\": \"Permittering – automatisk melding fra NAV\",\n" +
             "\"tekst\": \"Hei!\\n" +
-            "Du har svart at du trenger mer veiledning nå som retten til sykepenger nærmer seg slutten. Vi vil veilede deg videre og trenger derfor å vite litt mer.\\n" +
-            "Du kan velge om du vil fortelle om situasjonen din \\n" +
-            "- i et møte med veilederen din på NAV-kontoret\\n" +
-            "- i en telefonsamtale\\n" +
-            "- her i dialogen\\n" +
-            "Skriv svaret ditt i feltet over. Hvis du velger \\\"her i dialogen\\\", kan du fortelle mer allerede nå.\"\n" +
+            "Du har svart at du er permittert eller kommer til å bli permittert. \\n\\n" +
+            "Dette bør du gjøre nå:\\n" +
+            "- Ha tett kontakt med arbeidsgiveren din om situasjonen fremover.\\n" +
+            "- Oppdater CV og jobbprofil på www.arbeidsplassen.no/cv slik at du er tilgjengelig for eventuelle kortvarige oppdrag mens du er permittert. På grunn av situasjonen med korona-viruset vil det bli økt behov for arbeidskraft på flere områder. Tenk deg om – kanskje du har kompetanse som samfunnet vil ha ekstra behov for i en periode fremover?\\n\\n" +
+            "Hvis du kommer tilbake i jobben din eller mister jobben, så er det viktig at du gir beskjed til NAV. Du kan gi beskjed her i «Dialog med veilederen din».\\n\\n" +
+            "Hvis det ikke skjer noen endringer i din situasjon som permittert, så trenger du ikke svare på denne meldingen. Takk for din tålmodighet og forståelse.\\n" +
+            "Hilsen NAV\"\n" +
             "}";
 
-    private static final String arbeidsevnevurderingJson = "{\n" +
-            "\"overskrift\": \"Mer veiledning fra NAV\",\n" +
-            "\"tekst\": \"Hei!\\n" +
-            "Du har svart at du har utfordringer som hindrer deg i å søke eller være i jobb. Vi vil veilede deg videre og trenger derfor å vite litt mer.\\n" +
-            "Du kan velge om du vil fortelle om situasjonen din \\n" +
-            "- i et møte med veilederen din på NAV-kontoret\\n" +
-            "- i en telefonsamtale\\n" +
-            "- her i dialogen\\n" +
-            "Skriv svaret ditt i feltet over. Hvis du velger \\\"her i dialogen\\\", kan du fortelle mer allerede nå.\"\n" +
-            "}";
-
-    private static final HashMap<String, String> meldinger = HashMap.ofEntries(
-            Map.entry(sykemeldtDialog, sykemeldtJson),
-            Map.entry(arbeidsevnevurderingDialog, arbeidsevnevurderingJson)
-    );
+    private final List<String> registeringForslag = List.of("STANDARD_INNSATS",
+            "SITUASJONSBESTEMT_INNSATS",
+            "BEHOV_FOR_ARBEIDSEVNEVURDERING");
 
 
     @PostConstruct
@@ -75,55 +61,45 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
         if (message instanceof OppfolgingDataFraFeed) {
             OppfolgingDataFraFeed msg = (OppfolgingDataFraFeed) message;
 
-
-            // creating a Calendar object
-            Calendar c = Calendar.getInstance();
-            c.set(2020, Calendar.MARCH, 12, 0, 0, 0);
-            Date turnOfDate = c.getTime();
-
-            if (Optional.ofNullable(msg.getOpprettet()).map(d -> d.after(turnOfDate)).orElse(true)){
-                return List.empty();
-            }
-
-            boolean erNySykmeldtBrukerRegistrert = sykmeldtBrukerTyper.contains(msg.getSykmeldtBrukerType());
-
-            if (erNySykmeldtBrukerRegistrert) {
+            boolean erNyRegistrert = registeringForslag.contains(msg.getForeslattInnsatsgruppe());
+            if (erNyRegistrert) {
                 return List.of(
                         new Task<>()
-                                .withId(String.valueOf(msg.getId()) + "sykemeldtDialog")
+                                .withId(String.valueOf(msg.getId()) + "kanskjePermitert")
                                 .withType(TYPE)
-                                .withData(new TypedField<>(new OppfolgingData(msg, sykemeldtDialog))));
-            } else if (behovForArbeidsevnevurdering.equals(msg.getForeslattInnsatsgruppe())) {
-                return List.of(
-                        new Task<>()
-                                .withId(String.valueOf(msg.getId()) + "arbeidsevneDialog")
-                                .withType(TYPE)
-                                .withData(new TypedField<>(new OppfolgingData(msg, arbeidsevnevurderingDialog))));
+                                .withData(new TypedField<>(new OppfolgingData(msg, permitertDialog))));
             }
-
-            return List.empty();
-        } else {
-            return List.empty();
         }
+        return List.empty();
     }
 
 
     @Override
     public Try<String> handle(DialogHandler.OppfolgingData data) {
-        String dialogJson = meldinger
-                .get(data.meldingsName)
-                .getOrElse(sykemeldtJson);
 
-        return service.lagDialog(data.feedelement.getAktorId(), dialogJson);
+        Try<BrukerRegistreringWrapper> registeringsData = veilarbregisteringService.hentRegistrering(data.feedelement.getAktorId());
+        if(registeringsData.isFailure()){
+            return Try.failure(registeringsData.getCause());
+        }
+
+        Option<DinSituasjonSvar> svar = registeringsData
+                .toOption()
+                .flatMap(Option::of)
+                .map(BrukerRegistreringWrapper::getRegistrering)
+                .map(OrdinaerBrukerRegistrering::getBesvarelse)
+                .map(Besvarelse::getDinSituasjon);
+
+
+        if(svar.map(DinSituasjonSvar.ER_PERMITTERT::equals).getOrElse(false)){
+            return service.lagDialog(data.feedelement.getAktorId(), permitertJson);
+        }
+
+        return Try.success("Nothing to do here");
     }
 
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OppfolgingData {
-        public OppfolgingData(OppfolgingDataFraFeed feedelement) {
-            this.feedelement = feedelement;
-        }
-
         public OppfolgingDataFraFeed feedelement;
         public String meldingsName;
     }

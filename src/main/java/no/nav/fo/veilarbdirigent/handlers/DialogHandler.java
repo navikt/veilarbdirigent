@@ -70,8 +70,12 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
     @Override
     public Try<String> handle(DialogHandler.OppfolgingData data) {
 
-        Option<DinSituasjonSvar> svar = veilarbregisteringService
-                .hentRegistrering(data.feedelement.getAktorId())
+        Try<OrdinaerBrukerRegistrering> registeringsData = veilarbregisteringService.hentRegistrering(data.feedelement.getAktorId());
+        if(registeringsData.isFailure()){
+            return Try.failure(registeringsData.getCause());
+        }
+
+        Option<DinSituasjonSvar> svar = registeringsData
                 .toOption()
                 .flatMap(Option::of)
                 .map(OrdinaerBrukerRegistrering::getBesvarelse)

@@ -41,7 +41,6 @@ public class VeilarbregisteringService {
                     if (resp.getStatus() == 204){
                         return null;
                     }
-                    log.info("Response: " + resp.readEntity(String.class));
                     OrdinaerBrukerRegistrering registrering = resp.readEntity(OrdinaerBrukerRegistrering.class);
 
                     log.info("Entety resp: " + registrering.toString());

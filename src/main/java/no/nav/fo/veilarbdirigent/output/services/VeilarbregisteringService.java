@@ -4,7 +4,7 @@ import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.apiapp.util.UrlUtils;
 import no.nav.dialogarena.aktor.AktorService;
-import no.nav.fo.veilarbdirigent.output.domain.OrdinaerBrukerRegistrering;
+import no.nav.fo.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -30,7 +30,7 @@ public class VeilarbregisteringService {
         this.host = getOptionalProperty(VEILARBREGISTRERINGAPI_URL_PROPERTY).orElseGet(naisUrl);
     }
 
-    public Try<OrdinaerBrukerRegistrering> hentRegistrering(String aktorId) {
+    public Try<BrukerRegistreringWrapper> hentRegistrering(String aktorId) {
         return Try.of(() -> {
             String fnr = aktorService.getFnr(aktorId).get();
             String url = String.format("%s/registrering?fnr=%s", host, fnr);
@@ -41,7 +41,7 @@ public class VeilarbregisteringService {
                     if (resp.getStatus() == 204){
                         return null;
                     }
-                    OrdinaerBrukerRegistrering registrering = resp.readEntity(OrdinaerBrukerRegistrering.class);
+                    BrukerRegistreringWrapper registrering = resp.readEntity(BrukerRegistreringWrapper.class);
 
                     log.info("Entety resp: " + registrering.toString());
 

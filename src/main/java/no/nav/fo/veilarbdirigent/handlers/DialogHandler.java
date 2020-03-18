@@ -9,6 +9,7 @@ import no.nav.fo.veilarbdirigent.core.Core;
 import no.nav.fo.veilarbdirigent.core.api.*;
 import no.nav.fo.veilarbdirigent.input.feed.OppfolgingDataFraFeed;
 import no.nav.fo.veilarbdirigent.output.domain.Besvarelse;
+import no.nav.fo.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
 import no.nav.fo.veilarbdirigent.output.domain.DinSituasjonSvar;
 import no.nav.fo.veilarbdirigent.output.domain.OrdinaerBrukerRegistrering;
 import no.nav.fo.veilarbdirigent.output.services.VeilarbdialogService;
@@ -70,7 +71,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
     @Override
     public Try<String> handle(DialogHandler.OppfolgingData data) {
 
-        Try<OrdinaerBrukerRegistrering> registeringsData = veilarbregisteringService.hentRegistrering(data.feedelement.getAktorId());
+        Try<BrukerRegistreringWrapper> registeringsData = veilarbregisteringService.hentRegistrering(data.feedelement.getAktorId());
         if(registeringsData.isFailure()){
             return Try.failure(registeringsData.getCause());
         }
@@ -78,6 +79,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
         Option<DinSituasjonSvar> svar = registeringsData
                 .toOption()
                 .flatMap(Option::of)
+                .map(BrukerRegistreringWrapper::getRegistrering)
                 .map(OrdinaerBrukerRegistrering::getBesvarelse)
                 .map(Besvarelse::getDinSituasjon);
 

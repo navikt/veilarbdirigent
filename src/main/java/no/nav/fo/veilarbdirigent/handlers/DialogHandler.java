@@ -35,8 +35,8 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
 
     private static final String permitertJson = "{\n" +
             "\"overskrift\": \"PERM!!\",\n" +
-            "\"tekst\": \"Hei!\\n" +
-            "Nå har du fri en stund \\n" +
+            "\"tekst\": \"Hei!\n" +
+            "Nå har du fri en stund \"\n" +
             "}";
 
     private final List<String> registeringForslag = List.of("STANDARD_INNSATS",

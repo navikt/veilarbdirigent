@@ -41,11 +41,7 @@ public class VeilarbregisteringService {
                     if (resp.getStatus() == 204){
                         return null;
                     }
-                    BrukerRegistreringWrapper registrering = resp.readEntity(BrukerRegistreringWrapper.class);
-
-                    log.info("Entety resp: " + registrering.toString());
-
-                    return registrering;
+                    return resp.readEntity(BrukerRegistreringWrapper.class);
                 })
                 .onFailure((error) -> log.warn("Fail to request registrering: " + error));
     }

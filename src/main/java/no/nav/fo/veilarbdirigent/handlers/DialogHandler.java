@@ -39,7 +39,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             "Du har svart at du er permittert eller kommer til å bli permittert. \\n\\n" +
             "Dette bør du gjøre nå:\\n" +
             "- Ha tett kontakt med arbeidsgiveren din om situasjonen fremover.\\n" +
-            "- Oppdater CV-en og jobbprofil på www.arbeidsplassen.no/cv slik at du er tilgjengelig for eventuelle kortvarige oppdrag mens du er permittert. På grunn av situasjonen med korona-viruset vil det bli økt behov for arbeidskraft på flere områder. Tenk deg om – kanskje du har kompetanse som samfunnet vil ha ekstra behov for i en periode fremover?\\n\\n" +
+            "- Oppdater CV og jobbprofil på www.arbeidsplassen.no/cv slik at du er tilgjengelig for eventuelle kortvarige oppdrag mens du er permittert. På grunn av situasjonen med korona-viruset vil det bli økt behov for arbeidskraft på flere områder. Tenk deg om – kanskje du har kompetanse som samfunnet vil ha ekstra behov for i en periode fremover?\\n\\n" +
             "Hvis du kommer tilbake i jobben din eller mister jobben, så er det viktig at du gir beskjed til NAV. Du kan gi beskjed her i «Dialog med veilederen din».\\n\\n" +
             "Hvis det ikke skjer noen endringer i din situasjon som permittert, så trenger du ikke svare på denne meldingen. Takk for din tålmodighet og forståelse.\\n" +
             "Hilsen NAV\"\n" +

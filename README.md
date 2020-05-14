@@ -23,7 +23,6 @@ mvn test
 # For lokal test kjøring kjør MainTest.java
 ```
 
-
 ### Kontakt og spørsmål
 
 Spørsmål knyttet til koden eller prosjektet kan stilles via issues her på github.

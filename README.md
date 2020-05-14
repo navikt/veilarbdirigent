@@ -22,7 +22,6 @@ mvn test
 # For lokal test kjøring kjør VeilarbdirigentTestApp.java
 ```
 
-
 ### Kontakt og spørsmål
 
 Spørsmål knyttet til koden eller prosjektet kan stilles via issues her på github.

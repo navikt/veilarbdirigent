@@ -37,7 +37,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             "\"overskrift\": \"Permittering – automatisk melding fra NAV\",\n" +
             "\"tekst\": \"Hei!\\n" +
             "Ha tett kontakt med arbeidsgiveren din om situasjonen fremover, nå når du er permittert. Når du har begynt i jobben din igjen, eller mister jobben, så [gir du beskjed til NAV slik](https://www.nav.no/arbeid/no/dagpenger/#gi-beskjed-hvis-situasjonen-din-endrer-seg).\\n" +
-            "Du finner informasjon om [dagpenger og permittering her](https://www.nav.no/arbeid/no/permittert/).\\n" +
+            "Du finner informasjon om [dagpenger og permittering her](https://www.nav.no/arbeid/no/permittert).\\n" +
             "Hilsen NAV\"\n" +
             "}";
 

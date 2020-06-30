@@ -9,6 +9,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import java.io.IOException;
+import java.util.UUID;
 
 @Configuration
 public class ClientConfig {
@@ -26,7 +27,14 @@ public class ClientConfig {
         @Override
         public void filter(ClientRequestContext clientRequestContext) throws IOException {
             clientRequestContext.getHeaders().putSingle("Authorization", "Bearer " + systemUserTokenProvider.getToken());
+            clientRequestContext.getHeaders().putSingle("Nav-Consumer-Id", "veilarbdirigent");
+            clientRequestContext.getHeaders().putSingle("Nav-Call-Id", generateId());
         }
+    }
+
+    public static String generateId() {
+        UUID uuid = UUID.randomUUID();
+        return Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
     }
 
 }

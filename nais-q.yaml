@@ -49,4 +49,4 @@ spec:
     - name: APP_ENVIRONMENT_NAME
       value: {{namespace}}
     - name: VEILARBREGISTRERINGAPI_URL
-      value: https://veilarbregistrering-q0.nais.preprod.local
+      value: https://veilarbregistrering-q0.nais.preprod.local/veilarbregistrering/api

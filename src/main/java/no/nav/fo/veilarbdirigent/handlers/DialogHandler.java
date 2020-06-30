@@ -36,12 +36,8 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
     private static final String permitertJson = "{\n" +
             "\"overskrift\": \"Permittering – automatisk melding fra NAV\",\n" +
             "\"tekst\": \"Hei!\\n" +
-            "Du har svart at du er permittert eller kommer til å bli permittert. \\n\\n" +
-            "Dette bør du gjøre nå:\\n" +
-            "- Ha tett kontakt med arbeidsgiveren din om situasjonen fremover.\\n" +
-            "- Oppdater CV-en og jobbprofilen din på www.arbeidsplassen.no/cv slik at du er tilgjengelig for eventuelle kortvarige oppdrag mens du er permittert. Situasjonen rundt korona-viruset gjør at det vil bli økt behov for arbeidskraft på flere områder. Tenk deg om – kanskje du har kompetanse som samfunnet har ekstra behov for i en periode fremover?\\n\\n" +
-            "Når du har begynt i jobben din igjen, eller mister jobben, så er det viktig at du gir beskjed til NAV. Du kan gi beskjed her i «Dialog med veilederen din».\\n\\n" +
-            "Hvis du ikke har mer informasjon om situasjonen din, trenger du ikke svare på denne meldingen. Takk for din tålmodighet og forståelse.\\n" +
+            "Ha tett kontakt med arbeidsgiveren din om situasjonen fremover, nå når du er permittert. Når du har begynt i jobben din igjen, eller mister jobben, så [gir du beskjed til NAV slik](https://www.nav.no/arbeid/no/dagpenger/#gi-beskjed-hvis-situasjonen-din-endrer-seg).\\n" +
+            "Du finner informasjon om [dagpenger og permittering her](https://www.nav.no/arbeid/no/permittert).\\n" +
             "Hilsen NAV\"\n" +
             "}";
 

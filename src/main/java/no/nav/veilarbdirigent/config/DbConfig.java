@@ -11,7 +11,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import static no.nav.common.utils.NaisUtils.getCredentials;
@@ -38,7 +37,9 @@ public class DbConfig {
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 
-        return new HikariDataSource(config);
+        var dataSource = new HikariDataSource(config);
+        migrateDb(dataSource);
+        return dataSource;
     }
 
     @Bean
@@ -56,8 +57,7 @@ public class DbConfig {
         return new Transactor(transactionManager);
     }
 
-    @PostConstruct
-    public void migrateDb(DataSource dataSource) {
+    public static void migrateDb(DataSource dataSource) {
         Flyway flyway = new Flyway();
         flyway.setDataSource(dataSource);
         flyway.migrate();

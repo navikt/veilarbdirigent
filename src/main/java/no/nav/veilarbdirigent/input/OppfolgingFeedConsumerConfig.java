@@ -2,13 +2,15 @@ package no.nav.veilarbdirigent.input;
 
 import io.vavr.collection.List;
 import no.nav.common.sts.SystemUserTokenProvider;
-import no.nav.fo.feed.common.OutInterceptor;
-import no.nav.fo.feed.consumer.FeedConsumer;
-import no.nav.fo.feed.consumer.FeedConsumerConfig;
+import no.nav.veilarbdirigent.feed.consumer.FeedConsumer;
+import no.nav.veilarbdirigent.feed.consumer.FeedConsumerConfig;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.ws.rs.client.Invocation;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.function.Supplier;
 
@@ -47,15 +49,22 @@ public class OppfolgingFeedConsumerConfig {
         return new FeedConsumer<>(config);
     }
 
-    public static class OidcFeedOutInterceptor implements OutInterceptor {
+    public static class OidcFeedOutInterceptor implements Interceptor {
         private final SystemUserTokenProvider systemUserTokenProvider;
         public OidcFeedOutInterceptor(SystemUserTokenProvider systemUserTokenProvider) {
             this.systemUserTokenProvider = systemUserTokenProvider;
         }
 
         @Override
-        public void apply(Invocation.Builder builder) {
-            builder.header("Authorization", "Bearer " + systemUserTokenProvider.getSystemUserToken());
+        public Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
+            Request newRequest;
+
+            newRequest = request.newBuilder()
+                    .addHeader("Authorization", "Bearer " + systemUserTokenProvider.getSystemUserToken())
+                    .build();
+
+            return chain.proceed(newRequest);
         }
     }
 }

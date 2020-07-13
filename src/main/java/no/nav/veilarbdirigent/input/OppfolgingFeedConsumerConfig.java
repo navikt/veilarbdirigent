@@ -4,14 +4,10 @@ import io.vavr.collection.List;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.veilarbdirigent.feed.consumer.FeedConsumer;
 import no.nav.veilarbdirigent.feed.consumer.FeedConsumerConfig;
-import okhttp3.Interceptor;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.function.Supplier;
 
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
@@ -33,7 +29,9 @@ public class OppfolgingFeedConsumerConfig {
     }
 
     @Bean
-    public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service, SystemUserTokenProvider tokenProvider) {
+    public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service,
+                                                                      OkHttpClient client,
+                                                                      SystemUserTokenProvider tokenProvider) {
         FeedConsumerConfig<OppfolgingDataFraFeed> config = new FeedConsumerConfig<>(
                 new FeedConsumerConfig.BaseConfig<>(
                         OppfolgingDataFraFeed.class,
@@ -43,28 +41,9 @@ public class OppfolgingFeedConsumerConfig {
                 ),
                 new FeedConsumerConfig.SimplePollingConfig(POLLING)
         )
-                .callback((lastId, list) -> service.compute(lastId, List.ofAll(list)))
-                .interceptors(Collections.singletonList(new OidcFeedOutInterceptor(tokenProvider)));
+                .restClient(client)
+                .callback((lastId, list) -> service.compute(lastId, List.ofAll(list)));
 
         return new FeedConsumer<>(config);
-    }
-
-    public static class OidcFeedOutInterceptor implements Interceptor {
-        private final SystemUserTokenProvider systemUserTokenProvider;
-        public OidcFeedOutInterceptor(SystemUserTokenProvider systemUserTokenProvider) {
-            this.systemUserTokenProvider = systemUserTokenProvider;
-        }
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request request = chain.request();
-            Request newRequest;
-
-            newRequest = request.newBuilder()
-                    .addHeader("Authorization", "Bearer " + systemUserTokenProvider.getSystemUserToken())
-                    .build();
-
-            return chain.proceed(newRequest);
-        }
     }
 }

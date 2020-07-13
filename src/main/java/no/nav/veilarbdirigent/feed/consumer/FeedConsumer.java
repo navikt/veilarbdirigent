@@ -108,6 +108,7 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
         httpBuilder.addQueryParameter(QUERY_PARAM_ID, lastEntry);
         httpBuilder.addQueryParameter(QUERY_PARAM_PAGE_SIZE, String.valueOf(this.config.pageSize));
 
+        LOG.error(httpBuilder.toString());
         Request request = new Request.Builder().url(httpBuilder.build()).build();
         try (Response response = this.config.client.newCall(request).execute()) {
             return response;

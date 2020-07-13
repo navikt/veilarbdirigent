@@ -76,33 +76,6 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
 
     @SneakyThrows
     public synchronized Response poll() {
-        Response response = fetchChanges();
-
-        RestUtils.throwIfNotSuccessful(response);
-
-        LOG.error("status " + response.code());
-        LOG.error("BODY" + response.body().string());
-
-        FeedResponse entity = RestUtils.parseJsonResponse(response, FeedResponse.class).get();
-        List<FeedElement> elements = entity.getElements();
-        if (elements != null && !elements.isEmpty()) {
-            List<OppfolgingDataFraFeed> data = elements
-                    .stream()
-                    .map(FeedElement::getElement)
-                    .collect(Collectors.toList());
-
-            if (!(entity.hashCode() == lastResponseHash)) {
-                this.config.callback.call(entity.getNextPageId(), data);
-            }
-            this.lastResponseHash = entity.hashCode();
-        }
-
-
-        return response;
-    }
-
-    @SneakyThrows
-    public Response fetchChanges() {
         String lastEntry = this.config.lastEntrySupplier.get();
         HttpUrl.Builder httpBuilder = Objects.requireNonNull(HttpUrl.parse(getTargetUrl())).newBuilder();
         httpBuilder.addQueryParameter(QUERY_PARAM_ID, lastEntry);
@@ -110,9 +83,28 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
 
         Request request = new Request.Builder().url(httpBuilder.build()).build();
         try (Response response = this.config.client.newCall(request).execute()) {
+            RestUtils.throwIfNotSuccessful(response);
+            FeedResponse entity = RestUtils.parseJsonResponse(response, FeedResponse.class).get();
+
+
+            List<FeedElement> elements = entity.getElements();
+            if (elements != null && !elements.isEmpty()) {
+                List<OppfolgingDataFraFeed> data = elements
+                        .stream()
+                        .map(FeedElement::getElement)
+                        .collect(Collectors.toList());
+
+                if (!(entity.hashCode() == lastResponseHash)) {
+                    this.config.callback.call(entity.getNextPageId(), data);
+                }
+                this.lastResponseHash = entity.hashCode();
+            }
+
+
             return response;
         }
     }
+
 
     private String getTargetUrl() {
         return asUrl(this.config.host, "feed", this.config.feedName);

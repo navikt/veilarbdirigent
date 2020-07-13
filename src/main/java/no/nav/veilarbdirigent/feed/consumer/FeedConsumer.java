@@ -80,6 +80,7 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
 
         RestUtils.throwIfNotSuccessful(response);
 
+        LOG.error("status " + response.code());
         LOG.error("BODY" + response.body().string());
 
         FeedResponse entity = RestUtils.parseJsonResponse(response, FeedResponse.class).get();
@@ -103,12 +104,10 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
     @SneakyThrows
     public Response fetchChanges() {
         String lastEntry = this.config.lastEntrySupplier.get();
-        LOG.error(getTargetUrl());
         HttpUrl.Builder httpBuilder = Objects.requireNonNull(HttpUrl.parse(getTargetUrl())).newBuilder();
         httpBuilder.addQueryParameter(QUERY_PARAM_ID, lastEntry);
         httpBuilder.addQueryParameter(QUERY_PARAM_PAGE_SIZE, String.valueOf(this.config.pageSize));
 
-        LOG.error(httpBuilder.toString());
         Request request = new Request.Builder().url(httpBuilder.build()).build();
         try (Response response = this.config.client.newCall(request).execute()) {
             return response;

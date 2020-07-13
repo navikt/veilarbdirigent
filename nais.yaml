@@ -15,14 +15,12 @@ spec:
   webproxy: true
   prometheus:
     enabled: true
-    path: veilarbdirigent/internal/metrics
+    path: veilarbdirigent/internal/prometheus
   liveness:
     path: veilarbdirigent/internal/isAlive
-    port: 8080
     initialDelay: 60
   readiness:
     path: veilarbdirigent/internal/isReady
-    port: 8080
     initialDelay: 60
   replicas:
     min: 1

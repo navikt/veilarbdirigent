@@ -3,6 +3,7 @@ package no.nav.veilarbdirigent.feed.consumer;
 import lombok.SneakyThrows;
 import no.nav.common.rest.client.RestUtils;
 import no.nav.veilarbdirigent.feed.common.*;
+import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -21,13 +22,13 @@ import static no.nav.veilarbdirigent.feed.consumer.FeedPoller.createScheduledJob
 import static no.nav.veilarbdirigent.feed.util.UrlUtils.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class FeedConsumer<DOMAINOBJECT extends Comparable<DOMAINOBJECT>> implements Authorization, ApplicationListener<ContextClosedEvent> {
+public class FeedConsumer implements Authorization, ApplicationListener<ContextClosedEvent> {
     private static final Logger LOG = getLogger(FeedConsumer.class);
 
-    private final FeedConsumerConfig<DOMAINOBJECT> config;
+    private final FeedConsumerConfig config;
     private int lastResponseHash;
 
-    public FeedConsumer(FeedConsumerConfig<DOMAINOBJECT> config) {
+    public FeedConsumer(FeedConsumerConfig config) {
         String feedName = config.feedName;
         String host = config.host;
 
@@ -80,9 +81,9 @@ public class FeedConsumer<DOMAINOBJECT extends Comparable<DOMAINOBJECT>> impleme
         RestUtils.throwIfNotSuccessful(response);
 
         FeedResponse entity = RestUtils.parseJsonResponse(response, FeedResponse.class).get();
-        List<FeedElement<DOMAINOBJECT>> elements = entity.getElements();
+        List<FeedElement> elements = entity.getElements();
         if (elements != null && !elements.isEmpty()) {
-            List<DOMAINOBJECT> data = elements
+            List<OppfolgingDataFraFeed> data = elements
                     .stream()
                     .map(FeedElement::getElement)
                     .collect(Collectors.toList());

@@ -29,11 +29,11 @@ public class OppfolgingFeedConsumerConfig {
     }
 
     @Bean
-    public FeedConsumer<OppfolgingDataFraFeed> oppfolgingFeedConsumer(OppfolgingFeedService service,
-                                                                      OkHttpClient client,
-                                                                      SystemUserTokenProvider tokenProvider) {
-        FeedConsumerConfig<OppfolgingDataFraFeed> config = new FeedConsumerConfig<>(
-                new FeedConsumerConfig.BaseConfig<>(
+    public FeedConsumer oppfolgingFeedConsumer(OppfolgingFeedService service,
+                                               OkHttpClient client,
+                                               SystemUserTokenProvider tokenProvider) {
+        FeedConsumerConfig config = new FeedConsumerConfig(
+                new FeedConsumerConfig.BaseConfig(
                         OppfolgingDataFraFeed.class,
                         () -> Long.toString(service.sisteKjenteId()),
                         host,
@@ -44,6 +44,6 @@ public class OppfolgingFeedConsumerConfig {
                 .restClient(client)
                 .callback((lastId, list) -> service.compute(lastId, List.ofAll(list)));
 
-        return new FeedConsumer<>(config);
+        return new FeedConsumer(config);
     }
 }

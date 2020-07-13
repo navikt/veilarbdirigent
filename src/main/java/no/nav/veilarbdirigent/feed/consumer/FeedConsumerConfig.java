@@ -1,6 +1,7 @@
 package no.nav.veilarbdirigent.feed.consumer;
 
 import no.nav.veilarbdirigent.feed.common.FeedAuthorizationModule;
+import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.quartz.ScheduleBuilder;
@@ -12,9 +13,9 @@ import java.util.function.Supplier;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 
-public class FeedConsumerConfig<DOMAINOBJECT> {
+public class FeedConsumerConfig {
 
-    public final Class<DOMAINOBJECT> domainobject;
+    public final Class<OppfolgingDataFraFeed> domainobject;
     public final Supplier<String> lastEntrySupplier;
     public final String host;
     public final String feedName;
@@ -23,17 +24,17 @@ public class FeedConsumerConfig<DOMAINOBJECT> {
     public final WebhookScheduleCreator webhookPollingConfig;
     public OkHttpClient client;
 
-    FeedCallback<DOMAINOBJECT> callback;
+    FeedCallback callback;
     List<Interceptor> interceptors = new ArrayList<>();
     FeedAuthorizationModule authorizationModule = (feedname) -> true;
     int pageSize;
 
 
-    public FeedConsumerConfig(BaseConfig<DOMAINOBJECT> baseConfig, ScheduleCreator pollingConfig) {
+    public FeedConsumerConfig(BaseConfig baseConfig, ScheduleCreator pollingConfig) {
         this(baseConfig, pollingConfig, null);
     }
 
-    public FeedConsumerConfig(BaseConfig<DOMAINOBJECT> baseConfig, ScheduleCreator pollingConfig, WebhookScheduleCreator webhookPollingConfig) {
+    public FeedConsumerConfig(BaseConfig baseConfig, ScheduleCreator pollingConfig, WebhookScheduleCreator webhookPollingConfig) {
         this.domainobject = baseConfig.domainobject;
         this.lastEntrySupplier = baseConfig.lastEntrySupplier;
         this.host = baseConfig.host;
@@ -44,39 +45,29 @@ public class FeedConsumerConfig<DOMAINOBJECT> {
         this.pageSize = 100;
     }
 
-    public FeedConsumerConfig<DOMAINOBJECT> authorizatioModule(FeedAuthorizationModule authorizationModule) {
-        this.authorizationModule = authorizationModule;
-        return this;
-    }
-
-    public FeedConsumerConfig<DOMAINOBJECT> interceptors(List<Interceptor> interceptors) {
-        this.interceptors = interceptors;
-        return this;
-    }
-
-    public FeedConsumerConfig<DOMAINOBJECT> callback(FeedCallback<DOMAINOBJECT> callback) {
+    public FeedConsumerConfig callback(FeedCallback callback) {
         this.callback = callback;
         return this;
     }
 
-    public FeedConsumerConfig<DOMAINOBJECT> restClient(OkHttpClient client) {
+    public FeedConsumerConfig restClient(OkHttpClient client) {
         this.client = client;
         return this;
     }
 
 
-    public FeedConsumerConfig<DOMAINOBJECT> pageSize(int pageSize) {
+    public FeedConsumerConfig pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
     }
 
-    public static class BaseConfig<DOMAINOBJECT> {
-        public final Class<DOMAINOBJECT> domainobject;
+    public static class BaseConfig {
+        public final Class<OppfolgingDataFraFeed> domainobject;
         public final Supplier<String> lastEntrySupplier;
         public final String host;
         public final String feedName;
 
-        public BaseConfig(Class<DOMAINOBJECT> domainobject, Supplier<String> lastEntrySupplier, String host, String feedName) {
+        public BaseConfig(Class<OppfolgingDataFraFeed> domainobject, Supplier<String> lastEntrySupplier, String host, String feedName) {
             this.domainobject = domainobject;
             this.lastEntrySupplier = lastEntrySupplier;
             this.host = host;

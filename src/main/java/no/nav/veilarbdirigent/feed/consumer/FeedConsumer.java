@@ -103,6 +103,7 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
     @SneakyThrows
     public Response fetchChanges() {
         String lastEntry = this.config.lastEntrySupplier.get();
+        LOG.error(getTargetUrl());
         HttpUrl.Builder httpBuilder = Objects.requireNonNull(HttpUrl.parse(getTargetUrl())).newBuilder();
         httpBuilder.addQueryParameter(QUERY_PARAM_ID, lastEntry);
         httpBuilder.addQueryParameter(QUERY_PARAM_PAGE_SIZE, String.valueOf(this.config.pageSize));

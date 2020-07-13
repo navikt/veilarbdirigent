@@ -1,0 +1,31 @@
+package no.nav.veilarbdirigent.input.rest;
+
+import no.nav.veilarbdirigent.core.Core;
+import org.springframework.stereotype.Service;
+
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
+/*
+   This is a service to create busy tasks. These do nothing and simply validates that the internal flow works
+   as expected
+ */
+
+@Service
+@Path("/busy")
+public class BusyController {
+
+    private final Core core;
+
+    public BusyController(Core core) {
+        this.core = core;
+    }
+
+    @POST
+    @Path("/new")
+    public String makeBusyTask() {
+        BusyMessage msg = new BusyMessage();
+        core.submit(msg);
+        return "OK";
+    }
+}

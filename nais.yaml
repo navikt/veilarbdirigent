@@ -12,6 +12,7 @@ spec:
     - https://veilarbdirigent.nais.adeo.no
     - https://app.adeo.no/veilarbdirigent
   port: 8080
+  webproxy: true
   prometheus:
     enabled: true
     path: veilarbdirigent/internal/metrics

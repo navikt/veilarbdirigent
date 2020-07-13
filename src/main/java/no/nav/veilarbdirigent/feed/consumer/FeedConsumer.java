@@ -80,6 +80,8 @@ public class FeedConsumer implements Authorization, ApplicationListener<ContextC
 
         RestUtils.throwIfNotSuccessful(response);
 
+        LOG.error("BODY" + response.body().string());
+
         FeedResponse entity = RestUtils.parseJsonResponse(response, FeedResponse.class).get();
         List<FeedElement> elements = entity.getElements();
         if (elements != null && !elements.isEmpty()) {

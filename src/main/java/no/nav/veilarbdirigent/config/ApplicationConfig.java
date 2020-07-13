@@ -11,9 +11,6 @@ import no.nav.common.metrics.MetricsClient;
 import no.nav.common.sts.NaisSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
-import no.nav.veilarbdirigent.admin.AdminController;
-import no.nav.veilarbdirigent.core.Core;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,11 +51,6 @@ public class ApplicationConfig {
     @Bean
     public MetricsClient metricsClient() {
         return new InfluxClient();
-    }
-
-    @Bean
-    public AdminController adminController(Core core, TaskDAO dao) {
-        return new AdminController(core, dao);
     }
 
 }

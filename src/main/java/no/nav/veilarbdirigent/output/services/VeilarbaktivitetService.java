@@ -5,13 +5,11 @@ import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import org.springframework.stereotype.Service;
 
 import java.util.function.Supplier;
 
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
 
-@Service
 public class VeilarbaktivitetService {
     public static final String VEILARBAKTIVITETAPI_URL_PROPERTY = "VEILARBAKTIVITETAPI_URL";
     private final String host;

@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.springframework.stereotype.Service;
 
 import java.util.function.Supplier;
 
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
 
-@Service
 @Slf4j
 public class MalverkService {
     public static final String VEILARBMALVERKAPI_URL_PROPERTY = "VEILARBMALVERKAPI_URL";

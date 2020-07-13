@@ -3,13 +3,11 @@ package no.nav.veilarbdirigent.output.services;
 import io.vavr.control.Try;
 import no.nav.common.utils.UrlUtils;
 import okhttp3.*;
-import org.springframework.stereotype.Service;
 
 import java.util.function.Supplier;
 
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
 
-@Service
 public class VeilarbdialogService {
     public static final String VEILARBDIALOGAPI_URL_PROPERTY = "VEILARBDIALOGAPI_URL";
     private final String host;

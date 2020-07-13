@@ -7,14 +7,12 @@ import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.springframework.stereotype.Service;
 
 import java.util.function.Supplier;
 
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
 import static no.nav.veilarbdirigent.utils.SerializerUtils.mapper;
 
-@Service
 @Slf4j
 public class VeilarbregisteringService {
     public static final String VEILARBREGISTRERINGAPI_URL_PROPERTY = "VEILARBREGISTRERINGAPI_URL";

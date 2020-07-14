@@ -44,7 +44,6 @@ public class VeilarbaktivitetService {
                 .build();
         try{
             Response response = client.newCall(request).execute();
-            LOG.warn("HEADERS: " + response.request().headers().toString());
             if (response.isSuccessful()) {
                 return Try.success(response.body().string());
             } else {

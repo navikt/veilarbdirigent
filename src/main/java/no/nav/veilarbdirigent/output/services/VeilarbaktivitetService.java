@@ -42,9 +42,9 @@ public class VeilarbaktivitetService {
                 .url(url)
                 .post(body)
                 .build();
-        LOG.warn("HEADERS: " + request.headers().toString());
         try{
             Response response = client.newCall(request).execute();
+            LOG.warn("HEADERS: " + response.request().headers().toString());
             if (response.isSuccessful()) {
                 return Try.success(response.body().string());
             } else {

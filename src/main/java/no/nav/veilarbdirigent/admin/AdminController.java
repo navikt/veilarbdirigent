@@ -39,7 +39,8 @@ public class AdminController {
     }
 
     @GetMapping("/task/rerun")
-    public int runtask(@QueryParam("taskid") String taskId) {
-        return dao.runNow(taskId);
+    public String runtask(@QueryParam("taskid") String taskId) {
+        dao.runNow(taskId);
+        return "OK";
     }
 }

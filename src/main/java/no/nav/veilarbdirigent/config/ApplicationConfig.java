@@ -8,7 +8,7 @@ import no.nav.common.leaderelection.LeaderElectionClient;
 import no.nav.common.leaderelection.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.sts.OpenAmSystemUserTokenProvider;
+import no.nav.common.sts.NaisSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import static no.nav.common.utils.EnvironmentUtils.getRequiredProperty;
 import static no.nav.common.utils.NaisUtils.getCredentials;
 
 @Slf4j
@@ -33,9 +32,7 @@ public class ApplicationConfig {
 
     @Bean
     public SystemUserTokenProvider systemUserTokenProvider(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        String REDIRECT_URL_PROPERTY = "VEILARBLOGIN_REDIRECT_URL_URL";
-
-        return new OpenAmSystemUserTokenProvider(properties.getStsDiscoveryUrl(), getRequiredProperty(REDIRECT_URL_PROPERTY) ,serviceUserCredentials.username, serviceUserCredentials.password);
+        return new NaisSystemUserTokenProvider(properties.getStsDiscoveryUrl(), serviceUserCredentials.username, serviceUserCredentials.password);
     }
 
     @Bean

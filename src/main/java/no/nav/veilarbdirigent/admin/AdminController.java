@@ -4,10 +4,10 @@ import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.Task;
 import no.nav.veilarbdirigent.core.dao.TaskDAO;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.ws.rs.QueryParam;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +38,8 @@ public class AdminController {
         return "OK";
     }
 
-    @GetMapping("/task/{taskid}/rerun")
-    public int runtask(@PathVariable("taskid") String taskId) {
+    @GetMapping("/task/rerun")
+    public int runtask(@QueryParam("taskid") String taskId) {
         return dao.runNow(taskId);
     }
 }

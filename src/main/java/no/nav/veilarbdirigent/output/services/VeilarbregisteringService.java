@@ -7,16 +7,19 @@ import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
 import static no.nav.veilarbdirigent.utils.SerializerUtils.mapper;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Slf4j
 public class VeilarbregisteringService {
     public static final String VEILARBREGISTRERINGAPI_URL_PROPERTY = "VEILARBREGISTRERINGAPI_URL";
     private final String host;
+    private static final Logger LOG = getLogger(VeilarbregisteringService.class);
 
     private final OkHttpClient client;
     private final AktorregisterClient aktorService;
@@ -39,6 +42,8 @@ public class VeilarbregisteringService {
         try{
             var resp = client.newCall(request).execute();
             var body = resp.body().string();
+
+            LOG.warn("reg info: " + body);
             return Try.success(mapper.readValue(body, BrukerRegistreringWrapper.class));
         }
         catch (Exception e){

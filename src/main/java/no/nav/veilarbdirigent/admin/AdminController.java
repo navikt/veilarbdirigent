@@ -3,6 +3,7 @@ package no.nav.veilarbdirigent.admin;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.Task;
 import no.nav.veilarbdirigent.core.dao.TaskDAO;
+import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,9 +12,13 @@ import javax.ws.rs.QueryParam;
 import java.util.List;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+    private static final Logger LOG = getLogger(AdminController.class);
+
     private final Core core;
     private final TaskDAO dao;
 
@@ -40,6 +45,7 @@ public class AdminController {
 
     @GetMapping("/task/rerun")
     public String runtask(@QueryParam("taskid") String taskid) {
+        LOG.warn("Rerun taskid: " + taskid);
         dao.runNow(taskid);
         return "OK";
     }

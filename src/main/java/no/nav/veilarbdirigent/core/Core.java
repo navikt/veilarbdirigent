@@ -98,17 +98,19 @@ public class Core {
 
     private void runActuators() {
         if (leaderClient.isLeader()) {
-            log.warn("is leader!!");
-            List<Task> tasks = taskDAO.fetchTasksReadyForExecution(LIMIT);
-            log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
+            try {
+                List<Task> tasks = taskDAO.fetchTasksReadyForExecution(LIMIT);
+                log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
 
-            var event = new Event(metricName("runActuators"));
-            event.addFieldToReport("count", tasks.size());
-            metricsClient.report(event);
+                var event = new Event(metricName("runActuators"));
+                event.addFieldToReport("count", tasks.size());
+                metricsClient.report(event);
 
-            tasks.forEach(this::tryActuatorsInMDC);
-        }
-        else {
+                tasks.forEach(this::tryActuatorsInMDC);
+            } catch (Exception e) {
+                log.error("runActuators crashed", e);
+            }
+        } else {
             //This should not happen. Since there should only be one pod
             log.warn("Not leader, Do not run actuators");
         }

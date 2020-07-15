@@ -29,6 +29,7 @@ public class OppfolgingFeedService {
 
     void compute(String lastEntryId, List<OppfolgingDataFraFeed> elements) {
         if (!leaderElectionClient.isLeader()){
+            log.warn("Is not leader, Skipping action");
             return;
         }
         elements.forEach((element) -> {

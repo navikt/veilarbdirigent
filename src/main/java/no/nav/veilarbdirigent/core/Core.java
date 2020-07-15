@@ -111,6 +111,10 @@ public class Core {
                 forceScheduled();
             }
         }
+        else {
+            //This should not happen. Since there should only be one pod
+            log.warn("Not leader, Do not run actuators");
+        }
     }
 
     private void tryActuatorsInMDC(Task<?, ?> task) {

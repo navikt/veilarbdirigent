@@ -106,10 +106,6 @@ public class Core {
             metricsClient.report(event);
 
             tasks.forEach(this::tryActuatorsInMDC);
-            if (tasks.length() >= LIMIT) {
-                log.info("Tasks was equal to limit. Start next schedule at once");
-                forceScheduled();
-            }
         }
         else {
             //This should not happen. Since there should only be one pod

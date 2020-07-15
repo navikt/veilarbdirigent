@@ -19,7 +19,7 @@ public class CoreConfig {
 
     @Bean(destroyMethod = "shutdown")
     public ScheduledExecutorService taskExecutor() {
-        return Executors.newScheduledThreadPool(1);
+        return Executors.newScheduledThreadPool(5);
     }
 
     @Bean

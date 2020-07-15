@@ -98,6 +98,7 @@ public class Core {
 
     private void runActuators() {
         if (leaderClient.isLeader()) {
+            log.warn("is leader!!");
             List<Task> tasks = taskDAO.fetchTasksReadyForExecution(LIMIT);
             log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
 

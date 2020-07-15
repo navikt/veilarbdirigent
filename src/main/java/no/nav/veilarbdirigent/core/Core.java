@@ -107,6 +107,10 @@ public class Core {
                 metricsClient.report(event);
 
                 tasks.forEach(this::tryActuatorsInMDC);
+                if (tasks.length() >= LIMIT) {
+                    log.info("Tasks was equal to limit. Start next schedule at once");
+                    forceScheduled();
+                }
             } catch (Exception e) {
                 log.error("runActuators crashed", e);
             }

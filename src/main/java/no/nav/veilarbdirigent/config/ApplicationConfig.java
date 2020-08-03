@@ -31,8 +31,8 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public SystemUserTokenProvider systemUserTokenProvider(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        return new OpenAmSystemUserTokenProvider(properties.getOpenAmDiscoveryUrl(), properties.getOpenAmRedirectUrl(), serviceUserCredentials.username, serviceUserCredentials.password);
+    public SystemUserTokenProvider systemUserTokenProvider(EnvironmentProperties properties) {
+        return new OpenAmSystemUserTokenProvider(properties.getOpenAmDiscoveryUrl(), properties.getOpenAmRedirectUrl(), properties.getOpenAmUsername(), properties.getOpenAmPassword());
     }
 
     @Bean

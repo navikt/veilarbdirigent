@@ -13,6 +13,10 @@ public class EnvironmentProperties {
 
     private String openAmRedirectUrl;
 
+    private String openAmUsername;
+
+    private String openAmPassword;
+
     private String openAmClientId;
 
     private String openAmRefreshUrl;

@@ -11,6 +11,8 @@ public class EnvironmentProperties {
 
     private String openAmDiscoveryUrl;
 
+    private String openAmRedirectUrl;
+
     private String openAmClientId;
 
     private String openAmRefreshUrl;

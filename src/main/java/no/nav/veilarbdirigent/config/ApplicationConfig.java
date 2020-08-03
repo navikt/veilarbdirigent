@@ -8,7 +8,7 @@ import no.nav.common.leaderelection.LeaderElectionClient;
 import no.nav.common.leaderelection.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.sts.NaisSystemUserTokenProvider;
+import no.nav.common.sts.OpenAmSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,7 +32,7 @@ public class ApplicationConfig {
 
     @Bean
     public SystemUserTokenProvider systemUserTokenProvider(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        return new NaisSystemUserTokenProvider(properties.getStsDiscoveryUrl(), serviceUserCredentials.username, serviceUserCredentials.password);
+        return new OpenAmSystemUserTokenProvider(properties.getOpenAmDiscoveryUrl(), properties.getOpenAmRedirectUrl(), serviceUserCredentials.username, serviceUserCredentials.password);
     }
 
     @Bean

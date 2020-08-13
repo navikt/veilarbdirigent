@@ -38,9 +38,6 @@ public class VeilarbregisteringService {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            log.warn(response.message());
-            log.warn("HEADERS: " + response.request().headers().toString());
-
             RestUtils.throwIfNotSuccessful(response);
 
             BrukerRegistreringWrapper entity = RestUtils.parseJsonResponse(response, BrukerRegistreringWrapper.class).get();

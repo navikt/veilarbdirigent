@@ -18,8 +18,8 @@ mvn clean install
 mvn test
 
 # starte
-# Kjør main-metoden i Main.java
-# For lokal test kjøring kjør MainTest.java
+# Kjør main-metoden i no.nav.veilarbdirigent.VeilarbdirigentApp.java
+# For lokal test kjøring kjør VeilarbdirigentTestApp.java
 ```
 
 ### Kontakt og spørsmål

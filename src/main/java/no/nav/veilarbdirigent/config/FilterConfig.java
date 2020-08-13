@@ -3,6 +3,7 @@ package no.nav.veilarbdirigent.config;
 import no.nav.common.auth.oidc.filter.OidcAuthenticationFilter;
 import no.nav.common.auth.oidc.filter.OidcAuthenticatorConfig;
 import no.nav.common.auth.subject.IdentType;
+import no.nav.common.auth.utils.UserTokenFinder;
 import no.nav.common.log.LogFilter;
 import no.nav.common.rest.filter.SetStandardHttpHeadersFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -26,6 +27,7 @@ public class FilterConfig {
                 .withIdTokenCookieName(OPEN_AM_ID_TOKEN_COOKIE_NAME)
                 .withRefreshTokenCookieName(REFRESH_TOKEN_COOKIE_NAME)
                 .withRefreshUrl(environmentProperties.getOpenAmRefreshUrl())
+                .withIdTokenFinder(new UserTokenFinder())
                 .withIdentType(IdentType.InternBruker);
     }
 
@@ -37,23 +39,14 @@ public class FilterConfig {
                 .withIdentType(IdentType.InternBruker);
     }
 
-    public OidcAuthenticatorConfig azureAdB2CAuthConfig(EnvironmentProperties environmentProperties) {
-        return new OidcAuthenticatorConfig()
-                .withDiscoveryUrl(environmentProperties.getAzureAdB2cDiscoveryUrl())
-                .withClientId(environmentProperties.getAzureAdB2cClientId())
-                .withIdTokenCookieName(AZURE_AD_B2C_ID_TOKEN_COOKIE_NAME)
-                .withIdentType(IdentType.EksternBruker);
-    }
-
     @Bean
     public FilterRegistrationBean authenticationFilterRegistrationBean(EnvironmentProperties properties) {
         OidcAuthenticatorConfig openAmConfig = openAmAuthConfig(properties);
         OidcAuthenticatorConfig azureAdConfig = azureAdAuthConfig(properties);
-        OidcAuthenticatorConfig azureAdB2cConfig = azureAdB2CAuthConfig(properties);
 
         FilterRegistrationBean<OidcAuthenticationFilter> registration = new FilterRegistrationBean<>();
         OidcAuthenticationFilter authenticationFilter = new OidcAuthenticationFilter(
-                Arrays.asList(fromConfig(openAmConfig), fromConfig(azureAdConfig), fromConfig(azureAdB2cConfig))
+                Arrays.asList(fromConfig(openAmConfig), fromConfig(azureAdConfig))
         );
 
         registration.setFilter(authenticationFilter);

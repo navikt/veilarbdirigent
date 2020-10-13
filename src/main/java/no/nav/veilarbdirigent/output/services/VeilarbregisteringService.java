@@ -4,6 +4,7 @@ import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktorregister.AktorregisterClient;
 import no.nav.common.rest.client.RestUtils;
+import no.nav.common.types.identer.AktorId;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
 import okhttp3.OkHttpClient;
@@ -30,7 +31,7 @@ public class VeilarbregisteringService {
     }
 
     public Try<BrukerRegistreringWrapper> hentRegistrering(String aktorId) {
-        String fnr = aktorService.hentFnr(aktorId);
+        String fnr = aktorService.hentFnr(AktorId.of(aktorId)).get();
         String url = String.format("%s/registrering?fnr=%s", host, fnr);
 
         Request request = new Request.Builder()

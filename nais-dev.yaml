@@ -1,0 +1,50 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: veilarbdirigent
+  namespace: {{namespace}}
+  cluster: dev-fss
+  labels:
+    team: pto
+spec:
+  image: docker.pkg.github.com/navikt/veilarbdirigent/veilarbdirigent:{{version}}
+  ingresses:
+    - https://veilarbdirigent-{{namespace}}.nais.preprod.local
+    - https://app-{{namespace}}.adeo.no/veilarbdirigent
+  port: 8080
+  prometheus:
+    enabled: true
+    path: veilarbdirigent/internal/prometheus
+  liveness:
+    path: veilarbdirigent/internal/isAlive
+    initialDelay: 30
+  readiness:
+    path: veilarbdirigent/internal/isReady
+    initialDelay: 30
+  replicas:
+    min: 1
+    max: 1 # It should be 1. Race condition problems may arise if this is greater
+    cpuThresholdPercentage: 75
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 768Mi
+  envFrom:
+    - configmap: pto-config
+  vault:
+    enabled: true
+    paths:
+      - kvPath: /oracle/data/dev/creds/veilarbdirigent_{{namespace}}-user
+        mountPath: /var/run/secrets/nais.io/oracle_creds
+      - kvPath: /serviceuser/data/dev/srvveilarbdirigent
+        mountPath: /var/run/secrets/nais.io/service_user
+      - kvPath: /kv/preprod/fss/veilarbdirigent/{{namespace}}
+        mountPath: /var/run/secrets/nais.io/vault
+      - kvPath: /oracle/data/dev/config/veilarbdirigent_{{namespace}}
+        mountPath: /var/run/secrets/nais.io/oracle_config
+  env:
+    - name: OPPFOLGING_STARTET_TOPIC
+      value: aapen-arbeidsrettetOppfolging-oppfolgingStartet-v1-{{namespace}}

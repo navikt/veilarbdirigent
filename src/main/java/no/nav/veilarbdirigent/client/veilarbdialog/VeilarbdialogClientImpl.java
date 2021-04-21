@@ -2,6 +2,7 @@ package no.nav.veilarbdirigent.client.veilarbdialog;
 
 import io.vavr.control.Try;
 import no.nav.common.rest.client.RestClient;
+import no.nav.common.types.identer.AktorId;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -29,8 +30,8 @@ public class VeilarbdialogClientImpl implements VeilarbdialogClient {
     }
 
     @Override
-    public Try<String> lagDialog(String aktorId, String data) {
-        String url = joinPaths(apiUrl, "/api/dialog?aktorId=" + aktorId);
+    public Try<String> lagDialog(AktorId aktorId, String data) {
+        String url = joinPaths(apiUrl, "/api/dialog?aktorId=" + aktorId.get());
 
         Request request = new Request.Builder()
                 .url(url)

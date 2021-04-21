@@ -2,6 +2,7 @@ package no.nav.veilarbdirigent.client.veilarbaktivitet;
 
 import io.vavr.control.Try;
 import no.nav.common.rest.client.RestClient;
+import no.nav.common.types.identer.AktorId;
 import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,8 +31,8 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
     }
 
     @Override
-    public Try<String> lagAktivitet(String aktorId, String data) {
-        String url = UrlUtils.joinPaths(apiUrl, format("/api/aktivitet/ny?aktorId=%s&automatisk=true", aktorId));
+    public Try<String> lagAktivitet(AktorId aktorId, String data) {
+        String url = UrlUtils.joinPaths(apiUrl, format("/api/aktivitet/ny?aktorId=%s&automatisk=true", aktorId.get()));
 
         Request request = new Request.Builder()
                 .url(url)

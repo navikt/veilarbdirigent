@@ -4,6 +4,7 @@ import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.rest.client.RestUtils;
+import no.nav.common.types.identer.Fnr;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
 import okhttp3.OkHttpClient;
@@ -30,7 +31,7 @@ public class VeilarbregistreringClientImpl implements VeilarbregistreringClient 
         this.client = RestClient.baseClient();
     }
 
-    public Try<BrukerRegistreringWrapper> hentRegistrering(String fnr) {
+    public Try<BrukerRegistreringWrapper> hentRegistrering(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/registrering?fnr=" + fnr);
 
         Request request = new Request.Builder()

@@ -1,10 +1,6 @@
 package no.nav.veilarbdirigent.service;
 
 import lombok.RequiredArgsConstructor;
-import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
-import no.nav.veilarbdirigent.client.veilarbdialog.VeilarbdialogClient;
-import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
-import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.domain.OppfolgingStartetKafkaDTO;
 import org.springframework.stereotype.Service;
 
@@ -12,16 +8,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaConsumerService {
 
-    private final VeilarbaktivitetClient veilarbaktivitetClient;
+    private final AktivitetService aktivitetService;
 
-    private final VeilarbmalverkClient veilarbmalverkClient;
-
-    private final VeilarbregistreringClient veilarbregistreringClient;
-
-    private final VeilarbdialogClient veilarbdialogClient;
+    private final DialogService dialogService;
 
     public void behandleOppfolgingStartet(OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO) {
-        // TODO
+        // TODO: Begge disse må kjøres 1 gang, men ikke mer enn 1 gang
+        aktivitetService.opprettAktivteter(oppfolgingStartetKafkaDTO);
+        dialogService.opprettDialogForNyregistrertPermitertBruker(oppfolgingStartetKafkaDTO);
     }
 
 }

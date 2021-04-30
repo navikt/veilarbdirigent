@@ -2,7 +2,7 @@ package no.nav.veilarbdirigent.input;
 
 import io.vavr.collection.List;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.leaderelection.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.veilarbdirigent.config.Transactor;
 import no.nav.veilarbdirigent.core.Core;
 

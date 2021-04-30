@@ -1,6 +1,6 @@
 package no.nav.veilarbdirigent.config;
 
-import no.nav.common.leaderelection.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.dao.TaskDAO;

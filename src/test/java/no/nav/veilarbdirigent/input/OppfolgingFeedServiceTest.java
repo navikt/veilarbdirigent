@@ -1,7 +1,7 @@
 package no.nav.veilarbdirigent.input;
 
 import io.vavr.collection.List;
-import no.nav.common.leaderelection.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.config.Transactor;
 import no.nav.veilarbdirigent.core.Core;

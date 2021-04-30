@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.config;
 
+import no.nav.common.rest.client.RestClient;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
@@ -10,8 +11,14 @@ import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
 import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClientImpl;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClientImpl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
 
 
 @Configuration
@@ -39,6 +46,31 @@ public class ClientConfig {
     public VeilarbregistreringClient veilarbregistreringClient(SystemUserTokenProvider tokenProvider) {
         String url = UrlUtils.createServiceUrl("veilarbregistrering", true);
         return new VeilarbregistreringClientImpl(url, tokenProvider::getSystemUserToken);
+    }
+
+    @Bean
+    public OkHttpClient okHttpClient(SystemUserTokenProvider tokenProvider) {
+        var builder = RestClient.baseClientBuilder();
+        builder.addInterceptor(new SystemUserOidcTokenProviderInterceptor(tokenProvider));
+        return builder.build();
+    }
+
+    private static class SystemUserOidcTokenProviderInterceptor implements Interceptor {
+        private SystemUserTokenProvider systemUserTokenProvider;
+
+        private SystemUserOidcTokenProviderInterceptor(SystemUserTokenProvider systemUserTokenProvider) {
+            this.systemUserTokenProvider = systemUserTokenProvider;
+        }
+
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request original = chain.request();
+            Request newReq = original.newBuilder()
+                    .addHeader("Authorization", "Bearer " + systemUserTokenProvider.getSystemUserToken())
+                    .method(original.method(), original.body())
+                    .build();
+            return chain.proceed(newReq);
+        }
     }
 
 }

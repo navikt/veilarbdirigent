@@ -2,7 +2,7 @@ package no.nav.veilarbdirigent.core;
 
 import io.vavr.collection.List;
 import io.vavr.control.Try;
-import no.nav.common.leaderelection.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.config.CurrentThreadSceduler;

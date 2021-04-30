@@ -1,26 +1,27 @@
 package no.nav.veilarbdirigent.config;
 
+import no.nav.common.client.aktoroppslag.AktorOppslagClient;
+import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
+import no.nav.veilarbdirigent.client.veilarbdialog.VeilarbdialogClient;
+import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
+import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.handlers.AktivitetHandler;
 import no.nav.veilarbdirigent.handlers.BusyHandler;
 import no.nav.veilarbdirigent.handlers.DialogHandler;
-import no.nav.veilarbdirigent.output.services.MalverkService;
-import no.nav.veilarbdirigent.output.services.VeilarbaktivitetService;
-import no.nav.veilarbdirigent.output.services.VeilarbdialogService;
-import no.nav.veilarbdirigent.output.services.VeilarbregisteringService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class HandlerConfig {
     @Bean
-    public AktivitetHandler oppfolgingsHandler(Core core, VeilarbaktivitetService service, MalverkService malverk) {
-        return new AktivitetHandler(core, service, malverk);
+    public AktivitetHandler oppfolgingsHandler(Core core, VeilarbaktivitetClient veilarbaktivitetClient, VeilarbmalverkClient veilarbmalverkClient) {
+        return new AktivitetHandler(core, veilarbaktivitetClient, veilarbmalverkClient);
     }
 
     @Bean
-    public DialogHandler dialogHandler(Core core, VeilarbregisteringService veilarbregisteringService, VeilarbdialogService service) {
-        return new DialogHandler(core, veilarbregisteringService, service);
+    public DialogHandler dialogHandler(Core core, AktorOppslagClient aktorOppslagClient, VeilarbregistreringClient veilarbregistreringClient, VeilarbdialogClient veilarbdialogClient) {
+        return new DialogHandler(core, aktorOppslagClient, veilarbregistreringClient, veilarbdialogClient);
     }
 
     @Bean

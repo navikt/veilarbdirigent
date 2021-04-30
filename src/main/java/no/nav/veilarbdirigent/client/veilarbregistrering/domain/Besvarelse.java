@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.output.domain;
+package no.nav.veilarbdirigent.client.veilarbregistrering.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

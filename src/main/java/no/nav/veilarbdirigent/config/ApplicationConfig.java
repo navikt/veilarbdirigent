@@ -5,6 +5,8 @@ import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.client.aktoroppslag.CachedAktorOppslagClient;
 import no.nav.common.client.aktorregister.AktorregisterClient;
 import no.nav.common.client.aktorregister.AktorregisterHttpClient;
+import no.nav.common.job.leader_election.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.common.sts.OpenAmSystemUserTokenProvider;
@@ -46,6 +48,11 @@ public class ApplicationConfig {
     @Bean
     public MetricsClient metricsClient() {
         return new InfluxClient();
+    }
+
+    @Bean
+    public LeaderElectionClient leaderElectionClient() {
+        return new LeaderElectionHttpClient();
     }
 
 }

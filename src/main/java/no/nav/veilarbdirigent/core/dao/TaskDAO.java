@@ -15,6 +15,7 @@ import no.nav.veilarbdirigent.core.api.TaskType;
 import no.nav.veilarbdirigent.utils.SerializerUtils;
 import no.nav.veilarbdirigent.utils.TimeUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
@@ -22,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+@Repository
 public class TaskDAO {
     private static final String TASK_TABLE = "task";
     private final JdbcTemplate jdbc;

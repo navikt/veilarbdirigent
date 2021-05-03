@@ -4,11 +4,12 @@ import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import no.nav.common.types.identer.AktorId;
+import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
+import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.*;
 import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
-import no.nav.veilarbdirigent.output.services.MalverkService;
-import no.nav.veilarbdirigent.output.services.VeilarbaktivitetService;
 import no.nav.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
@@ -17,8 +18,8 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_AKTIVITET");
 
     private Core core;
-    private VeilarbaktivitetService service;
-    private MalverkService malverk;
+    private VeilarbaktivitetClient veilarbaktivitetClient;
+    private VeilarbmalverkClient veilarbmalverkClient;
 
     private final List<String> registeringForslag = List.of("STANDARD_INNSATS",
             "SITUASJONSBESTEMT_INNSATS",
@@ -26,10 +27,10 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
 
     private final List<String> sykmeldtBrukerTyper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
 
-    public AktivitetHandler(Core core, VeilarbaktivitetService service, MalverkService malverk) {
+    public AktivitetHandler(Core core, VeilarbaktivitetClient veilarbaktivitetClient, VeilarbmalverkClient veilarbmalverkClient) {
         this.core = core;
-        this.service = service;
-        this.malverk = malverk;
+        this.veilarbaktivitetClient = veilarbaktivitetClient;
+        this.veilarbmalverkClient = veilarbmalverkClient;
     }
 
     @PostConstruct
@@ -62,11 +63,11 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
         // The last activity created is the first shown in he same column.
         return List.of(
                new Task<>()
-                        .withId(String.valueOf(msg.getId()) + "cv_jobbprofil_aktivitet")
+                        .withId(msg.getId() + "cv_jobbprofil_aktivitet")
                         .withType(TYPE)
                         .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "cv_jobbprofil_aktivitet"))),
                 new Task<>()
-                        .withId(String.valueOf(msg.getId()) + "jobbsokerkompetanse")
+                        .withId(msg.getId() + "jobbsokerkompetanse")
                         .withType(TYPE)
                         .withData(new TypedField<>(new OppfolgingDataMedMal(msg, "jobbsokerkompetanse_aktivitet")))
         );
@@ -74,8 +75,8 @@ public class AktivitetHandler implements MessageHandler, Actuator<AktivitetHandl
 
     @Override
     public Try<String> handle(OppfolgingDataMedMal data) {
-        return malverk.hentMal(data.predefineddataName)
-                .flatMap((template) -> service.lagAktivitet(data.feedelement.getAktorId(), template));
+        return veilarbmalverkClient.hentMal(data.predefineddataName)
+                .flatMap((template) -> veilarbaktivitetClient.lagAktivitet(AktorId.of(data.feedelement.getAktorId()), template));
     }
 
     @NoArgsConstructor

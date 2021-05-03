@@ -1,8 +1,6 @@
-package no.nav.veilarbdirigent.admin;
+package no.nav.veilarbdirigent.controller;
 
-import no.nav.common.health.HealthCheck;
 import no.nav.common.health.HealthCheckResult;
-import no.nav.common.health.HealthCheckUtils;
 import no.nav.common.health.selftest.SelfTestCheck;
 import no.nav.common.health.selftest.SelfTestUtils;
 import no.nav.common.health.selftest.SelftTestCheckResult;

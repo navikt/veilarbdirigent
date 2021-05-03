@@ -8,10 +8,9 @@ import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.function.Supplier;
-
 import static no.nav.common.utils.EnvironmentUtils.getOptionalProperty;
-import static no.nav.common.utils.UrlUtils.clusterUrlForApplication;
+import static no.nav.common.utils.UrlUtils.createServiceUrl;
+import static no.nav.common.utils.UrlUtils.joinPaths;
 
 
 @Configuration
@@ -24,8 +23,8 @@ public class OppfolgingFeedConsumerConfig {
     private final String host;
 
     public OppfolgingFeedConsumerConfig() {
-        Supplier<String> naisUrl = () -> clusterUrlForApplication("veilarboppfolging") + "/veilarboppfolging/api";
-        host = getOptionalProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY).orElseGet(naisUrl);
+        String veilarboppfolgingUrl = joinPaths(createServiceUrl("veilarboppfolging", true), "/api");
+        host = getOptionalProperty(VEILARBOPPFOLGINGAPI_URL_PROPERTY).orElse(veilarboppfolgingUrl);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.admin;
+package no.nav.veilarbdirigent.controller;
 
 import lombok.Builder;
 import lombok.Data;

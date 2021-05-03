@@ -1,6 +1,6 @@
 package no.nav.veilarbdirigent.input;
 
-import no.nav.common.leaderelection.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.veilarbdirigent.config.Transactor;
 import no.nav.veilarbdirigent.core.Core;
 import org.springframework.context.annotation.Bean;

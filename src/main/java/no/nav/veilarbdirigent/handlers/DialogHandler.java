@@ -5,15 +5,18 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import no.nav.common.client.aktoroppslag.AktorOppslagClient;
+import no.nav.common.types.identer.AktorId;
+import no.nav.common.types.identer.Fnr;
+import no.nav.veilarbdirigent.client.veilarbdialog.VeilarbdialogClient;
+import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.Besvarelse;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.DinSituasjonSvar;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.OrdinaerBrukerRegistrering;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.*;
 import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
-import no.nav.veilarbdirigent.output.domain.Besvarelse;
-import no.nav.veilarbdirigent.output.domain.BrukerRegistreringWrapper;
-import no.nav.veilarbdirigent.output.domain.DinSituasjonSvar;
-import no.nav.veilarbdirigent.output.domain.OrdinaerBrukerRegistrering;
-import no.nav.veilarbdirigent.output.services.VeilarbdialogService;
-import no.nav.veilarbdirigent.output.services.VeilarbregisteringService;
 import no.nav.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;
@@ -22,8 +25,9 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
     private final TaskType TYPE = TaskType.of("OPPFOLGING_OPPRETT_DIALOG");
 
     private Core core;
-    private VeilarbregisteringService veilarbregisteringService;
-    private VeilarbdialogService service;
+    private AktorOppslagClient aktorOppslagClient;
+    private VeilarbregistreringClient veilarbregistreringClient;
+    private VeilarbdialogClient veilarbdialogClient;
 
     private static final String permitertDialog = "kanskje_permitert_dialog";
 
@@ -39,10 +43,11 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             "SITUASJONSBESTEMT_INNSATS",
             "BEHOV_FOR_ARBEIDSEVNEVURDERING");
 
-    public DialogHandler(Core core, VeilarbregisteringService veilarbregisteringService, VeilarbdialogService service) {
+    public DialogHandler(Core core, AktorOppslagClient aktorOppslagClient, VeilarbregistreringClient veilarbregistreringClient, VeilarbdialogClient veilarbdialogClient) {
         this.core = core;
-        this.veilarbregisteringService = veilarbregisteringService;
-        this.service = service;
+        this.aktorOppslagClient = aktorOppslagClient;
+        this.veilarbregistreringClient = veilarbregistreringClient;
+        this.veilarbdialogClient = veilarbdialogClient;
     }
 
 
@@ -61,7 +66,7 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
             if (erNyRegistrert) {
                 return List.of(
                         new Task<>()
-                                .withId(String.valueOf(msg.getId()) + "kanskjePermitert")
+                                .withId(msg.getId() + "kanskjePermitert")
                                 .withType(TYPE)
                                 .withData(new TypedField<>(new OppfolgingData(msg, permitertDialog))));
             }
@@ -72,8 +77,11 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
 
     @Override
     public Try<String> handle(DialogHandler.OppfolgingData data) {
+        AktorId brukerAktorId = AktorId.of(data.feedelement.getAktorId());
+        Fnr brukerFnr = aktorOppslagClient.hentFnr(brukerAktorId);
 
-        Try<BrukerRegistreringWrapper> registeringsData = veilarbregisteringService.hentRegistrering(data.feedelement.getAktorId());
+        Try<BrukerRegistreringWrapper> registeringsData = veilarbregistreringClient.hentRegistrering(brukerFnr);
+
         if(registeringsData.isFailure()){
             return Try.failure(registeringsData.getCause());
         }
@@ -86,8 +94,8 @@ public class DialogHandler implements MessageHandler, Actuator<DialogHandler.Opp
                 .map(Besvarelse::getDinSituasjon);
 
 
-        if(svar.map(DinSituasjonSvar.ER_PERMITTERT::equals).getOrElse(false)){
-            return service.lagDialog(data.feedelement.getAktorId(), permitertJson);
+        if (svar.map(DinSituasjonSvar.ER_PERMITTERT::equals).getOrElse(false)) {
+            return veilarbdialogClient.lagDialog(brukerAktorId, permitertJson);
         }
 
         return Try.success("Nothing to do here");

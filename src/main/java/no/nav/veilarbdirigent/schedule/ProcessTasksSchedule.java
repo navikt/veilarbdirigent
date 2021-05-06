@@ -1,6 +1,5 @@
 package no.nav.veilarbdirigent.schedule;
 
-import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,14 +7,15 @@ import no.nav.common.job.JobRunner;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.Event;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.veilarbdirigent.core.api.Status;
-import no.nav.veilarbdirigent.core.api.Task;
-import no.nav.veilarbdirigent.repository.TaskDAO;
+import no.nav.veilarbdirigent.repository.TaskRepository;
+import no.nav.veilarbdirigent.repository.domain.Status;
+import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.service.TaskProcessorService;
 import no.nav.veilarbdirigent.utils.TypedField;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static no.nav.veilarbdirigent.utils.MetricsUtils.metricName;
@@ -29,7 +29,7 @@ public class ProcessTasksSchedule {
 
     private final static long TEN_SECONDS = 10 * 1000;
 
-    private final TaskDAO taskDAO;
+    private final TaskRepository taskRepository;
 
     private final LeaderElectionClient leaderElectionClient;
 
@@ -46,23 +46,19 @@ public class ProcessTasksSchedule {
     }
 
     private void processTasks() {
-        List<Task> tasks = taskDAO.fetchTasksReadyForExecution(LIMIT);
-        log.info("Actuators scheduled: {} Task ready to be executed", tasks.length());
+        List<Task> tasks = taskRepository.fetchTasksReadyForExecution(LIMIT);
+        log.info("Actuators scheduled: {} Task ready to be executed", tasks.size());
 
         Event event = new Event(metricName("runActuators"));
         event.addFieldToReport("count", tasks.size());
         metricsClient.report(event);
 
         tasks.forEach(this::performTask);
-//        if (tasks.length() >= LIMIT) {
-//            log.info("Tasks was equal to limit. Start next schedule at once");
-////            forceScheduled();
-//        }
     }
 
     private void performTask(Task task) {
         // TODO: Burde det brukes transaksjon her for å forhindre andre å prosessere samtidig?
-        taskDAO.setStatusForTask(task, Status.WORKING);
+        taskRepository.setStatusForTask(task, Status.WORKING);
 
         Event event = new Event(metricName("tryActuator")).addFieldToReport("type", task.getType());
 
@@ -71,14 +67,14 @@ public class ProcessTasksSchedule {
                 .onFailure(throwable -> {
                     log.error(throwable.getMessage(), throwable);
                     Task taskWithError = task.withError(throwable.toString());
-                    taskDAO.setStatusForTask(taskWithError, Status.FAILED);
+                    taskRepository.setStatusForTask(taskWithError, Status.FAILED);
                     event.setFailed();
                     metricsClient.report(event);
                 })
                 .onSuccess(result -> {
                     log.info("Task:{} completed successfully", task.getId());
                     Task taskWithResult = task.withResult(new TypedField<>(result));
-                    taskDAO.setStatusForTask(taskWithResult, Status.OK);
+                    taskRepository.setStatusForTask(taskWithResult, Status.OK);
                     event.setSuccess();
                     metricsClient.report(event);
                 });

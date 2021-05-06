@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.core.api;
+package no.nav.veilarbdirigent.repository.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

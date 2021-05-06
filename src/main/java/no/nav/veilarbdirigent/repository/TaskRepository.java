@@ -3,15 +3,14 @@ package no.nav.veilarbdirigent.repository;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
-import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import no.nav.sbl.sql.SqlUtils;
 import no.nav.sbl.sql.UpdateQuery;
 import no.nav.sbl.sql.order.OrderClause;
 import no.nav.sbl.sql.where.WhereClause;
-import no.nav.veilarbdirigent.core.api.Status;
-import no.nav.veilarbdirigent.core.api.Task;
-import no.nav.veilarbdirigent.core.api.TaskType;
+import no.nav.veilarbdirigent.repository.domain.Status;
+import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskType;
 import no.nav.veilarbdirigent.utils.SerializerUtils;
 import no.nav.veilarbdirigent.utils.TimeUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,13 +21,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
-public class TaskDAO {
+public class TaskRepository {
     private static final String TASK_TABLE = "task";
     private final JdbcTemplate jdbc;
 
-    public TaskDAO(JdbcTemplate jdbc) {
+    public TaskRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
@@ -53,24 +53,23 @@ public class TaskDAO {
         WhereClause wc = timeCondition.and(statusCondition);
         OrderClause or = OrderClause.asc("created");
 
-        return List.ofAll(SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toTask)
+        return SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
                 .column("*")
                 .where(wc)
                 .orderBy(or)
                 .limit(limit)
-                .executeToList());
+                .executeToList();
     }
 
     public List<Task> fetchAllFailedTasks() {
-        return List.ofAll(SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toTask)
+        return SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
                 .column("*")
                 .where(WhereClause.equals("status", Status.FAILED.name()))
-                .executeToList()
-        );
+                .executeToList();
     }
 
     public Map<String, Integer> fetchStatusnumbers() {
-        Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskDAO::toStatusnumbers)
+        Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toStatusnumbers)
                 .column("status")
                 .column("count(*) as num")
                 .groupBy("status")
@@ -124,6 +123,7 @@ public class TaskDAO {
             query.set("attempts", task.getAttempts() + 1);
             query.set("error", task.getError());
         }
+
         if (status == Status.OK) {
             query.set("result", SerializerUtils.serialize(task.getResult()));
         }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class FeedDAO {
+public class FeedRepository {
 
     private static final String TABLE_NAME = "FEED_METADATA";
 
@@ -15,7 +15,7 @@ public class FeedDAO {
 
     private final JdbcTemplate jdbc;
 
-    public FeedDAO(JdbcTemplate jdbc) {
+    public FeedRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 

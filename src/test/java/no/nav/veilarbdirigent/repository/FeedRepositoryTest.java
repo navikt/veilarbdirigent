@@ -1,16 +1,13 @@
-package no.nav.veilarbdirigent.input;
+package no.nav.veilarbdirigent.repository;
 
 import no.nav.veilarbdirigent.mock.LocalH2Database;
-import no.nav.veilarbdirigent.repository.FeedDAO;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+class FeedRepositoryTest {
 
-@DisplayName("FeedDAO")
-class FeedDAOTest {
-    private FeedDAO dao = new FeedDAO(LocalH2Database.getDb());
+    private FeedRepository dao = new FeedRepository(LocalH2Database.getDb());
 
     @Test
     void should_be_able_to_update_and_return_the_last_saved_id_record(){

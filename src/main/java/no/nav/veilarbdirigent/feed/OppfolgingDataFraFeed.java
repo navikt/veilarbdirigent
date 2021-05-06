@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.nav.veilarbdirigent.core.api.Message;
 
 import java.util.Date;
 
@@ -14,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OppfolgingDataFraFeed implements Message, Comparable<OppfolgingDataFraFeed> {
+public class OppfolgingDataFraFeed implements Comparable<OppfolgingDataFraFeed> {
     long id;
     String aktorId;
     String foreslattInnsatsgruppe;

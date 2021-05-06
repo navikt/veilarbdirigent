@@ -3,14 +3,18 @@ package no.nav.veilarbdirigent.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.job.leader_election.LeaderElectionClient;
-import no.nav.veilarbdirigent.core.api.Task;
-import no.nav.veilarbdirigent.core.api.TaskType;
+import no.nav.common.types.identer.AktorId;
 import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
-import no.nav.veilarbdirigent.repository.FeedDAO;
-import no.nav.veilarbdirigent.utils.TypedField;
+import no.nav.veilarbdirigent.repository.FeedRepository;
+import no.nav.veilarbdirigent.repository.TaskRepository;
+import no.nav.veilarbdirigent.repository.domain.Status;
+import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.utils.RegistreringUtils;
+import no.nav.veilarbdirigent.utils.TaskFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -18,14 +22,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NyeBrukereFeedService {
 
-    private final FeedDAO feedDAO;
+    private final TaskProcessorService taskProcessorService;
+
+    private final TaskRepository taskRepository;
+
+    private final FeedRepository feedRepository;
 
     private final LeaderElectionClient leaderElectionClient;
 
     private final TransactionTemplate transactor;
 
     public long sisteKjenteId() {
-        return feedDAO.sisteKjenteId();
+        return feedRepository.sisteKjenteId();
     }
 
     public void processFeedElements(List<OppfolgingDataFraFeed> elements) {
@@ -35,54 +43,43 @@ public class NyeBrukereFeedService {
         }
 
         elements.forEach((element) -> {
-            /*
-                We cannot try to execute tasks if they are already stored.
-                We either need to store all, or check if the task already exists.
-
-                Try to perform all the tasks. The ones who are completed can be stored with success status.
-                The ones who could not be completed should be stored with failed status.
-            */
-
-        });
-
-        // TODO: Lagre i database
-
-//        elements.forEach((element) -> {
-//            runInMappedDiagnosticContext("batchID", String.valueOf(element.id), () -> submitToCore(element));
-//            core.forceScheduled();
-//        });
-    }
-
-    private void storeTasks(OppfolgingDataFraFeed element) {
-        transactor.executeWithoutResult((status) -> {
             long elementId = element.getId();
+            AktorId aktorId = AktorId.of(element.getAktorId());
 
             log.info("Submitting feed message with id: {}", elementId);
 
-            TaskType AKTIVITET_TYPE = TaskType.of("OPPFOLGING_OPPRETT_AKTIVITET");
+            List<Task> tasksToPerform = new ArrayList<>();
 
-            TaskType DIALOG_TYPE = TaskType.of("OPPFOLGING_OPPRETT_DIALOG");
+            boolean erNyRegistrert = RegistreringUtils.erNyregistrert(element.getForeslattInnsatsgruppe());
+            boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(element.getSykmeldtBrukerType());
 
-            String permitertDialog = "kanskje_permitert_dialog";
+            if (erNyRegistrert) {
+                Task kanskjePermittertDialogTask = TaskFactory.lagKanskjePermittertDialogTask(elementId, aktorId)
+                        .withStatus(Status.PENDING);
 
-            Task cvJobbprofilAktivitet = new Task<>()
-                    .withId(elementId + "cv_jobbprofil_aktivitet")
-                    .withType(AKTIVITET_TYPE)
-                    .withData(new TypedField<>(new AktivitetHandler.OppfolgingDataMedMal(element, "cv_jobbprofil_aktivitet")));
+                tasksToPerform.add(kanskjePermittertDialogTask);
+            }
 
-            Task jobbsokerkompetanseAktivitet = new Task<>()
-                    .withId(elementId + "jobbsokerkompetanse")
-                    .withType(AKTIVITET_TYPE)
-                    .withData(new TypedField<>(new AktivitetHandler.OppfolgingDataMedMal(element, "jobbsokerkompetanse_aktivitet")));
+            if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
+                Task cvJobbprofilAktivitetTask = TaskFactory.lagCvJobbprofilAktivitetTask(elementId, aktorId)
+                        .withStatus(Status.PENDING);
 
-            Task dialogTask = new Task<>()
-                    .withId(elementId + "kanskjePermitert")
-                    .withType(DIALOG_TYPE)
-                    .withData(new TypedField<>(new DialogHandler.OppfolgingData(element, permitertDialog)));
+                Task jobbsokerkompetanseAktivitetTask = TaskFactory.lagJobbsokerkompetanseAktivitetTask(elementId, aktorId)
+                        .withStatus(Status.PENDING);
 
-            feedDAO.oppdaterSisteKjenteId(elementId);
-            log.info("Feed message with id: {} completed successfully", elementId);
+                tasksToPerform.addAll(List.of(cvJobbprofilAktivitetTask, jobbsokerkompetanseAktivitetTask));
+            }
+
+            transactor.executeWithoutResult((status) -> {
+                // TODO: cvJobbprofilAktivitetTask, jobbsokerkompetanseAktivitetTask kan bli kjørt i feil rekkefølge
+                taskRepository.insert(tasksToPerform);
+
+                feedRepository.oppdaterSisteKjenteId(elementId);
+
+                log.info("Feed message with id: {} completed successfully", elementId);
+            });
         });
     }
 
 }
+

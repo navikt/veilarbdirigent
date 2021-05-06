@@ -1,19 +1,19 @@
-package no.nav.veilarbdirigent.dao;
+package no.nav.veilarbdirigent.repository;
 
-import io.vavr.collection.List;
 import no.nav.veilarbdirigent.TestUtils;
-import no.nav.veilarbdirigent.core.api.Status;
-import no.nav.veilarbdirigent.core.api.Task;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
-import no.nav.veilarbdirigent.repository.TaskDAO;
+import no.nav.veilarbdirigent.repository.domain.Status;
+import no.nav.veilarbdirigent.repository.domain.Task;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-class TaskDAOTest {
+class TaskRepositoryTest {
 
-    private TaskDAO dao = new TaskDAO(LocalH2Database.getDb());
+    private TaskRepository dao = new TaskRepository(LocalH2Database.getDb());
 
     @Test
     void persisting_task() {
@@ -25,7 +25,7 @@ class TaskDAOTest {
         dao.insert(tasks);
 
         List<Task> tasksFromDb = dao.fetchTasksReadyForExecution(100);
-        assertThat(tasksFromDb.length()).isEqualTo(1);
+        assertThat(tasksFromDb.size()).isEqualTo(1);
 
         Task task = tasksFromDb.get(0);
         assertThat(task.getId()).isEqualTo("id1");

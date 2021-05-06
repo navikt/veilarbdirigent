@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.handlers;
+package no.nav.veilarbdirigent.service;
 
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -16,7 +16,7 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.DinSituasjonSvar
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.OrdinaerBrukerRegistrering;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.*;
-import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 import no.nav.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;

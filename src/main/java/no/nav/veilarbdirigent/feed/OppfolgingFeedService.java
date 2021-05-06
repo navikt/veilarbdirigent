@@ -1,10 +1,11 @@
-package no.nav.veilarbdirigent.input;
+package no.nav.veilarbdirigent.feed;
 
 import io.vavr.collection.List;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.veilarbdirigent.config.Transactor;
 import no.nav.veilarbdirigent.core.Core;
+import no.nav.veilarbdirigent.repository.FeedDAO;
 
 import static no.nav.veilarbdirigent.core.Utils.runInMappedDiagnosticContext;
 
@@ -23,11 +24,11 @@ public class OppfolgingFeedService {
         this.leaderElectionClient = leaderElectionClient;
     }
 
-    long sisteKjenteId() {
+    public long sisteKjenteId() {
         return feedDAO.sisteKjenteId();
     }
 
-    void compute(String lastEntryId, List<OppfolgingDataFraFeed> elements) {
+    public void compute(String lastEntryId, List<OppfolgingDataFraFeed> elements) {
         if (!leaderElectionClient.isLeader()){
             log.warn("Is not leader, Skipping action");
             return;

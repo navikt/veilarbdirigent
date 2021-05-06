@@ -3,7 +3,7 @@ package no.nav.veilarbdirigent.config;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.veilarbdirigent.core.Core;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.veilarbdirigent.repository.TaskDAO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;

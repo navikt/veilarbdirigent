@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.input;
+package no.nav.veilarbdirigent.feed;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

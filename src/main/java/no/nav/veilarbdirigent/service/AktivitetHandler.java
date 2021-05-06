@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.handlers;
+package no.nav.veilarbdirigent.service;
 
 import io.vavr.collection.List;
 import io.vavr.control.Try;
@@ -9,7 +9,7 @@ import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
 import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.*;
-import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 import no.nav.veilarbdirigent.utils.TypedField;
 
 import javax.annotation.PostConstruct;

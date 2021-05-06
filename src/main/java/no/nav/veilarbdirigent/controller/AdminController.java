@@ -5,7 +5,7 @@ import lombok.Data;
 import no.nav.veilarbdirigent.core.Core;
 import no.nav.veilarbdirigent.core.api.Status;
 import no.nav.veilarbdirigent.core.api.TaskType;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.veilarbdirigent.repository.TaskDAO;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

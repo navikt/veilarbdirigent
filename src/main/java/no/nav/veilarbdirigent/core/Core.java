@@ -11,7 +11,7 @@ import no.nav.common.metrics.Event;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.veilarbdirigent.config.Transactor;
 import no.nav.veilarbdirigent.core.api.*;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.veilarbdirigent.repository.TaskDAO;
 import no.nav.veilarbdirigent.utils.TypedField;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

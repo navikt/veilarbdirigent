@@ -1,6 +1,7 @@
 package no.nav.veilarbdirigent.input;
 
 import no.nav.veilarbdirigent.mock.LocalH2Database;
+import no.nav.veilarbdirigent.repository.FeedDAO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

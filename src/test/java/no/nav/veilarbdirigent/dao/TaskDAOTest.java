@@ -4,8 +4,8 @@ import io.vavr.collection.List;
 import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.core.api.Status;
 import no.nav.veilarbdirigent.core.api.Task;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
+import no.nav.veilarbdirigent.repository.TaskDAO;
 import org.junit.jupiter.api.Test;
 
 import static java.time.LocalDateTime.now;

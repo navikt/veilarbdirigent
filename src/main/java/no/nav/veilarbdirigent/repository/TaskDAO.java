@@ -1,4 +1,4 @@
-package no.nav.veilarbdirigent.core.dao;
+package no.nav.veilarbdirigent.repository;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;

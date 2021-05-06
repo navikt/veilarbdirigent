@@ -8,7 +8,7 @@ import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.config.CurrentThreadSceduler;
 import no.nav.veilarbdirigent.config.Transactor;
 import no.nav.veilarbdirigent.core.api.*;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
+import no.nav.veilarbdirigent.repository.TaskDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

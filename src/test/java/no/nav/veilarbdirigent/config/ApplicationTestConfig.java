@@ -8,9 +8,9 @@ import no.nav.common.types.identer.AktorId;
 import no.nav.common.types.identer.Fnr;
 import no.nav.common.utils.Credentials;
 import no.nav.veilarbdirigent.controller.AdminController;
-import no.nav.veilarbdirigent.core.dao.TaskDAO;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
 import no.nav.veilarbdirigent.mock.MetricsClientMock;
+import no.nav.veilarbdirigent.repository.TaskDAO;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 @EnableConfigurationProperties({EnvironmentProperties.class})
 @Import({
         AdminController.class,
-        CoreConfig.class,
         FilterTestConfig.class
 })
 public class ApplicationTestConfig {

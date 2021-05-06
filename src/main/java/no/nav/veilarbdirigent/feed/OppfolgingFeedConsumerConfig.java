@@ -1,9 +1,8 @@
-package no.nav.veilarbdirigent.input;
+package no.nav.veilarbdirigent.feed;
 
-import io.vavr.collection.List;
-import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.veilarbdirigent.feed.consumer.FeedConsumer;
 import no.nav.veilarbdirigent.feed.consumer.FeedConsumerConfig;
+import no.nav.veilarbdirigent.service.NyeBrukereFeedService;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +15,11 @@ import static no.nav.common.utils.UrlUtils.joinPaths;
 @Configuration
 public class OppfolgingFeedConsumerConfig {
 
-    public static final String VEILARBOPPFOLGINGAPI_URL_PROPERTY = "VEILARBOPPFOLGINGAPI_URL";
-    private static final int POLLING = 10;
-    private static final String OPPFOLGING_FEED_NAME = "nyebrukere";
+    private final static String VEILARBOPPFOLGINGAPI_URL_PROPERTY = "VEILARBOPPFOLGINGAPI_URL";
+
+    private final static int POLLING = 10;
+
+    private final static String OPPFOLGING_FEED_NAME = "nyebrukere";
 
     private final String host;
 
@@ -28,20 +29,18 @@ public class OppfolgingFeedConsumerConfig {
     }
 
     @Bean
-    public FeedConsumer oppfolgingFeedConsumer(OppfolgingFeedService service,
-                                               OkHttpClient client,
-                                               SystemUserTokenProvider tokenProvider) {
+    public FeedConsumer oppfolgingFeedConsumer(NyeBrukereFeedService nyeBrukereFeedService, OkHttpClient client) {
         FeedConsumerConfig config = new FeedConsumerConfig(
                 new FeedConsumerConfig.BaseConfig(
                         OppfolgingDataFraFeed.class,
-                        () -> Long.toString(service.sisteKjenteId()),
+                        () -> Long.toString(nyeBrukereFeedService.sisteKjenteId()),
                         host,
                         OPPFOLGING_FEED_NAME
                 ),
                 new FeedConsumerConfig.SimplePollingConfig(POLLING)
         )
                 .restClient(client)
-                .callback((lastId, list) -> service.compute(lastId, List.ofAll(list)));
+                .callback((lastId, list) -> nyeBrukereFeedService.processFeedElements(list));
 
         return new FeedConsumer(config);
     }

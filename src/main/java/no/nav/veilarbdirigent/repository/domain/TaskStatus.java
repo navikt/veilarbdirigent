@@ -1,5 +1,5 @@
 package no.nav.veilarbdirigent.repository.domain;
 
-public enum Status {
+public enum TaskStatus {
     PENDING, WORKING, OK, FAILED
 }

@@ -8,8 +8,8 @@ import no.nav.sbl.sql.SqlUtils;
 import no.nav.sbl.sql.UpdateQuery;
 import no.nav.sbl.sql.order.OrderClause;
 import no.nav.sbl.sql.where.WhereClause;
-import no.nav.veilarbdirigent.repository.domain.Status;
 import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
 import no.nav.veilarbdirigent.utils.SerializerUtils;
 import no.nav.veilarbdirigent.utils.TimeUtils;
@@ -41,14 +41,14 @@ public class TaskRepository {
         SqlUtils.insert(jdbc, TASK_TABLE)
                 .value("id", task.getId())
                 .value("type", task.getType().getType())
-                .value("status", task.getStatus().name())
+                .value("status", task.getTaskStatus().name())
                 .value("data", task.getJsonData())
                 .execute();
     }
 
     public List<Task> fetchTasksReadyForExecution(int limit) {
-        WhereClause statusCondition = WhereClause.equals("status", Status.FAILED.name())
-                .or(WhereClause.equals("status", Status.PENDING.name()));
+        WhereClause statusCondition = WhereClause.equals("status", TaskStatus.FAILED.name())
+                .or(WhereClause.equals("status", TaskStatus.PENDING.name()));
         WhereClause timeCondition  = WhereClause.lteq("next_attempt", Timestamp.valueOf(LocalDateTime.now()));
         WhereClause wc = timeCondition.and(statusCondition);
         OrderClause or = OrderClause.asc("created");
@@ -64,7 +64,7 @@ public class TaskRepository {
     public List<Task> fetchAllFailedTasks() {
         return SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
                 .column("*")
-                .where(WhereClause.equals("status", Status.FAILED.name()))
+                .where(WhereClause.equals("status", TaskStatus.FAILED.name()))
                 .executeToList();
     }
 
@@ -95,7 +95,7 @@ public class TaskRepository {
         return Task.builder()
                 .id(rs.getString("id"))
                 .type(new TaskType(rs.getString("type")))
-                .status(Status.valueOf(rs.getString("status")))
+                .taskStatus(TaskStatus.valueOf(rs.getString("status")))
                 .created(rs.getTimestamp("created").toLocalDateTime())
                 .attempts(rs.getInt("attempts"))
                 .nextAttempt(SerializerUtils.deserialize(rs.getTimestamp("next_attempt")))
@@ -110,21 +110,21 @@ public class TaskRepository {
         return Tuple.of(rs.getString("status"), rs.getInt("num"));
     }
 
-    public int setStatusForTask(Task task, Status status) {
+    public int setStatusForTask(Task task, TaskStatus taskStatus) {
         LocalDateTime now = LocalDateTime.now();
         UpdateQuery query = SqlUtils.update(jdbc, TASK_TABLE)
                 .whereEquals("id", task.getId())
-                .set("status", status.name())
+                .set("status", taskStatus.name())
                 .set("last_attempt", Timestamp.valueOf(now));
 
-        if (status == Status.FAILED) {
+        if (taskStatus == TaskStatus.FAILED) {
             LocalDateTime nextRetry = TimeUtils.exponentialBackoff(task.getAttempts(), now);
             query.set("next_attempt", Timestamp.valueOf(nextRetry));
             query.set("attempts", task.getAttempts() + 1);
             query.set("error", task.getError());
         }
 
-        if (status == Status.OK) {
+        if (taskStatus == TaskStatus.OK) {
             query.set("result", task.getJsonResult());
         }
 

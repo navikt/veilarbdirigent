@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.service;
 
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.job.leader_election.LeaderElectionClient;
@@ -7,8 +8,8 @@ import no.nav.common.types.identer.AktorId;
 import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 import no.nav.veilarbdirigent.repository.FeedRepository;
 import no.nav.veilarbdirigent.repository.TaskRepository;
-import no.nav.veilarbdirigent.repository.domain.Status;
 import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import no.nav.veilarbdirigent.utils.TaskFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
 @Slf4j
 @Service
@@ -54,24 +57,36 @@ public class NyeBrukereFeedService {
             boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(element.getSykmeldtBrukerType());
 
             if (erNyRegistrert) {
-                Task kanskjePermittertDialogTask = TaskFactory.lagKanskjePermittertDialogTask(elementId, aktorId)
-                        .withStatus(Status.PENDING);
+                Task kanskjePermittertDialogTask = TaskFactory.lagKanskjePermittertDialogTask(elementId, aktorId);
+
+                Try<String> dialogTaskResult = taskProcessorService.processOpprettDialogTask(kanskjePermittertDialogTask);
+                kanskjePermittertDialogTask.setTaskStatus(getStatusFromTry(dialogTaskResult));
 
                 tasksToPerform.add(kanskjePermittertDialogTask);
             }
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
-                Task cvJobbprofilAktivitetTask = TaskFactory.lagCvJobbprofilAktivitetTask(elementId, aktorId)
-                        .withStatus(Status.PENDING);
+                Task cvJobbprofilAktivitetTask = TaskFactory.lagCvJobbprofilAktivitetTask(elementId, aktorId);
 
-                Task jobbsokerkompetanseAktivitetTask = TaskFactory.lagJobbsokerkompetanseAktivitetTask(elementId, aktorId)
-                        .withStatus(Status.PENDING);
+                Task jobbsokerkompetanseAktivitetTask = TaskFactory.lagJobbsokerkompetanseAktivitetTask(elementId, aktorId);
+
+                Try<String> cvJobbprofilAktivitetResult = taskProcessorService.processOpprettAktivitetTask(cvJobbprofilAktivitetTask);
+
+                if (cvJobbprofilAktivitetResult.isSuccess()) {
+                    Try<String> jobbsokerkompetanseAktivitetResult = taskProcessorService.processOpprettAktivitetTask(cvJobbprofilAktivitetTask);
+
+                    cvJobbprofilAktivitetTask.setTaskStatus(TaskStatus.OK);
+                    jobbsokerkompetanseAktivitetTask.setTaskStatus(getStatusFromTry(jobbsokerkompetanseAktivitetResult));
+                } else {
+                    // Hvis vi ikke får opprettet cv/jobbprofil aktivitet så dropper vi å prøve å opprette jobbsokerkompetanse
+                    cvJobbprofilAktivitetTask.setTaskStatus(TaskStatus.FAILED);
+                    jobbsokerkompetanseAktivitetTask.setTaskStatus(TaskStatus.PENDING);
+                }
 
                 tasksToPerform.addAll(List.of(cvJobbprofilAktivitetTask, jobbsokerkompetanseAktivitetTask));
             }
 
             transactor.executeWithoutResult((status) -> {
-                // TODO: cvJobbprofilAktivitetTask, jobbsokerkompetanseAktivitetTask kan bli kjørt i feil rekkefølge
                 taskRepository.insert(tasksToPerform);
 
                 feedRepository.oppdaterSisteKjenteId(elementId);

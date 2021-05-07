@@ -3,7 +3,7 @@ package no.nav.veilarbdirigent.controller;
 import lombok.Builder;
 import lombok.Data;
 import no.nav.veilarbdirigent.repository.TaskRepository;
-import no.nav.veilarbdirigent.repository.domain.Status;
+import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +35,7 @@ public class AdminController {
                 .map(task -> FailedTask.builder()
                         .id(task.getId())
                         .type(task.getType())
-                        .status(task.getStatus())
+                        .taskStatus(task.getTaskStatus())
                         .created(task.getCreated())
                         .attempts(task.getAttempts())
                         .nextAttempt(task.getNextAttempt())
@@ -68,7 +68,7 @@ public class AdminController {
     public static class FailedTask {
         String id;
         TaskType type;
-        Status status;
+        TaskStatus taskStatus;
         LocalDateTime created;
         int attempts;
         LocalDateTime nextAttempt;

@@ -29,7 +29,7 @@ public class TaskProcessorService {
                     taskData.getPredefineddataName()
             );
 
-            return processOpprettAktivitetTask(taskDataV2);
+            return processOpprettAktivitetTaskData(taskDataV2);
         } else if (DIALOG_TASK_TYPE_V1.equals(taskType)) {
             OldTask oldTask = fromJson(task.getJsonData(), OldTask.class);
             OpprettDialogTaskDataV1 taskData = fromJson(oldTask.getElement(), OpprettDialogTaskDataV1.class);
@@ -39,21 +39,31 @@ public class TaskProcessorService {
                     taskData.getMeldingsName()
             );
 
-            return processOpprettDialogTask(taskDataV2);
+            return processOpprettDialogTaskData(taskDataV2);
         } else if (AKTIVITET_TASK_TYPE_V2.equals(taskType)) {
-            return processOpprettAktivitetTask(fromJson(task.getJsonData(), OpprettAktivitetTaskDataV2.class));
+            return processOpprettAktivitetTask(task);
         } else if (DIALOG_TASK_TYPE_V2.equals(taskType)) {
-            return processOpprettDialogTask(fromJson(task.getJsonData(), OpprettDialogTaskDataV2.class));
+            return processOpprettDialogTask(task);
         } else {
             return Try.failure(new IllegalArgumentException("Unable to process task of type " + taskType));
         }
     }
 
-    public Try<String> processOpprettAktivitetTask(OpprettAktivitetTaskDataV2 taskData) {
+    public Try<String> processOpprettAktivitetTask(Task opprettAktivitetTaskV2) {
+        OpprettAktivitetTaskDataV2 taskData = fromJson(opprettAktivitetTaskV2.getJsonData(), OpprettAktivitetTaskDataV2.class);
+        return processOpprettAktivitetTaskData(taskData);
+    }
+
+    public Try<String> processOpprettDialogTask(Task opprettDialogTaskV2) {
+        OpprettDialogTaskDataV2 taskData = fromJson(opprettDialogTaskV2.getJsonData(), OpprettDialogTaskDataV2.class);
+        return processOpprettDialogTaskData(taskData);
+    }
+
+    private Try<String> processOpprettAktivitetTaskData(OpprettAktivitetTaskDataV2 taskData) {
         return aktivitetService.opprettAktivitetForBrukerMedMal(taskData.getAktorId(), taskData.getMalName());
     }
 
-    public Try<String> processOpprettDialogTask(OpprettDialogTaskDataV2 taskData) {
+    private Try<String> processOpprettDialogTaskData(OpprettDialogTaskDataV2 taskData) {
         return dialogService.opprettDialogHvisBrukerErPermittert(taskData.getAktorId());
     }
 

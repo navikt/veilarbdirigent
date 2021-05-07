@@ -2,8 +2,8 @@ package no.nav.veilarbdirigent.repository;
 
 import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
-import no.nav.veilarbdirigent.repository.domain.Status;
 import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,8 +29,8 @@ class TaskRepositoryTest {
 
         Task task = tasksFromDb.get(0);
         assertThat(task.getId()).isEqualTo("id1");
-        assertThat(task.getStatus()).isEqualTo(Status.PENDING);
-        assertThat(task.getData().element).isEqualTo(data);
+        assertThat(task.getTaskStatus()).isEqualTo(TaskStatus.PENDING);
+        assertThat(task.getJsonData()).isEqualTo(data);
         assertThat(task.getCreated()).isBetween(now().minusSeconds(1), now().plusSeconds(1));
         assertThat(task.getNextAttempt()).isBetween(now().minusSeconds(1), now().plusSeconds(1));
     }

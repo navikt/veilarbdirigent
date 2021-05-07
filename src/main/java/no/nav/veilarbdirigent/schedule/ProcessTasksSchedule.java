@@ -9,8 +9,8 @@ import no.nav.common.json.JsonUtils;
 import no.nav.common.metrics.Event;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.veilarbdirigent.repository.TaskRepository;
-import no.nav.veilarbdirigent.repository.domain.Status;
 import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.service.TaskProcessorService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -56,7 +56,7 @@ public class ProcessTasksSchedule {
     }
 
     private void performTask(Task task) {
-        taskRepository.setStatusForTask(task, Status.WORKING);
+        taskRepository.setStatusForTask(task, TaskStatus.WORKING);
 
         Event event = new Event(metricName("tryActuator")).addFieldToReport("type", task.getType());
 
@@ -65,14 +65,14 @@ public class ProcessTasksSchedule {
                 .onFailure(throwable -> {
                     log.error(throwable.getMessage(), throwable);
                     Task taskWithError = task.withError(throwable.toString());
-                    taskRepository.setStatusForTask(taskWithError, Status.FAILED);
+                    taskRepository.setStatusForTask(taskWithError, TaskStatus.FAILED);
                     event.setFailed();
                     metricsClient.report(event);
                 })
                 .onSuccess(result -> {
                     log.info("Task:{} completed successfully", task.getId());
                     Task taskWithResult = task.withJsonResult(JsonUtils.toJson(result));
-                    taskRepository.setStatusForTask(taskWithResult, Status.OK);
+                    taskRepository.setStatusForTask(taskWithResult, TaskStatus.OK);
                     event.setSuccess();
                     metricsClient.report(event);
                 });

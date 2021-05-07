@@ -1,22 +1,18 @@
 package no.nav.veilarbdirigent.repository.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Wither
+@With
 @Builder
 public class Task {
     String id;
     TaskType type;
-    Status status;
+    TaskStatus taskStatus;
     LocalDateTime created;
     int attempts;
     LocalDateTime nextAttempt;

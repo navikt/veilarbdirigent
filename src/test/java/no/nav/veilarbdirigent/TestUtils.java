@@ -2,10 +2,9 @@ package no.nav.veilarbdirigent;
 
 import io.vavr.collection.List;
 import lombok.SneakyThrows;
-import no.nav.veilarbdirigent.repository.domain.Status;
 import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
-import no.nav.veilarbdirigent.utils.TypedField;
 import org.mockito.ArgumentCaptor;
 
 public class TestUtils {
@@ -17,8 +16,8 @@ public class TestUtils {
                 .builder()
                 .id(id)
                 .type(TASK_TYPE)
-                .status(Status.PENDING)
-                .data(new TypedField<>(data))
+                .taskStatus(TaskStatus.PENDING)
+                .jsonData(data)
                 .build();
     }
 

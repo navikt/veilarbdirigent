@@ -39,7 +39,6 @@ public class ProcessTasksSchedule {
 
     @Scheduled(initialDelay = TEN_SECONDS, fixedRate = TEN_SECONDS)
     public void schedule() {
-        // TODO: Bytt med shedlock
         if (leaderElectionClient.isLeader()) {
             JobRunner.run("process_tasks", this::processTasks);
         }
@@ -57,7 +56,6 @@ public class ProcessTasksSchedule {
     }
 
     private void performTask(Task task) {
-        // TODO: Burde det brukes transaksjon her for å forhindre andre å prosessere samtidig?
         taskRepository.setStatusForTask(task, Status.WORKING);
 
         Event event = new Event(metricName("tryActuator")).addFieldToReport("type", task.getType());

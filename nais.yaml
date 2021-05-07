@@ -13,7 +13,6 @@ spec:
     - https://app.adeo.no/veilarbdirigent
   port: 8080
   webproxy: true
-  leaderElection: true
   prometheus:
     enabled: true
     path: veilarbdirigent/internal/prometheus

@@ -12,7 +12,6 @@ spec:
     - https://veilarbdirigent-{{namespace}}.nais.preprod.local
     - https://app-{{namespace}}.adeo.no/veilarbdirigent
   webproxy: true
-  leaderElection: true
   port: 8080
   prometheus:
     enabled: true

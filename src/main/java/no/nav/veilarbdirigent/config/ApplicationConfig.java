@@ -1,12 +1,14 @@
 package no.nav.veilarbdirigent.config;
 
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.core.LockConfiguration;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.client.aktoroppslag.CachedAktorOppslagClient;
 import no.nav.common.client.aktorregister.AktorregisterClient;
 import no.nav.common.client.aktorregister.AktorregisterHttpClient;
 import no.nav.common.job.leader_election.LeaderElectionClient;
-import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.common.sts.OpenAmSystemUserTokenProvider;
@@ -15,7 +17,11 @@ import no.nav.common.utils.Credentials;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.time.Duration;
+import java.time.Instant;
 
 import static no.nav.common.utils.NaisUtils.getCredentials;
 
@@ -53,8 +59,23 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public LeaderElectionClient leaderElectionClient() {
-        return new LeaderElectionHttpClient();
+    public LeaderElectionClient leaderElectionClient(LockProvider lockProvider) {
+        // Use shedlock for leader election to guarantee that there is 0-1 leaders at any given time
+        return () -> {
+            LockConfiguration configuration = new LockConfiguration(
+                    Instant.now(),
+                    "leader-election-lock",
+                    Duration.ofMinutes(3),
+                    Duration.ofSeconds(10)
+            );
+
+            return lockProvider.lock(configuration).isPresent();
+        };
+    }
+
+    @Bean
+    public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
+        return new JdbcTemplateLockProvider(jdbcTemplate);
     }
 
 }

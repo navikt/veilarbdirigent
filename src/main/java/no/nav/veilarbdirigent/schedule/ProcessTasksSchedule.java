@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.job.JobRunner;
 import no.nav.common.job.leader_election.LeaderElectionClient;
+import no.nav.common.json.JsonUtils;
 import no.nav.common.metrics.Event;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Status;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.service.TaskProcessorService;
-import no.nav.veilarbdirigent.utils.TypedField;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -73,7 +73,7 @@ public class ProcessTasksSchedule {
                 })
                 .onSuccess(result -> {
                     log.info("Task:{} completed successfully", task.getId());
-                    Task taskWithResult = task.withResult(new TypedField<>(result));
+                    Task taskWithResult = task.withJsonResult(JsonUtils.toJson(result));
                     taskRepository.setStatusForTask(taskWithResult, Status.OK);
                     event.setSuccess();
                     metricsClient.report(event);

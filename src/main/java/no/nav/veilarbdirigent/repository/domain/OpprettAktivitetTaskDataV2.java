@@ -8,7 +8,7 @@ import no.nav.common.types.identer.AktorId;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OpprettDialogTaskData {
+public class OpprettAktivitetTaskDataV2 {
     AktorId aktorId;
-    String dialogName;
+    String malName;
 }

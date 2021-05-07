@@ -42,7 +42,7 @@ public class TaskRepository {
                 .value("id", task.getId())
                 .value("type", task.getType().getType())
                 .value("status", task.getStatus().name())
-                .value("data", SerializerUtils.serialize(task.getData()))
+                .value("data", task.getJsonData())
                 .execute();
     }
 
@@ -100,8 +100,8 @@ public class TaskRepository {
                 .attempts(rs.getInt("attempts"))
                 .nextAttempt(SerializerUtils.deserialize(rs.getTimestamp("next_attempt")))
                 .lastAttempt(SerializerUtils.deserialize(rs.getTimestamp("last_attempt")))
-                .data(SerializerUtils.deserialize(rs.getString("data")))
-                .result(SerializerUtils.deserialize(rs.getString("result")))
+                .jsonData(rs.getString("data"))
+                .jsonResult(rs.getString("result"))
                 .error(rs.getString("error"))
                 .build();
     }
@@ -110,7 +110,7 @@ public class TaskRepository {
         return Tuple.of(rs.getString("status"), rs.getInt("num"));
     }
 
-    public int setStatusForTask(Task<?, ?> task, Status status) {
+    public int setStatusForTask(Task task, Status status) {
         LocalDateTime now = LocalDateTime.now();
         UpdateQuery query = SqlUtils.update(jdbc, TASK_TABLE)
                 .whereEquals("id", task.getId())
@@ -125,7 +125,7 @@ public class TaskRepository {
         }
 
         if (status == Status.OK) {
-            query.set("result", SerializerUtils.serialize(task.getResult()));
+            query.set("result", task.getJsonResult());
         }
 
         return query.execute();

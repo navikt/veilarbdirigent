@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
-import no.nav.veilarbdirigent.utils.TypedField;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Wither
 @Builder
-public class Task<DATA, RESULT> {
+public class Task {
     String id;
     TaskType type;
     Status status;
@@ -22,7 +21,7 @@ public class Task<DATA, RESULT> {
     int attempts;
     LocalDateTime nextAttempt;
     LocalDateTime lastAttempt;
-    TypedField<DATA> data;
-    TypedField<RESULT> result;
+    String jsonData;
+    String jsonResult;
     String error;
 }

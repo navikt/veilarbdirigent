@@ -6,6 +6,8 @@ import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
 import org.slf4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,9 +53,10 @@ public class AdminController {
     }
 
     @GetMapping("/forcerun")
-    public String forceRun() {
-//        core.forceScheduled();
-        return "NOT_SUPPORTED";
+    public ResponseEntity<String> forceRun() {
+        return ResponseEntity
+                .status(HttpStatus.NOT_IMPLEMENTED)
+                .body("NOT_IMPLEMENTED");
     }
 
     @GetMapping("/task/rerun")

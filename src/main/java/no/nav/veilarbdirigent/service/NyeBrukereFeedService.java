@@ -56,6 +56,8 @@ public class NyeBrukereFeedService {
             boolean erNyRegistrert = RegistreringUtils.erNyregistrert(element.getForeslattInnsatsgruppe());
             boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(element.getSykmeldtBrukerType());
 
+            log.info("Processing feed element. aktorId={} erNyRegistrert={} erNySykmeldtBrukerRegistrert={}", aktorId, erNyRegistrert, erNySykmeldtBrukerRegistrert);
+
             if (erNyRegistrert) {
                 Task kanskjePermittertDialogTask = TaskFactory.lagKanskjePermittertDialogTask(elementId, aktorId);
 

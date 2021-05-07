@@ -53,7 +53,7 @@ public class AdminController {
     @GetMapping("/forcerun")
     public String forceRun() {
 //        core.forceScheduled();
-        return "OK";
+        return "NOT_SUPPORTED";
     }
 
     @GetMapping("/task/rerun")

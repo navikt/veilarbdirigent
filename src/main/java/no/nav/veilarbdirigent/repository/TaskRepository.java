@@ -25,7 +25,9 @@ import java.util.List;
 
 @Repository
 public class TaskRepository {
-    private static final String TASK_TABLE = "task";
+
+    public static final String TASK_TABLE = "task";
+
     private final JdbcTemplate jdbc;
 
     public TaskRepository(JdbcTemplate jdbc) {
@@ -44,6 +46,16 @@ public class TaskRepository {
                 .value("status", task.getTaskStatus().name())
                 .value("data", task.getJsonData())
                 .execute();
+    }
+
+    public boolean hasTask(String taskId) {
+        Task task = SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
+                .column("*")
+                .where(WhereClause.equals("id", taskId))
+                .limit(1)
+                .execute();
+
+        return task != null;
     }
 
     public List<Task> fetchTasksReadyForExecution(int limit) {

@@ -1,0 +1,129 @@
+package no.nav.veilarbdirigent.service;
+
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import no.nav.common.job.leader_election.LeaderElectionClient;
+import no.nav.common.types.identer.AktorId;
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
+import no.nav.veilarbdirigent.repository.FeedRepository;
+import no.nav.veilarbdirigent.repository.TaskRepository;
+import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.utils.RegistreringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import static no.nav.veilarbdirigent.utils.TaskFactory.*;
+import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class NyeBrukereFeedService {
+
+    private final TaskProcessorService taskProcessorService;
+
+    private final TaskRepository taskRepository;
+
+    private final FeedRepository feedRepository;
+
+    private final LeaderElectionClient leaderElectionClient;
+
+    private final TransactionTemplate transactor;
+
+    public long sisteKjenteId() {
+        return feedRepository.sisteKjenteId();
+    }
+
+    public void processFeedElements(List<OppfolgingDataFraFeed> elements) {
+        if (!leaderElectionClient.isLeader()) {
+            log.warn("Is not leader, Skipping action");
+            return;
+        }
+
+        elements.forEach((element) -> {
+            long elementId = element.getId();
+            AktorId aktorId = AktorId.of(element.getAktorId());
+
+            log.info("Submitting feed message with id: {}", elementId);
+
+            List<Task> tasksToPerform = new ArrayList<>();
+
+            boolean erNyRegistrert = RegistreringUtils.erNyregistrert(element.getForeslattInnsatsgruppe());
+            boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(element.getSykmeldtBrukerType());
+
+            log.info("Processing feed element. aktorId={} erNyRegistrert={} erNySykmeldtBrukerRegistrert={}", aktorId, erNyRegistrert, erNySykmeldtBrukerRegistrert);
+
+            if (erNyRegistrert) {
+                Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
+                        () -> lagKanskjePermittertDialogTask(elementId, aktorId)
+                );
+
+                if (maybePermittertDialogTask.isPresent()) {
+                    Task permittertDialogTask = maybePermittertDialogTask.get();
+
+                    Try<String> dialogTaskResult = taskProcessorService.processOpprettDialogTask(permittertDialogTask);
+                    permittertDialogTask.setTaskStatus(getStatusFromTry(dialogTaskResult));
+
+                    tasksToPerform.add(permittertDialogTask);
+                }
+            }
+
+            if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
+                Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
+                        () -> lagCvJobbprofilAktivitetTask(elementId, aktorId)
+                );
+
+                Optional<Task> maybeJobbsokerkompetanseAktivitetTask = createTaskIfNotStoredInDb(
+                        () -> lagJobbsokerkompetanseAktivitetTask(elementId, aktorId)
+                );
+
+
+                if (maybeCvJobbprofilAktivitetTask.isPresent()) {
+                    Task cvJobbprofilAktivitetTask = maybeCvJobbprofilAktivitetTask.get();
+
+                    Try<String> cvJobbprofilAktivitetResult = taskProcessorService.processOpprettAktivitetTask(cvJobbprofilAktivitetTask);
+                    cvJobbprofilAktivitetTask.setTaskStatus(getStatusFromTry(cvJobbprofilAktivitetResult));
+
+                    tasksToPerform.add(cvJobbprofilAktivitetTask);
+                }
+
+                if (maybeJobbsokerkompetanseAktivitetTask.isPresent()) {
+                    Task jobbsokerkompetanseAktivitetTask = maybeJobbsokerkompetanseAktivitetTask.get();
+
+                    Try<String> jobbsokerkompetanseAktivitetResult = taskProcessorService.processOpprettAktivitetTask(jobbsokerkompetanseAktivitetTask);
+                    jobbsokerkompetanseAktivitetTask.setTaskStatus(getStatusFromTry(jobbsokerkompetanseAktivitetResult));
+
+                    tasksToPerform.add(jobbsokerkompetanseAktivitetTask);
+                }
+            }
+
+            transactor.executeWithoutResult((status) -> {
+                taskRepository.insert(tasksToPerform);
+
+                feedRepository.oppdaterSisteKjenteId(elementId);
+
+                log.info("Feed message with id: {} completed successfully", elementId);
+            });
+        });
+    }
+
+    private Optional<Task> createTaskIfNotStoredInDb(Supplier<Task> taskSupplier) {
+        Task task = taskSupplier.get();
+
+        if (taskRepository.hasTask(task.getId())) {
+            log.info("Task already exists for id={}", task.getId());
+            return Optional.empty();
+        } else {
+            log.info("Creating new task with id={}", task.getId());
+            return Optional.of(task);
+        }
+    }
+
+}
+

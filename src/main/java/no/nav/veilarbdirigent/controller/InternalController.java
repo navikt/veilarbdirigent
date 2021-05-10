@@ -39,7 +39,7 @@ public class InternalController {
 
     @GetMapping("/isAlive")
     public void isAlive() {
-        if(checkDbHealth(db).isUnhealthy()) {
+        if (checkDbHealth(db).isUnhealthy()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

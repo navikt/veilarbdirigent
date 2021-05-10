@@ -1,7 +1,7 @@
 package no.nav.veilarbdirigent.feed.consumer;
 
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 import no.nav.veilarbdirigent.feed.common.FeedAuthorizationModule;
-import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.quartz.ScheduleBuilder;

@@ -2,7 +2,7 @@ package no.nav.veilarbdirigent.feed.common;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 
 @Data
 @Accessors(chain = true)

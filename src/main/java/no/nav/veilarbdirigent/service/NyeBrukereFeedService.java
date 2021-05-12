@@ -36,11 +36,18 @@ public class NyeBrukereFeedService {
 
     private final TransactionTemplate transactor;
 
+    private final UnleashService unleashService;
+
     public long sisteKjenteId() {
         return feedRepository.sisteKjenteId();
     }
 
     public void processFeedElements(List<OppfolgingDataFraFeed> elements) {
+        if (unleashService.isKafkaEnabled()) {
+            log.info("Stopping processing of feed elements since kafka toggle is enabled");
+            return;
+        }
+
         if (!leaderElectionClient.isLeader()) {
             log.warn("Is not leader, Skipping action");
             return;

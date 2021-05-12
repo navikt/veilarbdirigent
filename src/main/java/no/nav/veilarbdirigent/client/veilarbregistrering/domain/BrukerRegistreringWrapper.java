@@ -11,5 +11,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class BrukerRegistreringWrapper {
     BrukerRegistreringType type;
-    OrdinaerBrukerRegistrering registrering;
+    OrdinaerBrukerRegistrering ordinaerBrukerRegistrering;
+    SykmeldtBrukerRegistrering sykmeldtBrukerRegistrering;
+    // Either ordinaerBrukerRegistrering or sykmeldtBrukerRegistrering is null
 }

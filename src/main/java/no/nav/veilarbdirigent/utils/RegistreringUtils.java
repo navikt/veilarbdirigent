@@ -1,8 +1,7 @@
 package no.nav.veilarbdirigent.utils;
 
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringType;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -27,24 +26,42 @@ public class RegistreringUtils {
     }
 
     public static LocalDateTime hentRegistreringDato(BrukerRegistreringWrapper brukerRegistrering) {
-        return brukerRegistrering.getRegistrering().getOpprettetDato();
+        return brukerRegistrering.getOrdinaerBrukerRegistrering().getOpprettetDato();
+    }
+
+    public static Besvarelse hentBesvarelse(BrukerRegistreringWrapper brukerRegistrering) {
+        if (brukerRegistrering.getSykmeldtBrukerRegistrering() != null) {
+            return brukerRegistrering.getSykmeldtBrukerRegistrering().getBesvarelse();
+        } else {
+            return brukerRegistrering.getOrdinaerBrukerRegistrering().getBesvarelse();
+        }
     }
 
     public static boolean erNyregistrert(BrukerRegistreringWrapper brukerRegistrering) {
-        if (BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType())) {
-            String innsatsgruppe = brukerRegistrering.getRegistrering().getProfilering().getInnsatsgruppe();
-            return erNyregistrert(innsatsgruppe);
+        if (!BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType())) {
+            return false;
         }
 
-        return false;
+        String innsatsgruppe = brukerRegistrering.getOrdinaerBrukerRegistrering()
+                .getProfilering()
+                .getInnsatsgruppe();
+
+        return erNyregistrert(innsatsgruppe);
     }
 
     public static boolean erNySykmeldtBrukerRegistrert(BrukerRegistreringWrapper brukerRegistrering) {
-        return false;
+        if (!BrukerRegistreringType.SYKMELDT.equals(brukerRegistrering.getType())) {
+            return false;
+        }
+
+        FremtidigSituasjonSvar fremtidigSituasjon = brukerRegistrering.getSykmeldtBrukerRegistrering()
+                .getBesvarelse()
+                .getFremtidigSituasjon();
+
+        return fremtidigSituasjon == FremtidigSituasjonSvar.USIKKER || fremtidigSituasjon == FremtidigSituasjonSvar.NY_ARBEIDSGIVER;
     }
 
     public static boolean erNyligRegistrert(LocalDateTime registreringsdato, List<Oppfolgingsperiode> oppfolgingsperioder) {
-
         // Hvis bruker kun har 1 oppfølgingsperiode og den er gjeldende så må registreringen være utført i denn perioden
         if (oppfolgingsperioder.size() == 1 && oppfolgingsperioder.get(0).getSluttDato() == null) {
             return true;

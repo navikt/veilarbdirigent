@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,4 +15,6 @@ import lombok.ToString;
 @ToString
 public class OrdinaerBrukerRegistrering {
     Besvarelse besvarelse;
+    Profilering profilering;
+    LocalDateTime opprettetDato;
 }

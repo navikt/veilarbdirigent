@@ -1,6 +1,12 @@
 package no.nav.veilarbdirigent.utils;
 
-import io.vavr.collection.List;
+import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringType;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
+
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 public class RegistreringUtils {
 
@@ -18,6 +24,43 @@ public class RegistreringUtils {
 
     public static boolean erNySykmeldtBrukerRegistrert(String sykmeldtBrukerType) {
         return sykmeldtBrukerTyper.contains(sykmeldtBrukerType);
+    }
+
+    public static LocalDateTime hentRegistreringDato(BrukerRegistreringWrapper brukerRegistrering) {
+        return brukerRegistrering.getRegistrering().getOpprettetDato();
+    }
+
+    public static boolean erNyregistrert(BrukerRegistreringWrapper brukerRegistrering) {
+        if (BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType())) {
+            String innsatsgruppe = brukerRegistrering.getRegistrering().getProfilering().getInnsatsgruppe();
+            return erNyregistrert(innsatsgruppe);
+        }
+
+        return false;
+    }
+
+    public static boolean erNySykmeldtBrukerRegistrert(BrukerRegistreringWrapper brukerRegistrering) {
+        return false;
+    }
+
+    public static boolean erNyligRegistrert(LocalDateTime registreringsdato, List<Oppfolgingsperiode> oppfolgingsperioder) {
+
+        // Hvis bruker kun har 1 oppfølgingsperiode og den er gjeldende så må registreringen være utført i denn perioden
+        if (oppfolgingsperioder.size() == 1 && oppfolgingsperioder.get(0).getSluttDato() == null) {
+            return true;
+        }
+
+        Oppfolgingsperiode forrigeOppfolgingsperiode = oppfolgingsperioder.stream()
+                .filter(op -> op.getSluttDato() != null)
+                .max(Comparator.comparing(Oppfolgingsperiode::getSluttDato))
+                .orElseThrow(() -> new IllegalStateException("Fant ikke forrige oppfølgingsperiode for bruker"));
+
+        /*
+         Registreringen vil være utført i omtrent samme tid som starten på oppfølgingsperioden.
+         Siden vi ikke har helt kontroll på at registreringen utføres etter at perioden har startet, så sjekker vi heller at den
+         ble utført etter avslutningen på forrige periode.
+        */
+        return registreringsdato.isAfter(forrigeOppfolgingsperiode.getSluttDato().toLocalDateTime());
     }
 
 }

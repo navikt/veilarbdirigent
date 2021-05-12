@@ -16,9 +16,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static no.nav.veilarbdirigent.utils.TaskFactory.*;
+import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
 import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
 @Slf4j
@@ -54,10 +54,10 @@ public class NyeBrukereFeedService {
         }
 
         elements.forEach((element) -> {
-            long elementId = element.getId();
+            String elementIdStr = String.valueOf(element.getId());
             AktorId aktorId = AktorId.of(element.getAktorId());
 
-            log.info("Submitting feed message with id: {}", elementId);
+            log.info("Submitting feed message with id: {}", elementIdStr);
 
             List<Task> tasksToPerform = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class NyeBrukereFeedService {
 
             if (erNyRegistrert) {
                 Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
-                        () -> lagKanskjePermittertDialogTask(elementId, aktorId)
+                        () -> lagKanskjePermittertDialogTask(elementIdStr, aktorId), taskRepository
                 );
 
                 if (maybePermittertDialogTask.isPresent()) {
@@ -83,11 +83,11 @@ public class NyeBrukereFeedService {
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
                 Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagCvJobbprofilAktivitetTask(elementId, aktorId)
+                        () -> lagCvJobbprofilAktivitetTask(elementIdStr, aktorId), taskRepository
                 );
 
                 Optional<Task> maybeJobbsokerkompetanseAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagJobbsokerkompetanseAktivitetTask(elementId, aktorId)
+                        () -> lagJobbsokerkompetanseAktivitetTask(elementIdStr, aktorId), taskRepository
                 );
 
 
@@ -113,23 +113,11 @@ public class NyeBrukereFeedService {
             transactor.executeWithoutResult((status) -> {
                 taskRepository.insert(tasksToPerform);
 
-                feedRepository.oppdaterSisteKjenteId(elementId);
+                feedRepository.oppdaterSisteKjenteId(element.getId());
 
-                log.info("Feed message with id: {} completed successfully", elementId);
+                log.info("Feed message with id: {} completed successfully", elementIdStr);
             });
         });
-    }
-
-    private Optional<Task> createTaskIfNotStoredInDb(Supplier<Task> taskSupplier) {
-        Task task = taskSupplier.get();
-
-        if (taskRepository.hasTask(task.getId())) {
-            log.info("Task already exists for id={}", task.getId());
-            return Optional.empty();
-        } else {
-            log.info("Creating new task with id={}", task.getId());
-            return Optional.of(task);
-        }
     }
 
 }

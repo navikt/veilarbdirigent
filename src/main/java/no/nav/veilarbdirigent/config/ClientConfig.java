@@ -10,6 +10,8 @@ import no.nav.veilarbdirigent.client.veilarbdialog.VeilarbdialogClient;
 import no.nav.veilarbdirigent.client.veilarbdialog.VeilarbdialogClientImpl;
 import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
 import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClientImpl;
+import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
+import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClientImpl;
 import okhttp3.Interceptor;
@@ -41,6 +43,12 @@ public class ClientConfig {
     public VeilarbdialogClient veilarbdialogClient(SystemUserTokenProvider tokenProvider) {
         String url = UrlUtils.createServiceUrl("veilarbdialog", "pto", true);
         return new VeilarbdialogClientImpl(url, tokenProvider::getSystemUserToken);
+    }
+
+    @Bean
+    public VeilarboppfolgingClient veilarboppfolgingClient(SystemUserTokenProvider tokenProvider) {
+        String url = UrlUtils.createServiceUrl("veilarboppfolging", "pto", true);
+        return new VeilarboppfolgingClientImpl(url, tokenProvider::getSystemUserToken);
     }
 
     @Bean

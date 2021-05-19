@@ -1,7 +1,10 @@
 package no.nav.veilarbdirigent.utils;
 
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.Besvarelse;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringType;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.FremtidigSituasjonSvar;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -18,10 +21,18 @@ public class RegistreringUtils {
     );
 
     public static boolean erNyregistrert(String foreslattInnsatsgruppe) {
+        if (foreslattInnsatsgruppe == null) {
+            return false;
+        }
+
         return registeringForslag.contains(foreslattInnsatsgruppe);
     }
 
     public static boolean erNySykmeldtBrukerRegistrert(String sykmeldtBrukerType) {
+        if (sykmeldtBrukerType == null) {
+            return false;
+        }
+
         return sykmeldtBrukerTyper.contains(sykmeldtBrukerType);
     }
 
@@ -38,7 +49,7 @@ public class RegistreringUtils {
     }
 
     public static boolean erNyregistrert(BrukerRegistreringWrapper brukerRegistrering) {
-        if (!BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType())) {
+        if (brukerRegistrering == null || !BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType())) {
             return false;
         }
 
@@ -50,7 +61,7 @@ public class RegistreringUtils {
     }
 
     public static boolean erNySykmeldtBrukerRegistrert(BrukerRegistreringWrapper brukerRegistrering) {
-        if (!BrukerRegistreringType.SYKMELDT.equals(brukerRegistrering.getType())) {
+        if (brukerRegistrering == null || !BrukerRegistreringType.SYKMELDT.equals(brukerRegistrering.getType())) {
             return false;
         }
 

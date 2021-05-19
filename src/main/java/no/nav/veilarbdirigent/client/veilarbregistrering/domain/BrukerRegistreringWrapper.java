@@ -10,6 +10,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class BrukerRegistreringWrapper {
-    String type;
-    OrdinaerBrukerRegistrering registrering;
+    BrukerRegistreringType type;
+    OrdinaerBrukerRegistrering ordinaerBrukerRegistrering;
+    SykmeldtBrukerRegistrering sykmeldtBrukerRegistrering;
+    // Either ordinaerBrukerRegistrering or sykmeldtBrukerRegistrering is null
 }

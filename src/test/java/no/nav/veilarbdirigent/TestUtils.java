@@ -1,11 +1,14 @@
 package no.nav.veilarbdirigent;
 
-import io.vavr.collection.List;
 import lombok.SneakyThrows;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
-import org.mockito.ArgumentCaptor;
+
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TestUtils {
 
@@ -21,14 +24,11 @@ public class TestUtils {
                 .build();
     }
 
-    public static <T> ArgumentCaptor<List<T>> listArgumentCaptor(Class<T> cls) {
-        Class<List<T>> captorType = (Class<List<T>>)(Class)List.class;
-        return ArgumentCaptor.forClass(captorType);
-    }
-
     @SneakyThrows
-    public static void delay(int millis) {
-        Thread.sleep(millis);
+    public static String readTestResourceFile(String fileName) {
+        URL fileUrl = TestUtils.class.getClassLoader().getResource(fileName);
+        Path resPath = Paths.get(fileUrl.toURI());
+        return Files.readString(resPath);
     }
 
 }

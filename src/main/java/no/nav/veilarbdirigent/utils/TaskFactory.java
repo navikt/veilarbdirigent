@@ -34,23 +34,23 @@ public class TaskFactory {
     private final static String KANSKJE_PERMITTERT_DIALOG_NAME = "kanskje_permitert_dialog";
 
 
-    public static Task lagCvJobbprofilAktivitetTask(long id, AktorId aktorId) {
+    public static Task lagCvJobbprofilAktivitetTask(String id, AktorId aktorId) {
         return new Task()
-                .withId(id + CV_JOBBPROFIL_AKTIVITET_TASK_ID_SUFFIX)
+                .withId(id + "_" + CV_JOBBPROFIL_AKTIVITET_TASK_ID_SUFFIX)
                 .withType(AKTIVITET_TASK_TYPE_V2)
                 .withJsonData(toJson(new OpprettAktivitetTaskDataV2(aktorId, CV_JOBBPROFIL_AKTIVITET_MAL)));
     }
 
-    public static Task lagJobbsokerkompetanseAktivitetTask(long id, AktorId aktorId) {
+    public static Task lagJobbsokerkompetanseAktivitetTask(String id, AktorId aktorId) {
         return new Task()
-                .withId(id + JOBBSOKERKOMPETANSE_AKTIVITET_TASK_ID_SUFFIX)
+                .withId(id + "_" + JOBBSOKERKOMPETANSE_AKTIVITET_TASK_ID_SUFFIX)
                 .withType(AKTIVITET_TASK_TYPE_V2)
                 .withJsonData(toJson(new OpprettAktivitetTaskDataV2(aktorId, JOBBSOKERKOMPETANSE_AKTIVITET_MAL)));
     }
 
-    public static Task lagKanskjePermittertDialogTask(long id, AktorId aktorId) {
+    public static Task lagKanskjePermittertDialogTask(String id, AktorId aktorId) {
         return new Task()
-                .withId(id + KANSKJE_PERMITTERT_DIALOG_TASK_ID_SUFFIX)
+                .withId(id + "_" + KANSKJE_PERMITTERT_DIALOG_TASK_ID_SUFFIX)
                 .withType(DIALOG_TASK_TYPE_V2)
                 .withJsonData(toJson(new OpprettDialogTaskDataV2(aktorId, KANSKJE_PERMITTERT_DIALOG_NAME)));
     }

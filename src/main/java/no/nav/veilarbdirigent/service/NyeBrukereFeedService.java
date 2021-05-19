@@ -3,12 +3,17 @@ package no.nav.veilarbdirigent.service;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.types.identer.AktorId;
+import no.nav.common.types.identer.Fnr;
+import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
+import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
 import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 import no.nav.veilarbdirigent.repository.FeedRepository;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.utils.OppfolgingsperiodeUtils;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -16,9 +21,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static no.nav.veilarbdirigent.utils.TaskFactory.*;
+import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
 import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
 @Slf4j
@@ -36,21 +41,40 @@ public class NyeBrukereFeedService {
 
     private final TransactionTemplate transactor;
 
+    private final UnleashService unleashService;
+
+    private final VeilarboppfolgingClient veilarboppfolgingClient;
+
+    private final AktorOppslagClient aktorOppslagClient;
+
     public long sisteKjenteId() {
         return feedRepository.sisteKjenteId();
     }
 
     public void processFeedElements(List<OppfolgingDataFraFeed> elements) {
+        if (unleashService.isKafkaEnabled()) {
+            log.info("Stopping processing of feed elements since kafka toggle is enabled");
+            return;
+        }
+
         if (!leaderElectionClient.isLeader()) {
             log.warn("Is not leader, Skipping action");
             return;
         }
 
         elements.forEach((element) -> {
-            long elementId = element.getId();
             AktorId aktorId = AktorId.of(element.getAktorId());
+            Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
-            log.info("Submitting feed message with id: {}", elementId);
+            log.info("Submitting feed message with id: {}", element.getId());
+
+            List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
+
+            Oppfolgingsperiode gjeldendeOppfolgingsperiode = OppfolgingsperiodeUtils
+                    .hentGjeldendeOppfolgingsperiode(oppfolgingsperioder)
+                    .orElseThrow(() -> new IllegalStateException("Bruker har ikke gjeldende oppfølgingsperiode"));
+
+            String oppfolgingsperiodeUuid = gjeldendeOppfolgingsperiode.getUuid().toString();
 
             List<Task> tasksToPerform = new ArrayList<>();
 
@@ -61,7 +85,7 @@ public class NyeBrukereFeedService {
 
             if (erNyRegistrert) {
                 Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
-                        () -> lagKanskjePermittertDialogTask(elementId, aktorId)
+                        () -> lagKanskjePermittertDialogTask(oppfolgingsperiodeUuid, aktorId), taskRepository
                 );
 
                 if (maybePermittertDialogTask.isPresent()) {
@@ -76,11 +100,11 @@ public class NyeBrukereFeedService {
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
                 Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagCvJobbprofilAktivitetTask(elementId, aktorId)
+                        () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeUuid, aktorId), taskRepository
                 );
 
                 Optional<Task> maybeJobbsokerkompetanseAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagJobbsokerkompetanseAktivitetTask(elementId, aktorId)
+                        () -> lagJobbsokerkompetanseAktivitetTask(oppfolgingsperiodeUuid, aktorId), taskRepository
                 );
 
 
@@ -106,23 +130,11 @@ public class NyeBrukereFeedService {
             transactor.executeWithoutResult((status) -> {
                 taskRepository.insert(tasksToPerform);
 
-                feedRepository.oppdaterSisteKjenteId(elementId);
+                feedRepository.oppdaterSisteKjenteId(element.getId());
 
-                log.info("Feed message with id: {} completed successfully", elementId);
+                log.info("Feed message with id: {} completed successfully", element.getId());
             });
         });
-    }
-
-    private Optional<Task> createTaskIfNotStoredInDb(Supplier<Task> taskSupplier) {
-        Task task = taskSupplier.get();
-
-        if (taskRepository.hasTask(task.getId())) {
-            log.info("Task already exists for id={}", task.getId());
-            return Optional.empty();
-        } else {
-            log.info("Creating new task with id={}", task.getId());
-            return Optional.of(task);
-        }
     }
 
 }

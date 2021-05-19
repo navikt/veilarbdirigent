@@ -2,6 +2,7 @@ package no.nav.veilarbdirigent.config;
 
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.sts.SystemUserTokenProvider;
+import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClientImpl;
@@ -20,31 +21,43 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
+import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
+import static no.nav.common.utils.UrlUtils.createAppAdeoPreprodIngressUrl;
+import static no.nav.common.utils.UrlUtils.createAppAdeoProdIngressUrl;
 
 @Configuration
 public class ClientConfig {
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(SystemUserTokenProvider tokenProvider) {
-        String url = UrlUtils.createServiceUrl("veilarbaktivitet", true);
+        String url = isDevelopment().orElse(false)
+                ? createAppAdeoPreprodIngressUrl("veilarbaktivitet", getEnvironment())
+                : createAppAdeoProdIngressUrl("veilarbaktivitet");
+
         return new VeilarbaktivitetClientImpl(url, tokenProvider::getSystemUserToken);
     }
 
     @Bean
     public VeilarbdialogClient veilarbdialogClient(SystemUserTokenProvider tokenProvider) {
-        String url = UrlUtils.createServiceUrl("veilarbdialog", true);
+        String url = UrlUtils.createServiceUrl("veilarbdialog", "pto", true);
         return new VeilarbdialogClientImpl(url, tokenProvider::getSystemUserToken);
     }
 
     @Bean
     public VeilarbmalverkClient veilarbmalverkClient(SystemUserTokenProvider tokenProvider) {
-        String url = UrlUtils.createServiceUrl("veilarbmalverk", true);
+        String url = isDevelopment().orElse(false)
+                ? createAppAdeoPreprodIngressUrl("veilarbmalverk", getEnvironment())
+                : createAppAdeoProdIngressUrl("veilarbmalverk");
+
         return new VeilarbmalverkClientImpl(url, tokenProvider::getSystemUserToken);
     }
 
     @Bean
     public VeilarbregistreringClient veilarbregistreringClient(SystemUserTokenProvider tokenProvider) {
-        String url = UrlUtils.createServiceUrl("veilarbregistrering", true);
+        String url = isDevelopment().orElse(false)
+                ? createAppAdeoPreprodIngressUrl("veilarbregistrering", getEnvironment())
+                : createAppAdeoProdIngressUrl("veilarbregistrering");
+
         return new VeilarbregistreringClientImpl(url, tokenProvider::getSystemUserToken);
     }
 
@@ -71,6 +84,10 @@ public class ClientConfig {
                     .build();
             return chain.proceed(newReq);
         }
+    }
+
+    private static String getEnvironment() {
+        return EnvironmentUtils.getRequiredProperty("APP_ENVIRONMENT_NAME");
     }
 
 }

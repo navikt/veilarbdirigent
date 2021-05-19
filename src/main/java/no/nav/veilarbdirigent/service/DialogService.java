@@ -11,7 +11,7 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClie
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.Besvarelse;
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.DinSituasjonSvar;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.OrdinaerBrukerRegistrering;
+import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,10 +44,8 @@ public class DialogService {
         Option<DinSituasjonSvar> svar = registeringsData
                 .toOption()
                 .flatMap(Option::of)
-                .map(BrukerRegistreringWrapper::getRegistrering)
-                .map(OrdinaerBrukerRegistrering::getBesvarelse)
+                .map(RegistreringUtils::hentBesvarelse)
                 .map(Besvarelse::getDinSituasjon);
-
 
         if (svar.map(DinSituasjonSvar.ER_PERMITTERT::equals).getOrElse(false)) {
             return veilarbdialogClient.lagDialog(aktorId, permitertJson);

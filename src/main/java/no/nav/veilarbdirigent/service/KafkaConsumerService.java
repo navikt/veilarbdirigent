@@ -86,6 +86,11 @@ public class KafkaConsumerService {
         boolean erNyRegistrert = RegistreringUtils.erNyregistrert(brukerRegistrering);
         boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(brukerRegistrering);
 
+        log.info(
+                "Behandler bruker hvor oppfølging har startet. aktorId={} erNyRegistrert={} erNySykmeldtBrukerRegistrert={}",
+                aktorId, erNyRegistrert, erNySykmeldtBrukerRegistrert
+        );
+
         List<Task> tasksToPerform = new ArrayList<>();
 
         if (erNyRegistrert) {
@@ -132,7 +137,12 @@ public class KafkaConsumerService {
             }
         }
 
-        taskRepository.insert(tasksToPerform);
+        if (tasksToPerform.isEmpty()) {
+            log.info("No tasks for aktorId={}", aktorId);
+        } else {
+            log.info("Inserting tasks for aktorId={} tasks={}", aktorId, tasksToPerform);
+            taskRepository.insert(tasksToPerform);
+        }
 
         log.info("Finished consuming kafka record for aktorId={}", aktorId);
     }

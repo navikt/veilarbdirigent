@@ -128,7 +128,12 @@ public class NyeBrukereFeedService {
             }
 
             transactor.executeWithoutResult((status) -> {
-                taskRepository.insert(tasksToPerform);
+                if (tasksToPerform.isEmpty()) {
+                    log.info("No tasks for aktorId={}", aktorId);
+                } else {
+                    log.info("Inserting tasks for aktorId={} tasks={}", aktorId, tasksToPerform);
+                    taskRepository.insert(tasksToPerform);
+                }
 
                 feedRepository.oppdaterSisteKjenteId(element.getId());
 

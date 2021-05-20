@@ -20,4 +20,10 @@ public class Task {
     String jsonData;
     String jsonResult;
     String error;
+
+    @Override
+    public String toString() {
+        return String.format("Task{ id=%s, type=%s status=%s }", id, type.getType(), taskStatus);
+    }
+
 }

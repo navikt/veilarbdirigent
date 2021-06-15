@@ -1,6 +1,6 @@
 package no.nav.veilarbdirigent.feed.consumer;
 
-import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 
 import java.util.List;
 

@@ -1,21 +1,27 @@
 package no.nav.veilarbdirigent.config;
 
-import no.nav.common.client.aktorregister.AktorregisterClient;
-import no.nav.common.leaderelection.LeaderElectionClient;
+import no.finn.unleash.UnleashContext;
+import no.nav.common.client.aktoroppslag.AktorOppslagClient;
+import no.nav.common.featuretoggle.UnleashClient;
+import no.nav.common.health.HealthCheckResult;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
+import no.nav.common.types.identer.AktorId;
+import no.nav.common.types.identer.Fnr;
 import no.nav.common.utils.Credentials;
-import no.nav.veilarbdirigent.admin.AdminController;
-import no.nav.veilarbdirigent.mock.AktorregisterClientMock;
+import no.nav.veilarbdirigent.controller.AdminController;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
 import no.nav.veilarbdirigent.mock.MetricsClientMock;
+import no.nav.veilarbdirigent.repository.TaskRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,8 +30,6 @@ import static org.mockito.Mockito.when;
 @EnableConfigurationProperties({EnvironmentProperties.class})
 @Import({
         AdminController.class,
-        DAOConfig.class,
-        CoreConfig.class,
         FilterTestConfig.class
 })
 public class ApplicationTestConfig {
@@ -36,8 +40,53 @@ public class ApplicationTestConfig {
     }
 
     @Bean
-    public AktorregisterClient aktorregisterClient() {
-        return new AktorregisterClientMock();
+    public UnleashClient unleashClient() {
+        return new UnleashClient() {
+            @Override
+            public boolean isEnabled(String toggleName) {
+                return true;
+            }
+
+            @Override
+            public boolean isEnabled(String toggleName, UnleashContext unleashContext) {
+                return true;
+            }
+
+            @Override
+            public HealthCheckResult checkHealth() {
+                return HealthCheckResult.healthy();
+            }
+        };
+    }
+
+    @Bean
+    public AktorOppslagClient aktorOppslagClient() {
+        return new AktorOppslagClient() {
+            @Override
+            public Fnr hentFnr(AktorId aktorId) {
+                return null;
+            }
+
+            @Override
+            public AktorId hentAktorId(Fnr fnr) {
+                return null;
+            }
+
+            @Override
+            public Map<AktorId, Fnr> hentFnrBolk(List<AktorId> list) {
+                return null;
+            }
+
+            @Override
+            public Map<Fnr, AktorId> hentAktorIdBolk(List<Fnr> list) {
+                return null;
+            }
+
+            @Override
+            public HealthCheckResult checkHealth() {
+                return null;
+            }
+        };
     }
 
     @Bean
@@ -46,15 +95,15 @@ public class ApplicationTestConfig {
     }
 
     @Bean
+    public TaskRepository taskDAO(JdbcTemplate jdbcTemplate) {
+        return new TaskRepository(jdbcTemplate);
+    }
+
+    @Bean
     public LeaderElectionClient leaderElectionClient() {
         var client = mock(LeaderElectionClient.class);
         when(client.isLeader()).thenAnswer(a -> true);
         return client;
-    }
-
-    @Bean
-    public Transactor transactor(PlatformTransactionManager transactionManager) {
-        return new Transactor(transactionManager);
     }
 
     @Bean

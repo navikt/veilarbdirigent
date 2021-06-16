@@ -8,11 +8,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class VeilarbregistreringClientImplTest {
 
@@ -34,16 +34,34 @@ public class VeilarbregistreringClientImplTest {
                         .withBody(registreringJson))
         );
 
-        BrukerRegistreringWrapper brukerRegistreringWrapper = veilarbregistreringClient.hentRegistrering(fnr)
-                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
+        BrukerRegistreringWrapper brukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
+                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new).get();
 
-        OrdinaerBrukerRegistrering registrering = brukerRegistreringWrapper.getOrdinaerBrukerRegistrering();
+        OrdinaerBrukerRegistrering registrering = brukerRegistrering.getOrdinaerBrukerRegistrering();
 
-        assertNull(brukerRegistreringWrapper.getSykmeldtBrukerRegistrering());
-        assertEquals(BrukerRegistreringType.ORDINAER, brukerRegistreringWrapper.getType());
+        assertNull(brukerRegistrering.getSykmeldtBrukerRegistrering());
+        assertEquals(BrukerRegistreringType.ORDINAER, brukerRegistrering.getType());
         assertEquals("2021-05-11T10:40:37.128625", registrering.getOpprettetDato().toString());
         assertEquals("BEHOV_FOR_ARBEIDSEVNEVURDERING", registrering.getProfilering().getInnsatsgruppe());
         assertEquals(DinSituasjonSvar.VIL_FORTSETTE_I_JOBB, registrering.getBesvarelse().getDinSituasjon());
+    }
+
+    @Test
+    public void skal_handtere_204() {
+        Fnr fnr = Fnr.of("1234");
+        String apiUrl = "http://localhost:" + wireMockRule.port();
+        VeilarbregistreringClient veilarbregistreringClient = new VeilarbregistreringClientImpl(apiUrl, () -> "TOKEN");
+
+        givenThat(get(urlEqualTo("/api/registrering?fnr=" + fnr))
+                .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
+                .willReturn(aResponse()
+                        .withStatus(204))
+        );
+
+        Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
+                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
+
+        assertTrue(maybeBrukerRegistrering.isEmpty());
     }
 
     @Test
@@ -62,7 +80,7 @@ public class VeilarbregistreringClientImplTest {
         );
 
         BrukerRegistreringWrapper brukerRegistreringWrapper = veilarbregistreringClient.hentRegistrering(fnr)
-                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
+                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new).get();
 
         SykmeldtBrukerRegistrering registrering = brukerRegistreringWrapper.getSykmeldtBrukerRegistrering();
 

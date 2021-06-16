@@ -2,6 +2,9 @@ package no.nav.veilarbdirigent.utils;
 
 import no.nav.common.types.identer.AktorId;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.OrdinaerBrukerRegistrering;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.SykmeldtBrukerRegistrering;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -9,10 +12,36 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RegistreringUtilsTest {
+
+    @Test
+    public void hentRegistreringDato__skal_returnere_dato_for_ordinaer_registrering() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        BrukerRegistreringWrapper wrapper = new BrukerRegistreringWrapper()
+                .setOrdinaerBrukerRegistrering(new OrdinaerBrukerRegistrering(
+                        null,
+                        null,
+                        localDateTime
+                ));
+
+        assertEquals(localDateTime, RegistreringUtils.hentRegistreringDato(wrapper));
+    }
+
+    @Test
+    public void hentRegistreringDato__skal_returnere_dato_for_sykmeldt_registrering() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        BrukerRegistreringWrapper wrapper = new BrukerRegistreringWrapper()
+                .setSykmeldtBrukerRegistrering(new SykmeldtBrukerRegistrering(
+                        localDateTime,
+                        null
+                ));
+
+        assertEquals(localDateTime, RegistreringUtils.hentRegistreringDato(wrapper));
+    }
 
     @Test
     public void erNySykmeldtBrukerRegistrert__skal_returnere_true_om_bruker_skal_til_ny_arbeidsgiver() {

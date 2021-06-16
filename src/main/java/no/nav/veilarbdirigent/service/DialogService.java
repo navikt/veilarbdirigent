@@ -1,8 +1,8 @@
 package no.nav.veilarbdirigent.service;
 
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.common.types.identer.Fnr;
@@ -14,6 +14,9 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.DinSituasjonSvar
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DialogService {
@@ -35,19 +38,23 @@ public class DialogService {
     public Try<String> opprettDialogHvisBrukerErPermittert(AktorId aktorId) {
         Fnr brukerFnr = aktorOppslagClient.hentFnr(aktorId);
 
-        Try<BrukerRegistreringWrapper> registeringsData = veilarbregistreringClient.hentRegistrering(brukerFnr);
+        Try<Optional<BrukerRegistreringWrapper>> maybeRegistreringData = veilarbregistreringClient.hentRegistrering(brukerFnr);
 
-        if (registeringsData.isFailure()){
-            return Try.failure(registeringsData.getCause());
+        if (maybeRegistreringData.isFailure()){
+            return Try.failure(maybeRegistreringData.getCause());
         }
 
-        Option<DinSituasjonSvar> svar = registeringsData
-                .toOption()
-                .flatMap(Option::of)
+        if (maybeRegistreringData.get().isEmpty()) {
+            log.info("Bruker med aktorId={} er ikke registrert i arbeidssokerregistrering og vil ikke få dialog om permittering", aktorId);
+            return Try.success("Bruker ikke registrert gjennom arbeidssokerregistrering");
+        }
+
+        Optional<DinSituasjonSvar> svar = maybeRegistreringData.get()
                 .map(RegistreringUtils::hentBesvarelse)
                 .map(Besvarelse::getDinSituasjon);
 
-        if (svar.map(DinSituasjonSvar.ER_PERMITTERT::equals).getOrElse(false)) {
+        if (svar.map(DinSituasjonSvar.ER_PERMITTERT::equals).orElse(false)) {
+            log.info("Oppretter dialog om permittering for bruker aktorId={}", aktorId);
             return veilarbdialogClient.lagDialog(aktorId, permitertJson);
         }
 

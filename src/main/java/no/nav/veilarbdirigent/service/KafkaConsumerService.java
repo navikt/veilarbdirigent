@@ -68,8 +68,15 @@ public class KafkaConsumerService {
 
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
 
-        BrukerRegistreringWrapper brukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
+        Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
                 .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
+
+        if (maybeBrukerRegistrering.isEmpty()) {
+            log.info("Bruker aktorId={} har ikke registrert seg gjennom arbeidssokerregistrering og skal ikke ha aktivitet/dialog", aktorId);
+            return;
+        }
+
+        BrukerRegistreringWrapper brukerRegistrering = maybeBrukerRegistrering.get();
 
         LocalDateTime registreringsdato = RegistreringUtils.hentRegistreringDato(brukerRegistrering);
 

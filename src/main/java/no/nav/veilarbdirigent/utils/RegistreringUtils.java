@@ -1,10 +1,7 @@
 package no.nav.veilarbdirigent.utils;
 
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.Besvarelse;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringType;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.FremtidigSituasjonSvar;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -37,7 +34,18 @@ public class RegistreringUtils {
     }
 
     public static LocalDateTime hentRegistreringDato(BrukerRegistreringWrapper brukerRegistrering) {
-        return brukerRegistrering.getOrdinaerBrukerRegistrering().getOpprettetDato();
+        OrdinaerBrukerRegistrering ordinaer = brukerRegistrering.getOrdinaerBrukerRegistrering();
+        SykmeldtBrukerRegistrering sykmeldt = brukerRegistrering.getSykmeldtBrukerRegistrering();
+
+        if (ordinaer != null) {
+            return ordinaer.getOpprettetDato();
+        }
+
+        if (sykmeldt != null) {
+            return sykmeldt.getOpprettetDato();
+        }
+
+        return null;
     }
 
     public static Besvarelse hentBesvarelse(BrukerRegistreringWrapper brukerRegistrering) {

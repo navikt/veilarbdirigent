@@ -15,7 +15,9 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.SykmeldtBrukerRe
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.http.HttpStatus;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static no.nav.common.rest.client.RestUtils.createBearerToken;
@@ -36,7 +38,7 @@ public class VeilarbregistreringClientImpl implements VeilarbregistreringClient 
         this.client = RestClient.baseClient();
     }
 
-    public Try<BrukerRegistreringWrapper> hentRegistrering(Fnr fnr) {
+    public Try<Optional<BrukerRegistreringWrapper>> hentRegistrering(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/registrering?fnr=" + fnr);
 
         Request request = new Request.Builder()
@@ -46,6 +48,10 @@ public class VeilarbregistreringClientImpl implements VeilarbregistreringClient 
 
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
+
+            if (response.code() == HttpStatus.NO_CONTENT.value()) {
+                return Try.success(Optional.empty());
+            }
 
             String json = RestUtils.getBodyStr(response).orElseThrow();
             JsonNode jsonNode = JsonUtils.getMapper().readTree(json);
@@ -69,7 +75,7 @@ public class VeilarbregistreringClientImpl implements VeilarbregistreringClient 
                 wrapper.setOrdinaerBrukerRegistrering(ordinaerBrukerRegistrering);
             }
 
-            return Try.success(wrapper);
+            return Try.success(Optional.of(wrapper));
         } catch (Exception e){
             log.warn("Fail request to registrering: " + e);
             return Try.failure(e);

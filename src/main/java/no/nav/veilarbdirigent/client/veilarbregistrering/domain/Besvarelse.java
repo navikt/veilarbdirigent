@@ -12,5 +12,6 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public class Besvarelse {
-    private DinSituasjonSvar dinSituasjon;
+    DinSituasjonSvar dinSituasjon;
+    FremtidigSituasjonSvar fremtidigSituasjon;
 }

@@ -1,0 +1,72 @@
+{
+  "type": "ORDINAER",
+  "registrering": {
+    "manueltRegistrertAv": {
+      "ident": "Z1234567",
+      "enhet": {
+        "id": "0219",
+        "navn": "NAV Bærum"
+      }
+    },
+    "id": 4235,
+    "opprettetDato": "2021-05-11T10:40:37.128625+02:00",
+    "besvarelse": {
+      "utdanning": "INGEN_SVAR",
+      "utdanningBestatt": "INGEN_SVAR",
+      "utdanningGodkjent": "INGEN_SVAR",
+      "helseHinder": "NEI",
+      "andreForhold": "JA",
+      "sisteStilling": "INGEN_SVAR",
+      "dinSituasjon": "VIL_FORTSETTE_I_JOBB",
+      "fremtidigSituasjon": null,
+      "tilbakeIArbeid": null
+    },
+    "teksterForBesvarelse": [
+      {
+        "sporsmalId": "sisteStilling",
+        "sporsmal": "Hva er din siste jobb?",
+        "svar": "Annen stilling"
+      },
+      {
+        "sporsmalId": "utdanning",
+        "sporsmal": "Hva er din høyeste fullførte utdanning?",
+        "svar": "Ikke aktuelt"
+      },
+      {
+        "sporsmalId": "utdanningBestatt",
+        "sporsmal": "Er utdanningen din bestått?",
+        "svar": "Ikke aktuelt"
+      },
+      {
+        "sporsmalId": "utdanningGodkjent",
+        "sporsmal": "Er utdanningen din godkjent i Norge?",
+        "svar": "Ikke aktuelt"
+      },
+      {
+        "sporsmalId": "dinSituasjon",
+        "sporsmal": "Velg den situasjonen som passer deg best",
+        "svar": "Har jobb og ønsker å fortsette i den jobben jeg er i"
+      },
+      {
+        "sporsmalId": "helseHinder",
+        "sporsmal": "Har du helseproblemer som hindrer deg i å søke eller være i jobb?",
+        "svar": "Nei"
+      },
+      {
+        "sporsmalId": "andreForhold",
+        "sporsmal": "Har du andre problemer med å søke eller være i jobb?",
+        "svar": "Ja"
+      }
+    ],
+    "sisteStilling": {
+      "label": "Annen stilling",
+      "konseptId": -1,
+      "styrk08": "-1"
+    },
+    "profilering": {
+      "jobbetSammenhengendeSeksAvTolvSisteManeder": false,
+      "alder": 40,
+      "innsatsgruppe": "BEHOV_FOR_ARBEIDSEVNEVURDERING"
+    }
+  }
+}

@@ -1,16 +1,23 @@
 package no.nav.veilarbdirigent.client.veilarbregistrering;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.json.JsonUtils;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.rest.client.RestUtils;
 import no.nav.common.types.identer.Fnr;
 import no.nav.common.utils.UrlUtils;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringType;
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.OrdinaerBrukerRegistrering;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.SykmeldtBrukerRegistrering;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.http.HttpStatus;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static no.nav.common.rest.client.RestUtils.createBearerToken;
@@ -31,7 +38,7 @@ public class VeilarbregistreringClientImpl implements VeilarbregistreringClient 
         this.client = RestClient.baseClient();
     }
 
-    public Try<BrukerRegistreringWrapper> hentRegistrering(Fnr fnr) {
+    public Try<Optional<BrukerRegistreringWrapper>> hentRegistrering(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/registrering?fnr=" + fnr);
 
         Request request = new Request.Builder()
@@ -41,9 +48,34 @@ public class VeilarbregistreringClientImpl implements VeilarbregistreringClient 
 
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
-            BrukerRegistreringWrapper entity = RestUtils.parseJsonResponse(response, BrukerRegistreringWrapper.class).get();
 
-            return Try.success(entity);
+            if (response.code() == HttpStatus.NO_CONTENT.value()) {
+                return Try.success(Optional.empty());
+            }
+
+            String json = RestUtils.getBodyStr(response).orElseThrow();
+            JsonNode jsonNode = JsonUtils.getMapper().readTree(json);
+
+            BrukerRegistreringType registreringType = BrukerRegistreringType.valueOf(jsonNode.get("type").textValue());
+
+            BrukerRegistreringWrapper wrapper = new BrukerRegistreringWrapper();
+            wrapper.setType(registreringType);
+
+            if (BrukerRegistreringType.SYKMELDT.equals(registreringType)) {
+                SykmeldtBrukerRegistrering sykmeldtBrukerRegistrering = JsonUtils.fromJson(
+                        jsonNode.get("registrering").toString(), SykmeldtBrukerRegistrering.class
+                );
+
+                wrapper.setSykmeldtBrukerRegistrering(sykmeldtBrukerRegistrering);
+            } else {
+                OrdinaerBrukerRegistrering ordinaerBrukerRegistrering = JsonUtils.fromJson(
+                        jsonNode.get("registrering").toString(), OrdinaerBrukerRegistrering.class
+                );
+
+                wrapper.setOrdinaerBrukerRegistrering(ordinaerBrukerRegistrering);
+            }
+
+            return Try.success(Optional.of(wrapper));
         } catch (Exception e){
             log.warn("Fail request to registrering: " + e);
             return Try.failure(e);

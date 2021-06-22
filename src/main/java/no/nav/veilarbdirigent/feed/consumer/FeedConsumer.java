@@ -2,8 +2,8 @@ package no.nav.veilarbdirigent.feed.consumer;
 
 import lombok.SneakyThrows;
 import no.nav.common.rest.client.RestUtils;
+import no.nav.veilarbdirigent.feed.OppfolgingDataFraFeed;
 import no.nav.veilarbdirigent.feed.common.*;
-import no.nav.veilarbdirigent.input.OppfolgingDataFraFeed;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;

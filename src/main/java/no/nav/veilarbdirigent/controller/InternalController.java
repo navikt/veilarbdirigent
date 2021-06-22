@@ -1,6 +1,5 @@
 package no.nav.veilarbdirigent.controller;
 
-import no.nav.common.health.HealthCheckResult;
 import no.nav.common.health.selftest.SelfTestCheck;
 import no.nav.common.health.selftest.SelfTestUtils;
 import no.nav.common.health.selftest.SelftTestCheckResult;
@@ -18,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.common.health.selftest.SelfTestUtils.checkAllParallel;
+import static no.nav.veilarbdirigent.utils.DbUtils.checkDbHealth;
 
 @RestController
 @RequestMapping("/internal")
@@ -39,7 +39,7 @@ public class InternalController {
 
     @GetMapping("/isAlive")
     public void isAlive() {
-        if(checkDbHealth(db).isUnhealthy()) {
+        if (checkDbHealth(db).isUnhealthy()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -54,15 +54,6 @@ public class InternalController {
                 .status(status)
                 .contentType(MediaType.TEXT_HTML)
                 .body(html);
-    }
-
-    public static HealthCheckResult checkDbHealth(JdbcTemplate db) {
-        try {
-            db.query("SELECT 1 FROM DUAL", resultSet -> {});
-            return HealthCheckResult.healthy();
-        } catch (Exception e) {
-            return HealthCheckResult.unhealthy("Fikk ikke kontakt med databasen", e);
-        }
     }
 
 }

@@ -49,11 +49,6 @@ public class DbConfig {
         return new JdbcTemplate(dataSource);
     }
 
-    @Bean
-    public Transactor transactor(PlatformTransactionManager transactionManager) {
-        return new Transactor(transactionManager);
-    }
-
     public static void migrateDb(DataSource dataSource) {
         var flyway = new Flyway();
         flyway.setDataSource(dataSource);

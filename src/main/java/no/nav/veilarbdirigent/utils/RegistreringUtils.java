@@ -1,12 +1,13 @@
 package no.nav.veilarbdirigent.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-
+@Slf4j
 public class RegistreringUtils {
 
     private final static List<String> sykmeldtBrukerTyper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
@@ -96,7 +97,11 @@ public class RegistreringUtils {
          Siden vi ikke har helt kontroll på at registreringen utføres etter at perioden har startet, så sjekker vi heller at den
          ble utført etter avslutningen på forrige periode.
         */
-        return registreringsdato.isAfter(forrigeOppfolgingsperiode.getSluttDato().toLocalDateTime());
+        boolean registreringsdatoAfter = registreringsdato.isAfter(forrigeOppfolgingsperiode.getSluttDato().toLocalDateTime());
+        if (!registreringsdatoAfter) {
+            log.info("Registreringsdato: {} ikke etter siste oppfølgingsperiode sluttdato: Forrige Oppfølgingsperiode: {} ", registreringsdato, forrigeOppfolgingsperiode);
+        }
+        return registreringsdatoAfter;
     }
 
 }

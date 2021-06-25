@@ -2,6 +2,7 @@ package no.nav.veilarbdirigent.service;
 
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
@@ -20,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,19 +50,23 @@ public class KafkaConsumerService {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @SneakyThrows
     public void behandleOppfolgingStartet(OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO) {
-        if (!unleashService.isKafkaEnabled()) {
-            log.info("Kafka toggle is not enabled, skipping processing of record for aktorId={}", oppfolgingStartetKafkaDTO.getAktorId());
-            return;
-        }
-
         /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
             på om koblingen til databasen er grei, slik at vi ikke utfører oppgaver og ikke får lagret resultatet.
         */
+
         if (DbUtils.checkDbHealth(jdbcTemplate).isUnhealthy()) {
             log.error("Health check failed, aborting consumption of kafka record");
             throw new IllegalStateException("Cannot connect to database");
+        }
+        // TODO: Fjerne, dette er en quick fix for å unngå race condition.
+        //  Når man henter siste registrering fra veilarbregistrering,
+        //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
+        var date = ZonedDateTime.now().minusMinutes(1);
+        if(oppfolgingStartetKafkaDTO.getOppfolgingStartet().isAfter(date)) {
+            Thread.sleep(60000);
         }
 
         AktorId aktorId = oppfolgingStartetKafkaDTO.getAktorId();

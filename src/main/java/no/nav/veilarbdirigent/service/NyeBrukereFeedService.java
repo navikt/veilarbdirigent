@@ -103,11 +103,6 @@ public class NyeBrukereFeedService {
                         () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeUuid, aktorId), taskRepository
                 );
 
-                Optional<Task> maybeJobbsokerkompetanseAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagJobbsokerkompetanseAktivitetTask(oppfolgingsperiodeUuid, aktorId), taskRepository
-                );
-
-
                 if (maybeCvJobbprofilAktivitetTask.isPresent()) {
                     Task cvJobbprofilAktivitetTask = maybeCvJobbprofilAktivitetTask.get();
 
@@ -115,15 +110,6 @@ public class NyeBrukereFeedService {
                     cvJobbprofilAktivitetTask.setTaskStatus(getStatusFromTry(cvJobbprofilAktivitetResult));
 
                     tasksToPerform.add(cvJobbprofilAktivitetTask);
-                }
-
-                if (maybeJobbsokerkompetanseAktivitetTask.isPresent()) {
-                    Task jobbsokerkompetanseAktivitetTask = maybeJobbsokerkompetanseAktivitetTask.get();
-
-                    Try<String> jobbsokerkompetanseAktivitetResult = taskProcessorService.processOpprettAktivitetTask(jobbsokerkompetanseAktivitetTask);
-                    jobbsokerkompetanseAktivitetTask.setTaskStatus(getStatusFromTry(jobbsokerkompetanseAktivitetResult));
-
-                    tasksToPerform.add(jobbsokerkompetanseAktivitetTask);
                 }
             }
 

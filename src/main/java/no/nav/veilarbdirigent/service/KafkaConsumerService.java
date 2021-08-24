@@ -126,11 +126,6 @@ public class KafkaConsumerService {
                     () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeId, aktorId), taskRepository
             );
 
-            Optional<Task> maybeJobbsokerkompetanseAktivitetTask = createTaskIfNotStoredInDb(
-                    () -> lagJobbsokerkompetanseAktivitetTask(oppfolgingsperiodeId, aktorId), taskRepository
-            );
-
-
             if (maybeCvJobbprofilAktivitetTask.isPresent()) {
                 Task cvJobbprofilAktivitetTask = maybeCvJobbprofilAktivitetTask.get();
 
@@ -138,15 +133,6 @@ public class KafkaConsumerService {
                 cvJobbprofilAktivitetTask.setTaskStatus(getStatusFromTry(cvJobbprofilAktivitetResult));
 
                 tasksToPerform.add(cvJobbprofilAktivitetTask);
-            }
-
-            if (maybeJobbsokerkompetanseAktivitetTask.isPresent()) {
-                Task jobbsokerkompetanseAktivitetTask = maybeJobbsokerkompetanseAktivitetTask.get();
-
-                Try<String> jobbsokerkompetanseAktivitetResult = taskProcessorService.processOpprettAktivitetTask(jobbsokerkompetanseAktivitetTask);
-                jobbsokerkompetanseAktivitetTask.setTaskStatus(getStatusFromTry(jobbsokerkompetanseAktivitetResult));
-
-                tasksToPerform.add(jobbsokerkompetanseAktivitetTask);
             }
         }
 

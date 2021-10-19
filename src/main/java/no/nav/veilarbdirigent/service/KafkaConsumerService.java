@@ -42,8 +42,6 @@ public class KafkaConsumerService {
 
     private final VeilarbregistreringClient veilarbregistreringClient;
 
-    private final UnleashService unleashService;
-
     private final TaskProcessorService taskProcessorService;
 
     private final TaskRepository taskRepository;

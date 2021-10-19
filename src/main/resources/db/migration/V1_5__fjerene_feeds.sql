@@ -1,0 +1,1 @@
+drop table FEED_METADATA;

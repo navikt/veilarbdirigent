@@ -35,6 +35,8 @@ spec:
       memory: 768Mi
   envFrom:
     - configmap: pto-config
+  secureLogs:
+    enabled: true
   vault:
     enabled: true
     paths:

@@ -1,7 +1,9 @@
 package no.nav.veilarbdirigent.config;
 
 import no.nav.common.rest.client.RestClient;
+import no.nav.common.sts.ServiceToServiceTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
+import no.nav.common.sts.utils.AzureAdServiceTokenProviderBuilder;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
@@ -67,6 +69,13 @@ public class ClientConfig {
                 : createAppAdeoProdIngressUrl("veilarbregistrering");
 
         return new VeilarbregistreringClientImpl(url, tokenProvider::getSystemUserToken);
+    }
+
+    @Bean
+    public ServiceToServiceTokenProvider serviceToServiceTokenProvider() {
+        return AzureAdServiceTokenProviderBuilder.builder()
+                .withEnvironmentDefaults()
+                .build();
     }
 
     @Bean

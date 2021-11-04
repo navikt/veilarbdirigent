@@ -1,10 +1,13 @@
 package no.nav.veilarbdirigent.service;
 
 import io.vavr.control.Try;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
+import no.nav.common.kafka.consumer.ConsumeStatus;
+import no.nav.common.kafka.consumer.TopicConsumer;
+import no.nav.common.kafka.consumer.util.TopicConsumerConfig;
+import no.nav.common.kafka.consumer.util.deserializer.Deserializers;
 import no.nav.common.types.identer.AktorId;
 import no.nav.common.types.identer.Fnr;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
@@ -17,6 +20,8 @@ import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.utils.DbUtils;
 import no.nav.veilarbdirigent.utils.OppfolgingsperiodeUtils;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +38,7 @@ import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class KafkaConsumerService {
+public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String, OppfolgingStartetKafkaDTO> implements TopicConsumer<String, OppfolgingStartetKafkaDTO> {
 
     private final AktorOppslagClient aktorOppslagClient;
 
@@ -48,8 +52,33 @@ public class KafkaConsumerService {
 
     private final JdbcTemplate jdbcTemplate;
 
+    public OppfolgingStartetConsumerService(
+            AktorOppslagClient aktorOppslagClient,
+            VeilarboppfolgingClient veilarboppfolgingClient,
+            VeilarbregistreringClient veilarbregistreringClient,
+            TaskProcessorService taskProcessorService,
+            TaskRepository taskRepository,
+            JdbcTemplate jdbcTemplate,
+            @Value("${app.kafka.oppfolgingStartetTopic}") String topic
+    ) {
+        this.aktorOppslagClient = aktorOppslagClient;
+        this.veilarboppfolgingClient = veilarboppfolgingClient;
+        this.veilarbregistreringClient = veilarbregistreringClient;
+        this.taskProcessorService = taskProcessorService;
+        this.taskRepository = taskRepository;
+        this.jdbcTemplate = jdbcTemplate;
+
+        this.setTopic(topic);
+        this.setKeyDeserializer(Deserializers.stringDeserializer());
+        this.setValueDeserializer(Deserializers.jsonDeserializer(OppfolgingStartetKafkaDTO.class));
+        this.setConsumer(this);
+    }
+
+
+    @Override
     @SneakyThrows
-    public void behandleOppfolgingStartet(OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO) {
+    public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> record) {
+        OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = record.value();
         /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
             på om koblingen til databasen er grei, slik at vi ikke utfører oppgaver og ikke får lagret resultatet.
@@ -77,7 +106,7 @@ public class KafkaConsumerService {
 
         if (maybeBrukerRegistrering.isEmpty()) {
             log.info("Bruker aktorId={} har ikke registrert seg gjennom arbeidssokerregistrering og skal ikke ha aktivitet/dialog", aktorId);
-            return;
+            return ConsumeStatus.OK;
         }
 
         BrukerRegistreringWrapper brukerRegistrering = maybeBrukerRegistrering.get();
@@ -86,7 +115,7 @@ public class KafkaConsumerService {
 
         if (!RegistreringUtils.erNyligRegistrert(registreringsdato, oppfolgingsperioder)) {
             log.info("Bruker {} er ikke nylig registrert og skal ikke ha aktivitet/dialog", aktorId);
-            return;
+            return ConsumeStatus.OK;
         }
 
         Oppfolgingsperiode gjeldendeOppfolgingsperiode = OppfolgingsperiodeUtils.hentGjeldendeOppfolgingsperiode(oppfolgingsperioder)
@@ -142,6 +171,6 @@ public class KafkaConsumerService {
         }
 
         log.info("Finished consuming kafka record for aktorId={}", aktorId);
+        return ConsumeStatus.OK;
     }
-
 }

@@ -13,6 +13,7 @@ import no.nav.veilarbdirigent.controller.AdminController;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
 import no.nav.veilarbdirigent.mock.MetricsClientMock;
 import no.nav.veilarbdirigent.repository.TaskRepository;
+import org.mockito.Mockito;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,32 +62,7 @@ public class ApplicationTestConfig {
 
     @Bean
     public AktorOppslagClient aktorOppslagClient() {
-        return new AktorOppslagClient() {
-            @Override
-            public Fnr hentFnr(AktorId aktorId) {
-                return null;
-            }
-
-            @Override
-            public AktorId hentAktorId(Fnr fnr) {
-                return null;
-            }
-
-            @Override
-            public Map<AktorId, Fnr> hentFnrBolk(List<AktorId> list) {
-                return null;
-            }
-
-            @Override
-            public Map<Fnr, AktorId> hentAktorIdBolk(List<Fnr> list) {
-                return null;
-            }
-
-            @Override
-            public HealthCheckResult checkHealth() {
-                return null;
-            }
-        };
+        return Mockito.mock(AktorOppslagClient.class);
     }
 
     @Bean

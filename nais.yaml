@@ -2,8 +2,7 @@ kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
   name: veilarbdirigent
-  namespace: default
-  cluster: prod-fss
+  namespace: pto
   labels:
     team: pto
 spec:

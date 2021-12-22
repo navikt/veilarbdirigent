@@ -26,3 +26,4 @@ mvn test
 ### Kontakt og spørsmål
 
 Spørsmål knyttet til koden eller prosjektet kan stilles via issues her på github.
+

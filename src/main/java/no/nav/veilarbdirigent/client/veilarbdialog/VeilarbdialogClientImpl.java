@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.springframework.http.HttpStatus;
 
 import java.util.function.Supplier;
 
@@ -42,6 +43,8 @@ public class VeilarbdialogClientImpl implements VeilarbdialogClient {
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 return Try.success(response.body().string());
+            } else if (response.code() == HttpStatus.CONTINUE.value()) {
+                return Try.success("Dialog kan ikke opprettes fordi bruker kan ikke varsles");
             } else {
                 return Try.failure(new RuntimeException(response.body().string()));
             }

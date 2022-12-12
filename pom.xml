@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <common.version>2.2021.09.17_07.09-67428a6422cc</common.version>
+        <common.version>2.2022.10.28_07.58-948a0174f7b3</common.version>
         <springfox.version>2.9.2</springfox.version>
     </properties>
 
@@ -160,6 +160,11 @@
             <artifactId>health</artifactId>
             <version>${common.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.navikt</groupId>
+            <artifactId>pto-schema</artifactId>
+            <version>1.2022.09.28_12.06-c4c0f289872c</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -226,4 +231,24 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>github</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <!-- Legger til central eksplisitt for prioritet over jitpack -->
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                </repository>
+                <repository>
+                    <id>jitpack</id>
+                    <url>https://jitpack.io</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
 </project>

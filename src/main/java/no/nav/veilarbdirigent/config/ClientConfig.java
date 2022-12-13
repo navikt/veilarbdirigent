@@ -4,6 +4,7 @@ import no.nav.common.rest.client.RestClient;
 import no.nav.common.sts.ServiceToServiceTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.sts.utils.AzureAdServiceTokenProviderBuilder;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
@@ -20,18 +21,20 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
 import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
-import static no.nav.common.utils.EnvironmentUtils.requireClusterName;
-import static no.nav.common.utils.UrlUtils.createAppAdeoPreprodIngressUrl;
-import static no.nav.common.utils.UrlUtils.createAppAdeoProdIngressUrl;
+import static no.nav.common.utils.UrlUtils.*;
 
 @Configuration
 public class ClientConfig {
+
+    @Value("${app.env.veilarboppfolging.api.scope}")
+    private String veilarboppfolgingapi_scope;
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(SystemUserTokenProvider tokenProvider) {
@@ -49,9 +52,9 @@ public class ClientConfig {
     }
 
     @Bean
-    public VeilarboppfolgingClient veilarboppfolgingClient(SystemUserTokenProvider tokenProvider) {
+    public VeilarboppfolgingClient veilarboppfolgingClient(AzureAdMachineToMachineTokenClient tokenClient) {
         String url = UrlUtils.createServiceUrl("veilarboppfolging", "pto", true);
-        return new VeilarboppfolgingClientImpl(url, tokenProvider::getSystemUserToken);
+        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingapi_scope));
     }
 
     @Bean
@@ -66,15 +69,16 @@ public class ClientConfig {
     @Bean
     public VeilarbregistreringClient veilarbregistreringClient(ServiceToServiceTokenProvider serviceToServiceTokenProvider) {
         String url = isDevelopment().orElse(false)
-                ? createAppAdeoPreprodIngressUrl("veilarbregistrering", getEnvironment())
+                ? createDevInternalIngressUrl("veilarbregistrering")
                 : createAppAdeoProdIngressUrl("veilarbregistrering");
+        String cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
 
         return new VeilarbregistreringClientImpl(
                 url,
                 () -> serviceToServiceTokenProvider.getServiceToken(
                         "veilarbregistrering",
                         "paw",
-                        requireClusterName()
+                        cluster
                 )
         );
     }

@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <common.version>2.2022.09.26_07.11-9c0037f021cb</common.version>
+        <common.version>2.2022.10.28_07.58-948a0174f7b3</common.version>
         <springfox.version>2.9.2</springfox.version>
     </properties>
 
@@ -163,6 +163,11 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>health</artifactId>
+            <version>${common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>token-client</artifactId>
             <version>${common.version}</version>
         </dependency>
 

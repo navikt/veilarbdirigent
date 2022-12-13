@@ -4,6 +4,7 @@ import no.nav.common.rest.client.RestClient;
 import no.nav.common.sts.ServiceToServiceTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.sts.utils.AzureAdServiceTokenProviderBuilder;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
@@ -25,8 +26,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
-import static no.nav.common.utils.EnvironmentUtils.requireClusterName;
+import static no.nav.common.utils.EnvironmentUtils.*;
 import static no.nav.common.utils.UrlUtils.createAppAdeoPreprodIngressUrl;
 import static no.nav.common.utils.UrlUtils.createAppAdeoProdIngressUrl;
 
@@ -49,9 +49,13 @@ public class ClientConfig {
     }
 
     @Bean
-    public VeilarboppfolgingClient veilarboppfolgingClient(SystemUserTokenProvider tokenProvider) {
+    public VeilarboppfolgingClient veilarboppfolgingClient(AzureAdMachineToMachineTokenClient tokenClient) {
+        String tokenScope = String.format(
+                "api://%s-fss.pto.veilarboppfolging/.default",
+                isProduction().orElse(false) ? "prod" : "dev"
+        );
         String url = UrlUtils.createServiceUrl("veilarboppfolging", "pto", true);
-        return new VeilarboppfolgingClientImpl(url, tokenProvider::getSystemUserToken);
+        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(tokenScope));
     }
 
     @Bean

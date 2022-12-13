@@ -15,6 +15,8 @@ import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.common.sts.OpenAmSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
+import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.Credentials;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -75,6 +77,13 @@ public class ApplicationConfig {
                         .usingDbTime()
                         .build()
         );
+    }
+
+    @Bean
+    public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
+        return AzureAdTokenClientBuilder.builder()
+                .withNaisDefaults()
+                .buildMachineToMachineTokenClient();
     }
 
 }

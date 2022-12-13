@@ -4,8 +4,10 @@ import no.nav.common.auth.context.UserRole;
 import no.nav.common.auth.oidc.filter.OidcAuthenticationFilter;
 import no.nav.common.auth.oidc.filter.OidcAuthenticatorConfig;
 import no.nav.common.auth.utils.UserTokenFinder;
-import no.nav.common.log.LogFilter;
+import no.nav.common.rest.filter.LogRequestFilter;
 import no.nav.common.rest.filter.SetStandardHttpHeadersFilter;
+import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
+import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,8 +43,8 @@ public class FilterConfig {
 
     @Bean
     public FilterRegistrationBean logFilterRegistrationBean() {
-        FilterRegistrationBean<LogFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new LogFilter(requireApplicationName(), isDevelopment().orElse(false)));
+        FilterRegistrationBean<LogRequestFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new LogRequestFilter(requireApplicationName(), isDevelopment().orElse(false)));
         registration.setOrder(1);
         registration.addUrlPatterns("/*");
         return registration;
@@ -71,6 +73,13 @@ public class FilterConfig {
         registration.setOrder(3);
         registration.addUrlPatterns("/*");
         return registration;
+    }
+
+    @Bean
+    public AzureAdOnBehalfOfTokenClient azureAdOnBehalfOfTokenClient() {
+        return AzureAdTokenClientBuilder.builder()
+                .withNaisDefaults()
+                .buildOnBehalfOfTokenClient();
     }
 
 }

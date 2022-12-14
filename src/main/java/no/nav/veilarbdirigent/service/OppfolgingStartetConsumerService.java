@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static no.nav.veilarbdirigent.utils.TaskFactory.*;
+import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
+import static no.nav.veilarbdirigent.utils.TaskFactory.lagKanskjePermittertDialogTask;
 import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
 import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
@@ -78,6 +79,7 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
     @Override
     @SneakyThrows
     public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> record) {
+        log.info("Oppfolging startet melding");
         OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = record.value();
         /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
@@ -92,15 +94,19 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
         //  Når man henter siste registrering fra veilarbregistrering,
         //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
         var date = ZonedDateTime.now().minusMinutes(1);
+        log.info("Oppfolging startet melding 1");
         if(oppfolgingStartetKafkaDTO.getOppfolgingStartet().isAfter(date)) {
             Thread.sleep(60000);
         }
 
+        log.info("Oppfolging startet melding 2");
         AktorId aktorId = oppfolgingStartetKafkaDTO.getAktorId();
         Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
+        log.info("Oppfolging startet melding 3");
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
 
+        log.info("Oppfolging startet melding 4");
         Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
                 .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
 

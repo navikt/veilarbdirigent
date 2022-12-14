@@ -55,7 +55,4 @@ spec:
   azure:
     application:
       enabled: true
-      claims:
-        extra:
-          - NAVident
-          - azp_name
+      

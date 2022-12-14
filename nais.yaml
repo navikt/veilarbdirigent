@@ -56,4 +56,3 @@ spec:
   azure:
     application:
       enabled: true
-   

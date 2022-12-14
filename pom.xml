@@ -127,6 +127,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
+            <artifactId>token-client</artifactId>
+            <version>${common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
             <artifactId>util</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -211,6 +216,7 @@
             <artifactId>quartz</artifactId>
             <version>2.3.2</version>
         </dependency>
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -223,7 +229,11 @@
             <version>2.26.3</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>test</artifactId>

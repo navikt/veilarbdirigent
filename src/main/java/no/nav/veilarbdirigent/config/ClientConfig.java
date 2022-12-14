@@ -29,6 +29,9 @@ import java.io.IOException;
 import static no.nav.common.utils.EnvironmentUtils.*;
 import static no.nav.common.utils.UrlUtils.createAppAdeoPreprodIngressUrl;
 import static no.nav.common.utils.UrlUtils.createAppAdeoProdIngressUrl;
+import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
+import static no.nav.common.utils.UrlUtils.*;
+
 
 @Configuration
 public class ClientConfig {
@@ -70,15 +73,16 @@ public class ClientConfig {
     @Bean
     public VeilarbregistreringClient veilarbregistreringClient(ServiceToServiceTokenProvider serviceToServiceTokenProvider) {
         String url = isDevelopment().orElse(false)
-                ? createAppAdeoPreprodIngressUrl("veilarbregistrering", getEnvironment())
+                ? createDevInternalIngressUrl("veilarbregistrering")
                 : createAppAdeoProdIngressUrl("veilarbregistrering");
+        String cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
 
         return new VeilarbregistreringClientImpl(
                 url,
                 () -> serviceToServiceTokenProvider.getServiceToken(
                         "veilarbregistrering",
                         "paw",
-                        requireClusterName()
+                        cluster
                 )
         );
     }

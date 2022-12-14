@@ -1,10 +1,8 @@
 package no.nav.veilarbdirigent.service;
 
 import io.vavr.control.Try;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
-import no.nav.common.kafka.consumer.ConsumeStatus;
 import no.nav.common.types.identer.AktorId;
 import no.nav.common.types.identer.Fnr;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
@@ -15,7 +13,6 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreri
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.utils.DbUtils;
-import no.nav.veilarbdirigent.utils.OppfolgingsperiodeUtils;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
@@ -62,7 +60,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void behandleKafkaMeldingLogikk(SisteOppfolgingsperiodeV1 sisteOppfolgingsperiod) {
+    public void mbehandleKafkaMeldingLogikk(SisteOppfolgingsperiodeV1 sisteOppfolgingsperiod) {
         if (sisteOppfolgingsperiod.getAktorId().isEmpty() || sisteOppfolgingsperiod.getStartDato() == null) {
             log.warn("Ugyldig data for siste oppfolging periode på bruker: " + sisteOppfolgingsperiod.getAktorId());
             return;
@@ -74,13 +72,13 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
         if (sisteOppfolgingsperiod.getSluttDato() == null) {
             log.info("Starter oppfolging for: " + sisteOppfolgingsperiod.getAktorId());
-            consumeOppfolgingStartet(sisteOppfolgingsperiod.getAktorId(), sisteOppfolgingsperiod.getStartDato());
+            consumeOppfolgingStartet(sisteOppfolgingsperiod.getAktorId(), sisteOppfolgingsperiod.getStartDato(), sisteOppfolgingsperiod.getUuid());
         } else {
             log.info("Avslutter oppfolging for: " + sisteOppfolgingsperiod.getAktorId());
         }
     }
 
-    private void consumeOppfolgingStartet(String aktorIdStr, ZonedDateTime oppfolgingStartDato) throws RuntimeException {
+    private void consumeOppfolgingStartet(String aktorIdStr, ZonedDateTime oppfolgingStartDato, UUID oppfolgingsperiodeId) throws RuntimeException {
         try {
             /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
@@ -121,11 +119,6 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
                 return;
             }
 
-            Oppfolgingsperiode gjeldendeOppfolgingsperiode = OppfolgingsperiodeUtils.hentGjeldendeOppfolgingsperiode(oppfolgingsperioder)
-                    .orElseThrow(() -> new IllegalStateException("Bruker har ikke gjeldende oppfølgingsperiode"));
-
-            String oppfolgingsperiodeId = gjeldendeOppfolgingsperiode.getUuid().toString();
-
             boolean erNyRegistrert = RegistreringUtils.erNyregistrert(brukerRegistrering);
             boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(brukerRegistrering);
 
@@ -138,7 +131,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
             if (erNyRegistrert) {
                 Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
-                        () -> lagKanskjePermittertDialogTask(oppfolgingsperiodeId, aktorId), taskRepository
+                        () -> lagKanskjePermittertDialogTask(oppfolgingsperiodeId.toString(), aktorId), taskRepository
                 );
 
                 if (maybePermittertDialogTask.isPresent()) {
@@ -153,7 +146,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
                 Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeId, aktorId), taskRepository
+                        () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeId.toString(), aktorId), taskRepository
                 );
 
                 if (maybeCvJobbprofilAktivitetTask.isPresent()) {

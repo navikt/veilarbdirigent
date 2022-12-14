@@ -75,11 +75,5 @@ public class FilterConfig {
         return registration;
     }
 
-    @Bean
-    public AzureAdOnBehalfOfTokenClient azureAdOnBehalfOfTokenClient() {
-        return AzureAdTokenClientBuilder.builder()
-                .withNaisDefaults()
-                .buildOnBehalfOfTokenClient();
-    }
-
+ 
 }

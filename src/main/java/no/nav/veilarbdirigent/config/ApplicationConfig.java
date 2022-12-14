@@ -91,11 +91,4 @@ public class ApplicationConfig {
         );
     }
 
-    @Bean
-    public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
-        return AzureAdTokenClientBuilder.builder()
-                .withNaisDefaults()
-                .buildMachineToMachineTokenClient();
-    }
-
 }

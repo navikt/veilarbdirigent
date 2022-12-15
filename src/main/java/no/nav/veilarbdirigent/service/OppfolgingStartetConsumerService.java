@@ -79,7 +79,6 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
     @Override
     @SneakyThrows
     public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> consumerRecord) {
-        log.info("Oppfolging startet melding");
         OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = consumerRecord.value();
         /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk

@@ -21,20 +21,21 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-import static no.nav.common.utils.EnvironmentUtils.*;
-import static no.nav.common.utils.UrlUtils.createAppAdeoPreprodIngressUrl;
-import static no.nav.common.utils.UrlUtils.createAppAdeoProdIngressUrl;
 import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
 import static no.nav.common.utils.UrlUtils.*;
 
 
 @Configuration
 public class ClientConfig {
+
+    @Value("${app.env.veilarboppfolging.api.scope}")
+    private String veilarboppfolgingapi_scope;
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(SystemUserTokenProvider tokenProvider) {
@@ -53,12 +54,8 @@ public class ClientConfig {
 
     @Bean
     public VeilarboppfolgingClient veilarboppfolgingClient(AzureAdMachineToMachineTokenClient tokenClient) {
-        String tokenScope = String.format(
-                "api://%s-fss.pto.veilarboppfolging/.default",
-                isProduction().orElse(false) ? "prod" : "dev"
-        );
         String url = UrlUtils.createServiceUrl("veilarboppfolging", "pto", true);
-        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(tokenScope));
+        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingapi_scope));
     }
 
     @Bean

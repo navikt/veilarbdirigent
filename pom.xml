@@ -68,6 +68,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>1.10.2</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>

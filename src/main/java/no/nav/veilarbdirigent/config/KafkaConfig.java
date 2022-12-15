@@ -54,7 +54,7 @@ public class KafkaConfig {
                     new KafkaConsumerClientBuilder
                             .TopicConfig()
                             .withConsumerConfig(it)
-                            .withMetrics(meterRegistry)
+                            // .withMetrics(meterRegistry)
                             .withLogging()
                             .withStoreOnFailure(kafkaConsumerRepository)
             );

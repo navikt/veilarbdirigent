@@ -65,11 +65,11 @@
             <version>4.21.0</version>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>1.10.2</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>

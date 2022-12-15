@@ -56,7 +56,7 @@ public class KafkaConfig {
                             .withConsumerConfig(it)
                             .withMetrics(meterRegistry)
                             .withLogging()
-                            .withStoreOnFailure(kafkaConsumerRepository)
+       //                     .withStoreOnFailure(kafkaConsumerRepository)
             );
         });
 

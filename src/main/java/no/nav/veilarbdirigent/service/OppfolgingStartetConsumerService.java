@@ -78,35 +78,31 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
 
     @Override
     @SneakyThrows
-    public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> record) {
+    public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> consumerRecord) {
         log.info("Oppfolging startet melding");
-        OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = record.value();
+        OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = consumerRecord.value();
         /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
             på om koblingen til databasen er grei, slik at vi ikke utfører oppgaver og ikke får lagret resultatet.
         */
 
         if (DbUtils.checkDbHealth(jdbcTemplate).isUnhealthy()) {
-            log.error("Health check failed, aborting consumption of kafka record");
+            log.error("Health check failed, aborting consumption of kafka consumerRecord");
             throw new IllegalStateException("Cannot connect to database");
         }
         // TODO: Fjerne, dette er en quick fix for å unngå race condition.
         //  Når man henter siste registrering fra veilarbregistrering,
         //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
         var date = ZonedDateTime.now().minusMinutes(1);
-        log.info("Oppfolging startet melding 1");
         if(oppfolgingStartetKafkaDTO.getOppfolgingStartet().isAfter(date)) {
             Thread.sleep(60000);
         }
 
-        log.info("Oppfolging startet melding 2");
         AktorId aktorId = oppfolgingStartetKafkaDTO.getAktorId();
         Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
-        log.info("Oppfolging startet melding 3");
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
 
-        log.info("Oppfolging startet melding 4");
         Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
                 .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
 
@@ -176,7 +172,7 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
             taskRepository.insert(tasksToPerform);
         }
 
-        log.info("Finished consuming kafka record for aktorId={}", aktorId);
+        log.info("Finished consuming kafka consumerRecord for aktorId={}", aktorId);
         return ConsumeStatus.OK;
     }
 }

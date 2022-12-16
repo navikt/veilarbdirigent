@@ -100,7 +100,6 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
         AktorId aktorId = oppfolgingStartetKafkaDTO.getAktorId();
         Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
-        log.info("Oppfolging startet melding 3");
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
 
         log.info("Oppfolging startet melding 4");

@@ -102,7 +102,6 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
 
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
 
-        log.info("Oppfolging startet melding 4");
         Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
                 .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
 

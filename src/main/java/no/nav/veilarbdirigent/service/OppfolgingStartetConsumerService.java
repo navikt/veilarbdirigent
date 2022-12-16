@@ -97,7 +97,6 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
             Thread.sleep(60000);
         }
 
-        log.info("Oppfolging startet melding 2");
         AktorId aktorId = oppfolgingStartetKafkaDTO.getAktorId();
         Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 

@@ -25,8 +25,7 @@ public class LocalH2Database {
     }
 
     private static void initDb(DataSource dataSource) {
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(dataSource);
+        var flyway = Flyway.configure().dataSource(dataSource).load();
         flyway.migrate();
     }
 

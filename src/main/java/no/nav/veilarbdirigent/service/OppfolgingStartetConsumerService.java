@@ -93,7 +93,6 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
         //  Når man henter siste registrering fra veilarbregistrering,
         //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
         var date = ZonedDateTime.now().minusMinutes(1);
-        log.info("Oppfolging startet melding 1");
         if(oppfolgingStartetKafkaDTO.getOppfolgingStartet().isAfter(date)) {
             Thread.sleep(60000);
         }

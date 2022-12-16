@@ -271,6 +271,7 @@
         <testcontainers.version>1.16.2</testcontainers.version>
         <h2.version>1.4.200</h2.version>
         <postgres.version>42.4.1</postgres.version>
+        <ojdbc.version>19.3.0.0</ojdbc.version>
     </properties>
 
 
@@ -731,6 +732,11 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle.ojdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${ojdbc.version}</version>
             </dependency>
 
             <!--Testing-->

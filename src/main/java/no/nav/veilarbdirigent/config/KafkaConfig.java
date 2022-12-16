@@ -11,7 +11,6 @@ import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder;
 import no.nav.common.kafka.consumer.util.TopicConsumerConfig;
 import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
 import no.nav.common.utils.Credentials;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +24,8 @@ import static no.nav.common.kafka.util.KafkaPropertiesPreset.onPremDefaultConsum
 @EnableConfigurationProperties({KafkaProperties.class})
 public class KafkaConfig {
 
-    public final static String CONSUMER_GROUP_ID = "veilarbdirigent-consumer";
+    public static final String CONSUMER_GROUP_ID = "veilarbdirigent-consumer";
     private static final String ONPREM_KAFKA_DISABLED = "veilarbdirigent.kafka.onprem.consumer.disabled";
-
-    @Autowired
-    KafkaConsumerRecordProcessor consumerRecordProcessor;
 
     @Bean
     public KafkaConsumerRepository kafkaConsumerRepository(JdbcTemplate jdbcTemplate) {
@@ -49,7 +45,7 @@ public class KafkaConfig {
                 .withProperties(onPremDefaultConsumerProperties(CONSUMER_GROUP_ID, kafkaProperties.getBrokersUrl(), credentials))
                 .withToggle(() -> unleashClient.isEnabled(ONPREM_KAFKA_DISABLED));
 
-        topicConfigs.forEach(it -> {
+        topicConfigs.forEach(it ->
             clientBuilder.withTopicConfig(
                     new KafkaConsumerClientBuilder
                             .TopicConfig()
@@ -57,8 +53,8 @@ public class KafkaConfig {
                             .withMetrics(meterRegistry)
                             .withLogging()
                             .withStoreOnFailure(kafkaConsumerRepository)
-            );
-        });
+            )
+        );
 
         var client = clientBuilder.build();
         client.start();

@@ -50,8 +50,11 @@ public class DbConfig {
     }
 
     public static void migrateDb(DataSource dataSource) {
-        var flyway = new Flyway();
-        flyway.setDataSource(dataSource);
+        var flyway = Flyway
+                .configure()
+                .table("schema_version")
+                .dataSource(dataSource)
+                .load();
         flyway.migrate();
     }
 

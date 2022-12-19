@@ -86,7 +86,7 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
         */
 
         if (DbUtils.checkDbHealth(jdbcTemplate).isUnhealthy()) {
-            log.error("Health check failed, aborting consumption of kafka record");
+            log.error("Health check failed, aborting consumption of kafka consumerRecord");
             throw new IllegalStateException("Cannot connect to database");
         }
         // TODO: Fjerne, dette er en quick fix for å unngå race condition.
@@ -171,7 +171,7 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
             taskRepository.insert(tasksToPerform);
         }
 
-        log.info("Finished consuming kafka record for aktorId={}", aktorId);
+        log.info("Finished consuming kafka consumerRecord for aktorId={}", aktorId);
         return ConsumeStatus.OK;
     }
 }

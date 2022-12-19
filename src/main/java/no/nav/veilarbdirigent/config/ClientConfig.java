@@ -69,7 +69,7 @@ public class ClientConfig {
     @Bean
     public VeilarbregistreringClient veilarbregistreringClient(ServiceToServiceTokenProvider serviceToServiceTokenProvider) {
         String url = isDevelopment().orElse(false)
-                ? createDevInternalIngressUrl("veilarbregistrering")
+                ? joinPaths(createDevInternalIngressUrl("veilarbregistrering"), "veilarbregistrering")
                 : createAppAdeoProdIngressUrl("veilarbregistrering");
         String cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
 

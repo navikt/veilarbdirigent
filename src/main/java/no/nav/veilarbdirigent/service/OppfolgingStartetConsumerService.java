@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static no.nav.veilarbdirigent.utils.TaskFactory.*;
+import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
+import static no.nav.veilarbdirigent.utils.TaskFactory.lagKanskjePermittertDialogTask;
 import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
 import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
@@ -77,8 +78,8 @@ public class OppfolgingStartetConsumerService extends TopicConsumerConfig<String
 
     @Override
     @SneakyThrows
-    public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> record) {
-        OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = record.value();
+    public ConsumeStatus consume(ConsumerRecord<String, OppfolgingStartetKafkaDTO> consumerRecord) {
+        OppfolgingStartetKafkaDTO oppfolgingStartetKafkaDTO = consumerRecord.value();
         /*
             Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
             på om koblingen til databasen er grei, slik at vi ikke utfører oppgaver og ikke får lagret resultatet.

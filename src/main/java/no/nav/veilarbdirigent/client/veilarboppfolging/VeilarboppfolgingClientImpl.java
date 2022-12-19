@@ -14,21 +14,18 @@ import okhttp3.Response;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static no.nav.common.rest.client.RestUtils.createBearerToken;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 @Slf4j
 public class VeilarboppfolgingClientImpl implements VeilarboppfolgingClient {
 
     private final String apiUrl;
 
-    private final Supplier<String> serviceTokenSupplier;
+    private final Supplier<String> machineToMachineTokenSupplier;
 
     private final OkHttpClient client;
 
-    public VeilarboppfolgingClientImpl(String apiUrl, Supplier<String> serviceTokenSupplier) {
+    public VeilarboppfolgingClientImpl(String apiUrl, Supplier<String> tokenClient) {
         this.apiUrl = apiUrl;
-        this.serviceTokenSupplier = serviceTokenSupplier;
+        this.machineToMachineTokenSupplier = tokenClient;
         this.client = RestClient.baseClient();
     }
 
@@ -37,14 +34,19 @@ public class VeilarboppfolgingClientImpl implements VeilarboppfolgingClient {
     public List<Oppfolgingsperiode> hentOppfolgingsperioder(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/oppfolging/oppfolgingsperioder?fnr=" + fnr);
 
+        log.info("Hent oppfolgingsperioder");
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader(AUTHORIZATION, createBearerToken(serviceTokenSupplier.get()))
+                .header("Authorization", "Bearer " + machineToMachineTokenSupplier.get())
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
             return RestUtils.parseJsonResponseArrayOrThrow(response, Oppfolgingsperiode.class);
+        }
+        catch (Exception e){
+            log.error("Error hent oppfolgingsperiode " + e);
+            throw e;
         }
     }
 

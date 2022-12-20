@@ -13,7 +13,6 @@ import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClientImpl;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,14 +22,15 @@ import static no.nav.common.utils.UrlUtils.*;
 @Configuration
 public class ClientConfig {
 
-    @Value("${app.env.veilarboppfolging.api.scope}")
-    private String veilarboppfolgingapiScope;
-    @Value("${app.env.veilarbdialog.api.scope}")
-    private String veilarbdialogScope;
-    @Value("${app.env.veilarbaktivitet.api.scope}")
-    private String veilarbaktivitetScope;
-    @Value("${app.env.veilarbregistrering.api.scope}")
-    private String veilarbregistreringScope;
+    private String devFss = "dev-fss";
+    private String prodFss = "prod-fss";
+    private String scope(String appName, String namespace, String cluster) {
+        return String.format("api://%s.%s.%s/.default", cluster, namespace, appName);
+    }
+    private Boolean isDev = isDevelopment().orElse(false);
+    private String veilarboppfolgingapiScope = scope("veilarboppfolging", "pto", isDev ? devFss : prodFss);
+    private String veilarbdialogScope = scope("veilarbdialog", "pto", isDev ? devFss : prodFss);
+    private String veilarbaktivitetScope = scope("veilarbaktivitet", "pto", isDev ? devFss : prodFss);
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
@@ -54,7 +54,7 @@ public class ClientConfig {
     }
 
     @Bean
-    public VeilarbmalverkClient veilarbmalverkClient(AzureAdMachineToMachineTokenClient tokenClient) {
+    public VeilarbmalverkClient veilarbmalverkClient() {
         String url = isDevelopment().orElse(false)
                 ? createAppAdeoPreprodIngressUrl("veilarbmalverk", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbmalverk");
@@ -67,9 +67,10 @@ public class ClientConfig {
         String url = isDevelopment().orElse(false)
                 ? joinPaths(createDevInternalIngressUrl(appName), appName)
                 : createAppAdeoProdIngressUrl(appName);
+        var cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
         return new VeilarbregistreringClientImpl(
                 url,
-                () -> tokenClient.createMachineToMachineToken(veilarbregistreringScope)
+                () -> tokenClient.createMachineToMachineToken(scope("veilarbregistrering", "paw", cluster))
         );
     }
 

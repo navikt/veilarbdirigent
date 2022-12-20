@@ -12,8 +12,6 @@ import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.ShedLockLeaderElectionClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.sts.OpenAmSystemUserTokenProvider;
-import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.token_client.client.MachineToMachineTokenClient;
@@ -39,13 +37,6 @@ public class ApplicationConfig {
     @Bean
     public Credentials serviceUserCredentials() {
         return getCredentials("service_user");
-    }
-
-    // TODO: Bedre å bruke NaisSystemUserTokenProvider hvis alle tjenester støtter det
-    @Bean
-    public SystemUserTokenProvider systemUserTokenProvider(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        Credentials isso = new Credentials(properties.getOpenAmUsername(), properties.getOpenAmPassword());
-        return new OpenAmSystemUserTokenProvider(properties.getOpenAmDiscoveryUrl(), properties.getOpenAmRedirectUrl(), isso, serviceUserCredentials);
     }
 
     @Bean

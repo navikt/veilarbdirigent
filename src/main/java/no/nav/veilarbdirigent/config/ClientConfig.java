@@ -29,9 +29,6 @@ public class ClientConfig {
     private String veilarbdialogScope;
     @Value("${app.env.veilarbaktivitet.api.scope}")
     private String veilarbaktivitetScope;
-    @Value("${app.env.veilarbmalverk.api.scope}")
-    private String veilarbmalverkScope;
-
     @Value("${app.env.veilarbregistrering.api.scope}")
     private String veilarbregistreringScope;
 
@@ -61,7 +58,7 @@ public class ClientConfig {
         String url = isDevelopment().orElse(false)
                 ? createAppAdeoPreprodIngressUrl("veilarbmalverk", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbmalverk");
-        return new VeilarbmalverkClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbmalverkScope));
+        return new VeilarbmalverkClientImpl(url);
     }
 
     @Bean

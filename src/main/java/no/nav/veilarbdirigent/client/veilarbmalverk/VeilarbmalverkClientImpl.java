@@ -19,13 +19,10 @@ public class VeilarbmalverkClientImpl implements VeilarbmalverkClient {
 
     private final String apiUrl;
 
-    private final Supplier<String> serviceTokenSupplier;
-
     private final OkHttpClient client;
 
-    public VeilarbmalverkClientImpl(String apiUrl, Supplier<String> serviceTokenSupplier) {
+    public VeilarbmalverkClientImpl(String apiUrl) {
         this.apiUrl = apiUrl;
-        this.serviceTokenSupplier = serviceTokenSupplier;
         this.client = RestClient.baseClient();
     }
 
@@ -36,7 +33,6 @@ public class VeilarbmalverkClientImpl implements VeilarbmalverkClient {
 
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader(AUTHORIZATION, createBearerToken(serviceTokenSupplier.get()))
                 .build();
 
         try (Response response = client.newCall(request).execute()) {

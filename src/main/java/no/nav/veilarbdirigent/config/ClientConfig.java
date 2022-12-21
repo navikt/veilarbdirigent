@@ -1,9 +1,5 @@
 package no.nav.veilarbdirigent.config;
 
-import no.nav.common.rest.client.RestClient;
-import no.nav.common.sts.ServiceToServiceTokenProvider;
-import no.nav.common.sts.SystemUserTokenProvider;
-import no.nav.common.sts.utils.AzureAdServiceTokenProviderBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
@@ -17,15 +13,8 @@ import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClientImpl;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
 
 import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
 import static no.nav.common.utils.UrlUtils.*;
@@ -33,86 +22,56 @@ import static no.nav.common.utils.UrlUtils.*;
 @Configuration
 public class ClientConfig {
 
-    @Value("${app.env.veilarboppfolging.api.scope}")
-    private String veilarboppfolgingapi_scope;
+    private String devFss = "dev-fss";
+    private String prodFss = "prod-fss";
+    private String scope(String appName, String namespace, String cluster) {
+        return String.format("api://%s.%s.%s/.default", cluster, namespace, appName);
+    }
+    private Boolean isDev = isDevelopment().orElse(false);
+    private String veilarboppfolgingapiScope = scope("veilarboppfolging", "pto", isDev ? devFss : prodFss);
+    private String veilarbdialogScope = scope("veilarbdialog", "pto", isDev ? devFss : prodFss);
+    private String veilarbaktivitetScope = scope("veilarbaktivitet", "pto", isDev ? devFss : prodFss);
 
     @Bean
-    public VeilarbaktivitetClient veilarbaktivitetClient(SystemUserTokenProvider tokenProvider) {
+    public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
         String url = isDevelopment().orElse(false)
                 ? createAppAdeoPreprodIngressUrl("veilarbaktivitet", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbaktivitet");
 
-        return new VeilarbaktivitetClientImpl(url, tokenProvider::getSystemUserToken);
+        return new VeilarbaktivitetClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope));
     }
 
     @Bean
-    public VeilarbdialogClient veilarbdialogClient(SystemUserTokenProvider tokenProvider) {
+    public VeilarbdialogClient veilarbdialogClient(AzureAdMachineToMachineTokenClient tokenClient) {
         String url = UrlUtils.createServiceUrl("veilarbdialog", "pto", true);
-        return new VeilarbdialogClientImpl(url, tokenProvider::getSystemUserToken);
+        return new VeilarbdialogClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbdialogScope));
     }
 
     @Bean
     public VeilarboppfolgingClient veilarboppfolgingClient(AzureAdMachineToMachineTokenClient tokenClient) {
         String url = UrlUtils.createServiceUrl("veilarboppfolging", "pto", true);
-        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingapi_scope));
+        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingapiScope));
     }
 
     @Bean
-    public VeilarbmalverkClient veilarbmalverkClient(SystemUserTokenProvider tokenProvider) {
+    public VeilarbmalverkClient veilarbmalverkClient() {
         String url = isDevelopment().orElse(false)
                 ? createAppAdeoPreprodIngressUrl("veilarbmalverk", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbmalverk");
-
-        return new VeilarbmalverkClientImpl(url, tokenProvider::getSystemUserToken);
+        return new VeilarbmalverkClientImpl(url);
     }
 
     @Bean
-    public VeilarbregistreringClient veilarbregistreringClient(ServiceToServiceTokenProvider serviceToServiceTokenProvider) {
+    public VeilarbregistreringClient veilarbregistreringClient(AzureAdMachineToMachineTokenClient tokenClient) {
+        var appName = "veilarbregistrering";
         String url = isDevelopment().orElse(false)
-                ? joinPaths(createDevInternalIngressUrl("veilarbregistrering"), "veilarbregistrering")
-                : createAppAdeoProdIngressUrl("veilarbregistrering");
-        String cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
-
+                ? joinPaths(createDevInternalIngressUrl(appName), appName)
+                : createAppAdeoProdIngressUrl(appName);
+        var cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
         return new VeilarbregistreringClientImpl(
                 url,
-                () -> serviceToServiceTokenProvider.getServiceToken(
-                        "veilarbregistrering",
-                        "paw",
-                        cluster
-                )
+                () -> tokenClient.createMachineToMachineToken(scope("veilarbregistrering", "paw", cluster))
         );
-    }
-
-    @Bean
-    public ServiceToServiceTokenProvider serviceToServiceTokenProvider() {
-        return AzureAdServiceTokenProviderBuilder.builder()
-                .withEnvironmentDefaults()
-                .build();
-    }
-
-    @Bean
-    public OkHttpClient okHttpClient(SystemUserTokenProvider tokenProvider) {
-        var builder = RestClient.baseClientBuilder();
-        builder.addInterceptor(new SystemUserOidcTokenProviderInterceptor(tokenProvider));
-        return builder.build();
-    }
-
-    private static class SystemUserOidcTokenProviderInterceptor implements Interceptor {
-        private SystemUserTokenProvider systemUserTokenProvider;
-
-        private SystemUserOidcTokenProviderInterceptor(SystemUserTokenProvider systemUserTokenProvider) {
-            this.systemUserTokenProvider = systemUserTokenProvider;
-        }
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request original = chain.request();
-            Request newReq = original.newBuilder()
-                    .addHeader("Authorization", "Bearer " + systemUserTokenProvider.getSystemUserToken())
-                    .method(original.method(), original.body())
-                    .build();
-            return chain.proceed(newReq);
-        }
     }
 
     private static String getEnvironment() {

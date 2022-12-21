@@ -60,7 +60,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void mbehandleKafkaMeldingLogikk(SisteOppfolgingsperiodeV1 sisteOppfolgingsperiod) {
+    @Override
+    protected void behandleKafkaMeldingLogikk(SisteOppfolgingsperiodeV1 sisteOppfolgingsperiod) {
         if (sisteOppfolgingsperiod.getAktorId().isEmpty() || sisteOppfolgingsperiod.getStartDato() == null) {
             log.warn("Ugyldig data for siste oppfolging periode på bruker: " + sisteOppfolgingsperiod.getAktorId());
             return;
@@ -172,4 +173,5 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             throw new RuntimeException("Kan ikke behandle oppfølging startet fra Kafka");
         }
     }
+
 }

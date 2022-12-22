@@ -15,6 +15,7 @@ import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.service.OppfolgingPeriodeService;
 import no.nav.veilarbdirigent.unleash.KafkaAivenUnleash;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 

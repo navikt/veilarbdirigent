@@ -81,7 +81,7 @@ public class KafkaConfigAiven {
         consumerRecordProcessor = KafkaConsumerRecordProcessorBuilder
                 .builder()
                 .withLockProvider(new JdbcTemplateLockProvider(jdbcTemplate))
-                .withKafkaConsumerRepository(kafkaConsumerRepository)
+                .withKafkaConsumerRepository(consumerRepository)
                 .withConsumerConfigs(findConsumerConfigsWithStoreOnFailure(topicConfigsAiven))
                 .withBackoffStrategy(new LinearBackoffStrategy(0, 2 * 60 * 60, 144))
                 .build();

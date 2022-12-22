@@ -46,7 +46,7 @@ public class KafkaConfigAiven {
 
     private final List<KafkaConsumerClient> consumerClientAiven;
 
-    public KafkaConfigAiven(JdbcTemplate jdbcTemplate, KafkaConsumerRepository kafkaConsumerRepository,
+    public KafkaConfigAiven(JdbcTemplate jdbcTemplate,
                             UnleashClient unleashClient, OppfolgingPeriodeService oppfolgingPeriodeService){
         MeterRegistry prometheusMeterRegistry = new MetricsReporter.ProtectedPrometheusMeterRegistry();
         KafkaConsumerRepository consumerRepository = new OracleJdbcTemplateConsumerRepository(jdbcTemplate);

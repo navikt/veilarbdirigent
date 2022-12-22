@@ -36,6 +36,8 @@ spec:
     - configmap: pto-config
   secureLogs:
     enabled: true
+  kafka:
+    pool: nav-dev
   vault:
     enabled: true
     paths:

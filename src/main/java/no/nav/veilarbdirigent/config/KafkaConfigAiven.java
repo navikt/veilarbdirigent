@@ -15,7 +15,6 @@ import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.service.OppfolgingPeriodeService;
 import no.nav.veilarbdirigent.unleash.KafkaAivenUnleash;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -31,7 +30,7 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET
 @Configuration
 public class KafkaConfigAiven {
 
-    public final static String CONSUMER_GROUP_ID = "veilarbdirigent-consumer";
+    public static final String CONSUMER_GROUP_ID = "veilarbdirigent-consumer";
 
     public enum Topic {
         OPPFOLGING_PERIODE("pto.siste-oppfolgingsperiode-v1");

@@ -9,6 +9,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static no.nav.common.rest.client.RestUtils.MEDIA_TYPE_JSON;
@@ -46,7 +47,10 @@ public class VeilarbdialogClientImpl implements VeilarbdialogClient {
             } else if (response.code() == HttpStatus.CONTINUE.value()) {
                 return Try.success("Dialog kan ikke opprettes fordi bruker kan ikke varsles");
             } else {
-                return Try.failure(new RuntimeException(response.body().string()));
+                var message = Optional.ofNullable(response.body().string())
+                    .filter(maybeMessage -> maybeMessage != null && !maybeMessage.isEmpty())
+                    .orElse(String.format("Failed call lagDialog, http status %s", response.code()));
+                return Try.failure(new RuntimeException(message));
             }
         } catch (Exception e) {
             return Try.failure(e);

@@ -10,6 +10,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
@@ -46,8 +47,10 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
             if (response.isSuccessful()) {
                 return Try.success(response.body().string());
             } else {
-                log.error(String.format("Failed call lagAktivitet, http status %s", response.code()));
-                return Try.failure(new RuntimeException(response.body().string()));
+                var message = Optional.ofNullable(response.body().string())
+                    .filter(maybeMessage -> maybeMessage != null && !maybeMessage.isEmpty())
+                    .orElse(String.format("Failed call lagAktivitet, http status %s", response.code()));
+                return Try.failure(new RuntimeException(message));
             }
         } catch (Exception e){
             return Try.failure(e);

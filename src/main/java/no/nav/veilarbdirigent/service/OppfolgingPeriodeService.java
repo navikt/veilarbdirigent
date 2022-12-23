@@ -170,7 +170,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             log.info("Finished consuming kafka record for aktorId={}", aktorId);
         }
         catch (Exception e){
-            throw new RuntimeException("Kan ikke behandle oppfølging startet fra Kafka");
+            throw new RuntimeException("Kan ikke behandle oppfølging startet fra Kafka", e);
         }
     }
 

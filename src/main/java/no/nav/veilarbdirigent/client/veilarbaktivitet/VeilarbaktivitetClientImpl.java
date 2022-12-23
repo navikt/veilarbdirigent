@@ -1,6 +1,7 @@
 package no.nav.veilarbdirigent.client.veilarbaktivitet;
 
 import io.vavr.control.Try;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.common.utils.UrlUtils;
@@ -16,6 +17,7 @@ import static no.nav.common.rest.client.RestUtils.MEDIA_TYPE_JSON;
 import static no.nav.common.rest.client.RestUtils.createBearerToken;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Slf4j
 public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
 
     private final String apiUrl;
@@ -44,6 +46,7 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
             if (response.isSuccessful()) {
                 return Try.success(response.body().string());
             } else {
+                log.error(String.format("Failed call lagAktivitet, http status %s", response.code()));
                 return Try.failure(new RuntimeException(response.body().string()));
             }
         } catch (Exception e){

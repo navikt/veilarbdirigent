@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static no.nav.common.auth.Constants.*;
 import static no.nav.common.auth.oidc.filter.OidcAuthenticator.fromConfig;
@@ -21,17 +22,6 @@ import static no.nav.common.utils.EnvironmentUtils.requireApplicationName;
 
 @Configuration
 public class FilterConfig {
-
-    public OidcAuthenticatorConfig openAmAuthConfig(EnvironmentProperties environmentProperties) {
-        return new OidcAuthenticatorConfig()
-                .withDiscoveryUrl(environmentProperties.getOpenAmDiscoveryUrl())
-                .withClientId(environmentProperties.getOpenAmClientId())
-                .withIdTokenCookieName(OPEN_AM_ID_TOKEN_COOKIE_NAME)
-                .withRefreshTokenCookieName(REFRESH_TOKEN_COOKIE_NAME)
-                .withRefreshUrl(environmentProperties.getOpenAmRefreshUrl())
-                .withIdTokenFinder(new UserTokenFinder())
-                .withUserRole(UserRole.INTERN);
-    }
 
     public OidcAuthenticatorConfig azureAdAuthConfig(EnvironmentProperties environmentProperties) {
         return new OidcAuthenticatorConfig()
@@ -52,12 +42,11 @@ public class FilterConfig {
 
     @Bean
     public FilterRegistrationBean authenticationFilterRegistrationBean(EnvironmentProperties properties) {
-        OidcAuthenticatorConfig openAmConfig = openAmAuthConfig(properties);
         OidcAuthenticatorConfig azureAdConfig = azureAdAuthConfig(properties);
 
         FilterRegistrationBean<OidcAuthenticationFilter> registration = new FilterRegistrationBean<>();
         OidcAuthenticationFilter authenticationFilter = new OidcAuthenticationFilter(
-                Arrays.asList(fromConfig(openAmConfig), fromConfig(azureAdConfig))
+                List.of(fromConfig(azureAdConfig))
         );
 
         registration.setFilter(authenticationFilter);

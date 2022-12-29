@@ -8,19 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "app.env")
 public class EnvironmentProperties {
-
-    private String openAmDiscoveryUrl;
-
-    private String openAmRedirectUrl;
-
-    private String openAmUsername;
-
-    private String openAmPassword;
-
-    private String openAmClientId;
-
-    private String openAmRefreshUrl;
-
     private String azureAdDiscoveryUrl;
 
     private String azureAdClientId;

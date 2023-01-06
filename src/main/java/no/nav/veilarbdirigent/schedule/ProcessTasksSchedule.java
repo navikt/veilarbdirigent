@@ -37,10 +37,14 @@ public class ProcessTasksSchedule {
 
     private final TaskProcessorService taskProcessorService;
 
+    private boolean yes = true;
+
     @Scheduled(initialDelay = TEN_SECONDS, fixedRate = TEN_SECONDS)
     public void schedule() {
         if (leaderElectionClient.isLeader()) {
-            throw new RuntimeException("IS THIS ERROR LOGGED?");
+            if (yes) {
+                throw new RuntimeException("IS THIS ERROR LOGGED?");
+            }
             JobRunner.run("process_tasks", this::processTasks);
         }
     }

@@ -39,8 +39,8 @@ public class ProcessTasksSchedule {
 
     @Scheduled(initialDelay = TEN_SECONDS, fixedRate = TEN_SECONDS)
     public void schedule() {
-        throw new RuntimeException("IS THIS ERROR LOGGED?");
         if (leaderElectionClient.isLeader()) {
+            throw new RuntimeException("IS THIS ERROR LOGGED?");
             JobRunner.run("process_tasks", this::processTasks);
         }
     }

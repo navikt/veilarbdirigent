@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: docker.pkg.github.com/navikt/veilarbdirigent/veilarbdirigent:{{version}}
+  image: ghcr.io/navikt/veilarbdirigent/veilarbdirigent:{{version}}
   ingresses:
     - https://veilarbdirigent.nais.adeo.no
     - https://app.adeo.no/veilarbdirigent
@@ -49,7 +49,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
       - kvPath: /oracle/data/prod/config/veilarbdirigent_p
         mountPath: /var/run/secrets/nais.io/oracle_config
-
   env:
     - name: APP_ENVIRONMENT_NAME
       value: p

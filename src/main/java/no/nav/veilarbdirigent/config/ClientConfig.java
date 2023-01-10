@@ -66,7 +66,7 @@ public class ClientConfig {
         var appName = "veilarbregistrering";
         String url = isDevelopment().orElse(false)
                 ? joinPaths(createDevInternalIngressUrl(appName), appName)
-                : createAppAdeoProdIngressUrl(appName);
+                : createProdInternalIngressUrl(appName);
         var cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-fss";
         return new VeilarbregistreringClientImpl(
                 url,

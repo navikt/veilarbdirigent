@@ -66,7 +66,7 @@ public class ClientConfig {
         var appName = "veilarbregistrering";
         String url = isDevelopment().orElse(false)
                 ? joinPaths(createDevInternalIngressUrl(appName), appName)
-                : joinPaths(createProdInternalIngressUrl("veilarbregistrering-gcp"), appName);
+                : joinPaths(createProdInternalIngressUrl(appName), appName);
         var cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-gcp";
         return new VeilarbregistreringClientImpl(
                 url,

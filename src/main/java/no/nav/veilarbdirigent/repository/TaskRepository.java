@@ -119,13 +119,6 @@ public class TaskRepository {
 
         List<Tuple2<String, Integer>> statusCounts = jdbc.query(sql, rowMapper);
 
-
-//        Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toStatusnumbers)
-//                .column("status")
-//                .column("count(*) as num")
-//                .groupBy("status")
-//                .execute();
-
         if (statusCounts.isEmpty()) {
             return HashMap.empty();
         }
@@ -206,25 +199,5 @@ public class TaskRepository {
 
         return jdbc.update(sql, params);
 
-/*
-        LocalDateTime now = LocalDateTime.now();
-        UpdateQuery query = SqlUtils.update(jdbc, TASK_TABLE)
-                .whereEquals("id", task.getId())
-                .set("status", taskStatus.name())
-                .set("last_attempt", Timestamp.valueOf(now));
-
-        if (taskStatus == TaskStatus.FAILED) {
-            LocalDateTime nextRetry = TimeUtils.exponentialBackoff(task.getAttempts(), now);
-            query.set("next_attempt", Timestamp.valueOf(nextRetry));
-            query.set("attempts", task.getAttempts() + 1);
-            query.set("error", task.getError());
-        }
-
-        if (taskStatus == TaskStatus.OK) {
-            query.set("result", task.getJsonResult());
-        }
-
-        return query.execute();
-        */
     }
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@Builder
+@Builder(toBuilder = true)
 public class Task {
     String id;
     TaskType type;

@@ -6,8 +6,6 @@ import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.health.HealthCheckResult;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.types.identer.AktorId;
-import no.nav.common.types.identer.Fnr;
 import no.nav.common.utils.Credentials;
 import no.nav.veilarbdirigent.controller.AdminController;
 import no.nav.veilarbdirigent.mock.LocalH2Database;
@@ -19,10 +17,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
-import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,7 +68,7 @@ public class ApplicationTestConfig {
     }
 
     @Bean
-    public TaskRepository taskDAO(JdbcTemplate jdbcTemplate) {
+    public TaskRepository taskDAO(NamedParameterJdbcTemplate jdbcTemplate) {
         return new TaskRepository(jdbcTemplate);
     }
 

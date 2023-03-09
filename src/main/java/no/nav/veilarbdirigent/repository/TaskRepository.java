@@ -4,35 +4,32 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
-import no.nav.sbl.sql.SqlUtils;
-import no.nav.sbl.sql.UpdateQuery;
-import no.nav.sbl.sql.order.OrderClause;
-import no.nav.sbl.sql.where.WhereClause;
+import lombok.RequiredArgsConstructor;
+
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.repository.domain.TaskStatus;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
 import no.nav.veilarbdirigent.utils.SerializerUtils;
 import no.nav.veilarbdirigent.utils.TimeUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class TaskRepository {
 
     public static final String TASK_TABLE = "task";
 
-    private final JdbcTemplate jdbc;
-
-    public TaskRepository(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
+    private final NamedParameterJdbcTemplate jdbc;
 
     @Transactional
     public void insert(List<Task> tasks) {
@@ -40,66 +37,111 @@ public class TaskRepository {
     }
 
     private void insert(Task task) {
-        SqlUtils.insert(jdbc, TASK_TABLE)
-                .value("id", task.getId())
-                .value("type", task.getType().getType())
-                .value("status", task.getTaskStatus().name())
-                .value("data", task.getJsonData())
-                .execute();
+        var params = new MapSqlParameterSource()
+                .addValue("id", task.getId())
+                .addValue("type", task.getType().getType())
+                .addValue("status", task.getTaskStatus().name())
+                .addValue("data", task.getJsonData());
+
+        var sql = """
+                INSERT INTO TASK (ID, TYPE, STATUS, DATA)
+                VALUES (:id, :type, :status, :data)
+                """;
+
+        jdbc.update(sql, params);
+    }
+
+    public Optional<Task> fetch(String taskId) {
+        var params = new MapSqlParameterSource()
+                .addValue("id", taskId);
+
+        var sql = """
+                SELECT * FROM TASK WHERE ID = :id FETCH FIRST 1 ROW ONLY
+                """;
+
+        RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
+        List<Task> taskList = jdbc.query(sql, params, rowmapper);
+        if (taskList.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(taskList.get(0));
+        }
     }
 
     public boolean hasTask(String taskId) {
-        Task task = SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
-                .column("*")
-                .where(WhereClause.equals("id", taskId))
-                .limit(1)
-                .execute();
+        var params = new MapSqlParameterSource()
+                .addValue("id", taskId);
 
-        return task != null;
+        var sql = """
+                SELECT * FROM TASK WHERE ID = :id FETCH FIRST 1 ROW ONLY
+                """;
+
+        RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
+        List<Task> tasks = jdbc.query(sql, params, rowmapper);
+
+
+        return ! tasks.isEmpty();
     }
 
     public List<Task> fetchTasksReadyForExecution(int limit) {
-        WhereClause statusCondition = WhereClause.equals("status", TaskStatus.FAILED.name())
-                .or(WhereClause.equals("status", TaskStatus.PENDING.name()));
-        WhereClause timeCondition  = WhereClause.lteq("next_attempt", Timestamp.valueOf(LocalDateTime.now()));
-        WhereClause wc = timeCondition.and(statusCondition);
-        OrderClause or = OrderClause.asc("created");
 
-        return SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
-                .column("*")
-                .where(wc)
-                .orderBy(or)
-                .limit(limit)
-                .executeToList();
+        var params = new MapSqlParameterSource()
+                .addValue("limit", limit)
+                .addValue("statuser", List.of(TaskStatus.FAILED.name(), TaskStatus.PENDING.name()));
+
+        var sql = """
+                SELECT * FROM TASK WHERE STATUS IN (:statuser)
+                AND NEXT_ATTEMPT <= CURRENT_TIMESTAMP
+                ORDER BY CREATED
+                FETCH FIRST :limit ROWS ONLY
+                """;
+        RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
+        return jdbc.query(sql, params, rowmapper);
     }
 
     public List<Task> fetchAllFailedTasks() {
-        return SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toTask)
-                .column("*")
-                .where(WhereClause.equals("status", TaskStatus.FAILED.name()))
-                .executeToList();
+        var params = new MapSqlParameterSource()
+                .addValue("status", TaskStatus.FAILED.name());
+
+        var sql = """
+                SELECT * FROM TASK WHERE STATUS = :status
+                """;
+        RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
+        return jdbc.query(sql, params, rowmapper);
     }
 
     public Map<String, Integer> fetchStatusnumbers() {
-        Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toStatusnumbers)
-                .column("status")
-                .column("count(*) as num")
-                .groupBy("status")
-                .execute();
+        var sql = """
+                SELECT STATUS, COUNT(*) AS NUM FROM TASK GROUP BY STATUS
+                """;
 
-        if (result == null) {
+        RowMapper<Tuple2<String, Integer>> rowMapper = (rs, i) -> toStatusnumbers(rs);
+
+        List<Tuple2<String, Integer>> statusCounts = jdbc.query(sql, rowMapper);
+
+
+//        Tuple2<String, Integer> result = SqlUtils.select(jdbc, TASK_TABLE, TaskRepository::toStatusnumbers)
+//                .column("status")
+//                .column("count(*) as num")
+//                .groupBy("status")
+//                .execute();
+
+        if (statusCounts.isEmpty()) {
             return HashMap.empty();
         }
 
-        return HashMap.ofEntries(result);
+        return HashMap.ofEntries(statusCounts);
     }
 
     public int runNow(String taskId) {
-        return SqlUtils.update(jdbc, TASK_TABLE)
-                .whereEquals("id", taskId)
-                .set("attempts", 1)
-                .set("next_attempt", Timestamp.valueOf(LocalDateTime.now()))
-            .execute();
+        var params = new MapSqlParameterSource()
+                .addValue("id", taskId);
+        var sql = """
+                UPDATE TASK SET ATTEMPTS = ATTEMPTS + 1,
+                            NEXT_ATTEMPT = CURRENT_TIMESTAMP
+                            WHERE ID = :id
+                """;
+        return jdbc.update(sql, params);
     }
 
     @SuppressWarnings("unchecked")
@@ -123,6 +165,48 @@ public class TaskRepository {
     }
 
     public int setStatusForTask(Task task, TaskStatus taskStatus) {
+        var params  = new MapSqlParameterSource()
+                .addValue("id", task.getId())
+                .addValue("status", taskStatus.name());
+
+        var sql = """
+                UPDATE TASK SET 
+                    STATUS = :status,
+                    LAST_ATTEMPT = CURRENT_TIMESTAMP
+                WHERE ID = :id    
+                """;
+
+        if (taskStatus == TaskStatus.FAILED) {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime nextRetry = TimeUtils.exponentialBackoff(task.getAttempts(), now);
+            params
+                    .addValue("next_attempt", nextRetry)
+                    .addValue("error", task.getError());
+            sql = """
+                UPDATE TASK SET 
+                    STATUS = :status,
+                    LAST_ATTEMPT = CURRENT_TIMESTAMP,
+                    NEXT_ATTEMPT = :next_attempt,
+                    ATTEMPTS = ATTEMPTS + 1,
+                    ERROR = :error
+                WHERE ID = :id    
+                """;
+        }
+
+        if (taskStatus == TaskStatus.OK) {
+            params.addValue("result", task.getJsonResult());
+            sql = """
+                UPDATE TASK SET 
+                    STATUS = :status,
+                    LAST_ATTEMPT = CURRENT_TIMESTAMP,
+                    RESULT = :result
+                WHERE ID = :id    
+                """;
+        }
+
+        return jdbc.update(sql, params);
+
+/*
         LocalDateTime now = LocalDateTime.now();
         UpdateQuery query = SqlUtils.update(jdbc, TASK_TABLE)
                 .whereEquals("id", task.getId())
@@ -141,5 +225,6 @@ public class TaskRepository {
         }
 
         return query.execute();
+        */
     }
 }

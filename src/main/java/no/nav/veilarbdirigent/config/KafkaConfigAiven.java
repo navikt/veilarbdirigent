@@ -18,7 +18,7 @@ import no.nav.veilarbdirigent.unleash.KafkaAivenUnleash;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;

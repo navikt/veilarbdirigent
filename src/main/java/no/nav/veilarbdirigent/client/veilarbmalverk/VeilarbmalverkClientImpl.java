@@ -8,11 +8,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.util.function.Supplier;
-
-import static no.nav.common.rest.client.RestUtils.createBearerToken;
 import static no.nav.common.utils.UrlUtils.joinPaths;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 public class VeilarbmalverkClientImpl implements VeilarbmalverkClient {

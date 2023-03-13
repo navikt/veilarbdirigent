@@ -3,12 +3,15 @@ package no.nav.veilarbdirigent.service;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.types.identer.AktorId;
-import no.nav.veilarbdirigent.repository.domain.*;
+import no.nav.veilarbdirigent.repository.domain.OpprettAktivitetTaskDataV2;
+import no.nav.veilarbdirigent.repository.domain.OpprettDialogTaskDataV2;
+import no.nav.veilarbdirigent.repository.domain.Task;
+import no.nav.veilarbdirigent.repository.domain.TaskType;
 import org.springframework.stereotype.Service;
 
 import static no.nav.common.json.JsonUtils.fromJson;
-import static no.nav.veilarbdirigent.utils.TaskFactory.*;
+import static no.nav.veilarbdirigent.utils.TaskFactory.AKTIVITET_TASK_TYPE_V2;
+import static no.nav.veilarbdirigent.utils.TaskFactory.DIALOG_TASK_TYPE_V2;
 
 @Slf4j
 @Service

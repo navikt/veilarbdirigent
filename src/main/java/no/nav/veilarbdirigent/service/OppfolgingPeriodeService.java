@@ -131,18 +131,19 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             List<Task> tasksToPerform = new ArrayList<>();
 
             if (erNyRegistrert) {
-                Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
-                        () -> lagKanskjePermittertDialogTask(oppfolgingsperiodeId.toString(), aktorId), taskRepository
-                );
-
-                if (maybePermittertDialogTask.isPresent()) {
-                    Task permittertDialogTask = maybePermittertDialogTask.get();
-
-                    Try<String> dialogTaskResult = taskProcessorService.processOpprettDialogTask(permittertDialogTask);
-                    permittertDialogTask.setTaskStatus(getStatusFromTry(dialogTaskResult));
-
-                    tasksToPerform.add(permittertDialogTask);
-                }
+                // Fjernet 13.06.2023 - Hvis denne skal aktiveres igjen, sjekk https://jira.adeo.no/browse/FAGSYSTEM-281446
+//                Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
+//                        () -> lagKanskjePermittertDialogTask(oppfolgingsperiodeId.toString(), aktorId), taskRepository
+//                );
+//
+//                if (maybePermittertDialogTask.isPresent()) {
+//                    Task permittertDialogTask = maybePermittertDialogTask.get();
+//
+//                    Try<String> dialogTaskResult = taskProcessorService.processOpprettDialogTask(permittertDialogTask);
+//                    permittertDialogTask.setTaskStatus(getStatusFromTry(dialogTaskResult));
+//
+//                    tasksToPerform.add(permittertDialogTask);
+//                }
             }
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {

@@ -8,6 +8,11 @@ concurrency:
   group: deploy_prod
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: write
+
+
 env:
   IMAGE_TAG: ${{ github.sha }}
   IMAGE: ghcr.io/${{ github.repository }}/veilarbdirigent

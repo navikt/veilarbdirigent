@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.config;
 
+import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
@@ -33,12 +34,12 @@ public class ClientConfig {
     private String veilarbaktivitetScope = scope("veilarbaktivitet", "pto", isDev ? devFss : prodFss);
 
     @Bean
-    public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
+    public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient, AktorOppslagClient aktorOppslagClient) {
         String url = isDevelopment().orElse(false)
                 ? createAppAdeoPreprodIngressUrl("veilarbaktivitet", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbaktivitet");
 
-        return new VeilarbaktivitetClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope));
+        return new VeilarbaktivitetClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope), aktorOppslagClient);
     }
 
     @Bean

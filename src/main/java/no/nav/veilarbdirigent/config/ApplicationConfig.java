@@ -6,8 +6,6 @@ import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.client.aktoroppslag.CachedAktorOppslagClient;
 import no.nav.common.client.aktoroppslag.PdlAktorOppslagClient;
-import no.nav.common.featuretoggle.UnleashClient;
-import no.nav.common.featuretoggle.UnleashClientImpl;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.ShedLockLeaderElectionClient;
 import no.nav.common.metrics.InfluxClient;
@@ -65,11 +63,6 @@ public class ApplicationConfig {
     @Bean
     public LeaderElectionClient leaderElectionClient(LockProvider lockProvider) {
         return new ShedLockLeaderElectionClient(lockProvider);
-    }
-
-    @Bean
-    public UnleashClient unleashClient(EnvironmentProperties properties) {
-        return new UnleashClientImpl(properties.getUnleashUrl(), APPLICATION_NAME);
     }
 
     @Bean

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.featuretoggle.UnleashClient;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,10 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class DbConfig {
-    public static final String FLYWAY_REPAIR_TOGGLE = "veilarbdirigent.flyway.repair";
 
     private final DatasourceProperties datasourceProperties;
-    private final UnleashClient unleashClient;
 
 
     @Bean
@@ -62,12 +59,6 @@ public class DbConfig {
                 .table("schema_version")
                 .dataSource(dataSource)
                 .load();
-        if (unleashClient.isEnabled(FLYWAY_REPAIR_TOGGLE)) {
-            List<String> warnings = flyway.info().getInfoResult().warnings;
-            log.warn("Flyway warnings: {}", warnings);
-            log.warn("Toggle for flyway repair aktiv. Kjører flyway repair før migrate");
-            flyway.repair();
-        }
         flyway.migrate();
     }
 

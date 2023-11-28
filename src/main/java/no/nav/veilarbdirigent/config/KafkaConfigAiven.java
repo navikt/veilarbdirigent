@@ -3,7 +3,6 @@ package no.nav.veilarbdirigent.config;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.kafka.consumer.KafkaConsumerClient;
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor;
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRepository;
@@ -14,7 +13,6 @@ import no.nav.common.kafka.consumer.util.deserializer.Deserializers;
 import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.service.OppfolgingPeriodeService;
-import no.nav.veilarbdirigent.unleash.KafkaAivenUnleash;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -46,8 +44,7 @@ public class KafkaConfigAiven {
 
     private final List<KafkaConsumerClient> consumerClientAiven;
 
-    public KafkaConfigAiven(JdbcTemplate jdbcTemplate,
-                            UnleashClient unleashClient, OppfolgingPeriodeService oppfolgingPeriodeService){
+    public KafkaConfigAiven(JdbcTemplate jdbcTemplate, OppfolgingPeriodeService oppfolgingPeriodeService){
         MeterRegistry prometheusMeterRegistry = new MetricsReporter.ProtectedPrometheusMeterRegistry();
         KafkaConsumerRepository consumerRepository = new OracleJdbcTemplateConsumerRepository(jdbcTemplate);
         List<KafkaConsumerClientBuilder.TopicConfig<?, ?>> topicConfigsAiven =
@@ -64,7 +61,6 @@ public class KafkaConfigAiven {
                                 )
                 );
 
-        KafkaAivenUnleash kafkaAivenUnleash = new KafkaAivenUnleash(unleashClient);
         Properties aivenConsumerProperties = aivenDefaultConsumerProperties(CONSUMER_GROUP_ID);
         aivenConsumerProperties.setProperty(AUTO_OFFSET_RESET_CONFIG, "earliest");
 
@@ -73,7 +69,6 @@ public class KafkaConfigAiven {
                         KafkaConsumerClientBuilder.builder()
                                 .withProperties(aivenConsumerProperties)
                                 .withTopicConfig(config)
-                                .withToggle(kafkaAivenUnleash)
                                 .build())
                 .collect(Collectors.toList());
 

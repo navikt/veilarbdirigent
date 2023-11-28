@@ -1,9 +1,6 @@
 package no.nav.veilarbdirigent.config;
 
-import no.finn.unleash.UnleashContext;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
-import no.nav.common.featuretoggle.UnleashClient;
-import no.nav.common.health.HealthCheckResult;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.common.utils.Credentials;
@@ -35,26 +32,6 @@ public class ApplicationTestConfig {
     @Bean
     public Credentials serviceUserCredentials() {
         return new Credentials("username", "password");
-    }
-
-    @Bean
-    public UnleashClient unleashClient() {
-        return new UnleashClient() {
-            @Override
-            public boolean isEnabled(String toggleName) {
-                return true;
-            }
-
-            @Override
-            public boolean isEnabled(String toggleName, UnleashContext unleashContext) {
-                return true;
-            }
-
-            @Override
-            public HealthCheckResult checkHealth() {
-                return HealthCheckResult.healthy();
-            }
-        };
     }
 
     @Bean

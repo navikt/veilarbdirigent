@@ -6,6 +6,8 @@ import no.nav.veilarbdirigent.repository.domain.OpprettDialogTaskDataV2;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.repository.domain.TaskType;
 
+import java.util.UUID;
+
 import static no.nav.common.json.JsonUtils.toJson;
 
 public class TaskFactory {
@@ -28,9 +30,9 @@ public class TaskFactory {
     private final static String KANSKJE_PERMITTERT_DIALOG_NAME = "kanskje_permitert_dialog";
 
 
-    public static Task lagCvJobbprofilAktivitetTask(String id, AktorId aktorId) {
+    public static Task lagCvJobbprofilAktivitetTask(UUID oppfolgingsPeriodeId, AktorId aktorId) {
         return new Task()
-                .withId(id + "_" + CV_JOBBPROFIL_AKTIVITET_TASK_ID_SUFFIX)
+                .withId(oppfolgingsPeriodeId + "_" + CV_JOBBPROFIL_AKTIVITET_TASK_ID_SUFFIX)
                 .withType(AKTIVITET_TASK_TYPE_V2)
                 .withJsonData(toJson(new OpprettAktivitetTaskDataV2(aktorId, CV_JOBBPROFIL_AKTIVITET_MAL)));
     }

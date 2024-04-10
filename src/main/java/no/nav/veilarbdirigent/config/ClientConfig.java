@@ -34,12 +34,12 @@ public class ClientConfig {
     private String veilarbaktivitetScope = scope("veilarbaktivitet", "pto", isDev ? devFss : prodFss);
 
     @Bean
-    public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient, AktorOppslagClient aktorOppslagClient) {
+    public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
         String url = isDevelopment().orElse(false)
                 ? createAppAdeoPreprodIngressUrl("veilarbaktivitet", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbaktivitet");
 
-        return new VeilarbaktivitetClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope), aktorOppslagClient);
+        return new VeilarbaktivitetClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope));
     }
 
     @Bean

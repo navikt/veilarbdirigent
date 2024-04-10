@@ -2,10 +2,8 @@ package no.nav.veilarbdirigent.client.veilarbaktivitet;
 
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.types.identer.AktorId;
-import no.nav.common.types.identer.Fnr;
 import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -13,6 +11,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
@@ -23,25 +22,20 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Slf4j
 public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
 
-    private final AktorOppslagClient aktorOppslagClient;
     private final String apiUrl;
-
     private final Supplier<String> serviceTokenSupplier;
-
     private final OkHttpClient client;
 
 
-    public VeilarbaktivitetClientImpl(String apiUrl, Supplier<String> serviceTokenSupplier, AktorOppslagClient aktorOppslagClient) {
-        this.aktorOppslagClient = aktorOppslagClient;
+    public VeilarbaktivitetClientImpl(String apiUrl, Supplier<String> serviceTokenSupplier) {
         this.apiUrl = apiUrl;
         this.serviceTokenSupplier = serviceTokenSupplier;
         this.client = RestClient.baseClient();
     }
 
     @Override
-    public Try<String> lagAktivitet(AktorId aktorId, String data) {
-        Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
-        String url = UrlUtils.joinPaths(apiUrl, format("/api/aktivitet/ny?fnr=%s&automatisk=true", fnr.get()));
+    public Try<String> lagAktivitet(String data, UUID oppfolgingsPeriodeId) {
+        String url = UrlUtils.joinPaths(apiUrl, format("/api/aktivitet/%s/ny?automatisk=true", oppfolgingsPeriodeId.toString()));
 
         Request request = new Request.Builder()
                 .url(url)

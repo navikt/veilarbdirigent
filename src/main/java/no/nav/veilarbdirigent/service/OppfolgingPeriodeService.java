@@ -148,7 +148,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
                 Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
-                        () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeId.toString(), aktorId), taskRepository
+                        () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeId, aktorId), taskRepository
                 );
 
                 if (maybeCvJobbprofilAktivitetTask.isPresent()) {

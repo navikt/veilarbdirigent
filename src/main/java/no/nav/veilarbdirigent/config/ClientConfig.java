@@ -2,8 +2,10 @@ package no.nav.veilarbdirigent.config;
 
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
+import no.nav.common.token_client.client.MachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
+import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClientImpl;
 import no.nav.veilarbdirigent.client.veilarbdialog.VeilarbdialogClient;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
+import static no.nav.common.utils.EnvironmentUtils.isProduction;
 import static no.nav.common.utils.UrlUtils.*;
 
 @Configuration
@@ -28,7 +31,7 @@ public class ClientConfig {
     private String scope(String appName, String namespace, String cluster) {
         return String.format("api://%s.%s.%s/.default", cluster, namespace, appName);
     }
-    private Boolean isDev = isDevelopment().orElse(false);
+    private boolean isDev = isDevelopment().orElse(false);
     private String veilarboppfolgingapiScope = scope("veilarboppfolging", "pto", isDev ? devFss : prodFss);
     private String veilarbdialogScope = scope("veilarbdialog", "pto", isDev ? devFss : prodFss);
     private String veilarbaktivitetScope = scope("veilarbaktivitet", "pto", isDev ? devFss : prodFss);
@@ -73,6 +76,14 @@ public class ClientConfig {
                 url,
                 () -> tokenClient.createMachineToMachineToken(scope("veilarbregistrering", "paw", cluster))
         );
+    }
+
+    @Bean
+    public ArbeidssoekerregisterClient arbeidssoekerregisterClient(MachineToMachineTokenClient tokenClient) {
+        String tokenScope = String.format("api://%s-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
+                isProduction().orElse(false) ? "prod" : "dev");
+        return new ArbeidssoekerregisterClient(createServiceUrl("paw-arbeidssoekerregisteret-api-oppslag", "paw", false),
+                () -> tokenClient.createMachineToMachineToken(tokenScope));
     }
 
     private static String getEnvironment() {

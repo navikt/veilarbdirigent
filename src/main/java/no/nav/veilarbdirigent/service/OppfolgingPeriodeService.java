@@ -19,6 +19,7 @@ import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -52,7 +53,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
                                     VeilarbregistreringClient veilarbregistreringClient, ArbeidssoekerregisterClient arbeidssoekerregisterClient,
                                     TaskProcessorService taskProcessorService,
                                     TaskRepository taskRepository,
-                                    JdbcTemplate jdbcTemplate){
+                                    JdbcTemplate jdbcTemplate) {
         this.aktorOppslagClient = aktorOppslagClient;
         this.veilarboppfolgingClient = veilarboppfolgingClient;
         this.veilarbregistreringClient = veilarbregistreringClient;
@@ -96,7 +97,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             //  Når man henter siste registrering fra veilarbregistrering,
             //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
             var date = ZonedDateTime.now().minusMinutes(1);
-            if(oppfolgingStartDato.isAfter(date)) {
+            if (oppfolgingStartDato.isAfter(date)) {
                 Thread.sleep(60000);
             }
 
@@ -155,22 +156,38 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             }
 
             log.info("Finished consuming kafka record for aktorId={}", aktorId);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Kan ikke behandle oppfølging startet fra Kafka", e);
         }
     }
 
-    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr) {
+    private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {
         var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
         if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
 
-        var sortertePerioder = arbeidssøkerperioder
+        var gjeldendePerioder = arbeidssøkerperioder
                 .stream()
-                .sorted(Comparator.comparingLong(periode -> periode.startet.tidspunkt.toEpochSecond()))
+                .filter((arbeidssoekerPeriode ->
+                        arbeidssoekerPeriode.avsluttet == null && arbeidssoekerPeriode.startet.tidspunkt.isBefore(ZonedDateTime.now())
+                ))
                 .toList();
-        var nyestePeriodeId = sortertePerioder.get(0).periodeId;
 
+        if (gjeldendePerioder.isEmpty()) {
+            log.info("Fant ingen gjeldende arbeidssøkerperiode");
+            return Optional.empty();
+        } else if (gjeldendePerioder.size() > 1) {
+            log.info("Fant mer enn en åpne arbeidssøkerperioder. Returnerer den siste");
+            return Optional.ofNullable(gjeldendePerioder
+                    .stream()
+                    .sorted(Comparator.comparing(arbeidssoekerPeriode -> arbeidssoekerPeriode.startet.tidspunkt))
+                    .toList()
+                    .get(0));
+        } else {
+           return Optional.ofNullable(gjeldendePerioder.get(0));
+        }
+    }
+
+    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr) {
         var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, nyestePeriodeId);
         if (profileringer.isEmpty()) {
             log.info("Fant arbeidssøkerperiode, men ingen profilering");

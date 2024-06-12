@@ -101,7 +101,7 @@ public class ArbeidssoekerregisterClient {
     }
 
     public static class ProfileringSendtInnAv {
-        public LocalDateTime tidspunkt;
+        public ZonedDateTime tidspunkt;
         public UtførtAv utfoertAv;
     }
 

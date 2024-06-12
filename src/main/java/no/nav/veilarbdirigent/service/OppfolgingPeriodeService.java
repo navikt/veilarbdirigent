@@ -105,6 +105,15 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
             List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
+            var arbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
+
+            if (arbeidssøkerperiode.isPresent()) {
+                behandleOppfølgingStartetForArbeidssøker(arbeidssøkerperiode.get());
+            } else {
+                behandleOppfølgingStartetForSykmeldt();
+            }
+
+            // TODO: Koden under kan splittes inn i metodene for arbeidssøker og sykmeldt
 
             Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
                     .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
@@ -161,6 +170,14 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         }
     }
 
+    private void behandleOppfølgingStartetForArbeidssøker(ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode) {
+
+    }
+
+    private void behandleOppfølgingStartetForSykmeldt() {
+
+    }
+
     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {
         var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
         if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
@@ -187,10 +204,11 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         }
     }
 
-    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr) {
-        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, nyestePeriodeId);
+    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr, UUID arbeidssøkerperiode) {
+        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiode);
+
         if (profileringer.isEmpty()) {
-            log.info("Fant arbeidssøkerperiode, men ingen profilering");
+            log.info("Fant ingen profilering for arbeidssøkerperiode " + arbeidssøkerperiode);
             return Optional.empty();
         }
 

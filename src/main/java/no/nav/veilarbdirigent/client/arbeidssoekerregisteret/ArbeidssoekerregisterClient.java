@@ -2,6 +2,7 @@ package no.nav.veilarbdirigent.client.arbeidssoekerregisteret;
 
 import com.google.common.collect.Lists;
 import no.nav.common.rest.client.RestClient;
+import no.nav.common.types.identer.Fnr;
 import okhttp3.OkHttpClient;
 
 import java.time.ZonedDateTime;
@@ -23,7 +24,7 @@ public class ArbeidssoekerregisterClient {
         this.client = RestClient.baseClient();
     }
 
-    public List<ArbeidssoekerPeriodeResponse> hentArbeidsoekerPerioder(ArbeidssoekerperiodeRequest request) {
+    public List<ArbeidssoekerPeriodeResponse> hentArbeidsoekerPerioder(Fnr fnr) {
         return Lists.newArrayList();
     }
 

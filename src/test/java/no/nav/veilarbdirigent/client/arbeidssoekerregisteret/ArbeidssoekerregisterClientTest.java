@@ -41,8 +41,8 @@ class ArbeidssoekerregisterClientTest {
     @Test
     void testDeserialization() {
         String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssoekerperioder.json");
-        List<ArbeidssoekerregisterClient.ArbeidssoekerPeriodeResponse> arbeidssoekerPeriodeResponses = JsonUtils.fromJsonArray(json, ArbeidssoekerregisterClient.ArbeidssoekerPeriodeResponse.class);
-        assertThat(arbeidssoekerPeriodeResponses).isNotEmpty();
+        List<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> arbeidssoekerPeriodeRespons = JsonUtils.fromJsonArray(json, ArbeidssoekerregisterClient.ArbeidssoekerPeriode.class);
+        assertThat(arbeidssoekerPeriodeRespons).isNotEmpty();
     }
 
     private void mockAvArbeidssøkerperioder(String fnr) {

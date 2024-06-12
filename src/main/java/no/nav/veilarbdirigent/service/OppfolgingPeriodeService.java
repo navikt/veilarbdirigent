@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.service;
 
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
 import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
@@ -159,14 +161,28 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         }
     }
 
-    private ArbeidssoekerregisterClient.ProfileringsResultat hentSisteProfilering(Fnr fnr) {
+    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr) {
         var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
-        var comparator = Comparator<Arbeid>
-        var nyesteArbeidssøkerperiode = arbeidssøkerperioder.stream().sorted((periode1, periode2) -> );
+        if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
+
+        var sortertePerioder = arbeidssøkerperioder
+                .stream()
+                .sorted(Comparator.comparingLong(periode -> periode.startet.tidspunkt.toEpochSecond()))
+                .toList();
+        var nyestePeriodeId = sortertePerioder.get(0).periodeId;
+
+        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, nyestePeriodeId);
+        if (profileringer.isEmpty()) {
+            log.info("Fant arbeidssøkerperiode, men ingen profilering");
+            return Optional.empty();
+        }
+
+        var sisteProfilering = profileringer
+                .stream()
+                .sorted(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt))
+                .toList()
+                .get(0);
+
+        return Optional.of(sisteProfilering.profilertTil);
     }
-
 }
-
-//(o1, o2)->o1.getItem().getValue().
-//compareTo(o2.getItem().getValue())).
-//collect(Collectors.toList()

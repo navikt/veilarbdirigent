@@ -36,7 +36,7 @@ public class ArbeidssoekerregisterClient {
     }
 
     @SneakyThrows
-    public List<ArbeidssoekerPeriodeResponse> hentArbeidsoekerPerioder(Fnr fnr) {
+    public List<ArbeidssoekerPeriode> hentArbeidsoekerPerioder(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/arbeidssoekerperioder");
         var body = JsonUtils.toJson(new ArbeidssoekerperiodeRequest(fnr.get()));
         log.info("Hent arbeidssøkerperioder");
@@ -49,7 +49,7 @@ public class ArbeidssoekerregisterClient {
 
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
-            return RestUtils.parseJsonResponseArrayOrThrow(response, ArbeidssoekerPeriodeResponse.class);
+            return RestUtils.parseJsonResponseArrayOrThrow(response, ArbeidssoekerPeriode.class);
         }
         catch (Exception e){
             log.error("Error hent arbeidssøkerperioder " + e);
@@ -58,7 +58,7 @@ public class ArbeidssoekerregisterClient {
     }
 
     @SneakyThrows
-    public List<ProfileringResponse> hentProfileringer(Fnr fnr, UUID arbeidssøkerperiodeId) {
+    public List<Profilering> hentProfileringer(Fnr fnr, UUID arbeidssøkerperiodeId) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/profilering");
         var body = JsonUtils.toJson(new ProfileringRequest(fnr.get(), arbeidssøkerperiodeId));
         log.info("Hent profileringer");
@@ -71,7 +71,7 @@ public class ArbeidssoekerregisterClient {
 
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
-            return RestUtils.parseJsonResponseArrayOrThrow(response, ProfileringResponse.class);
+            return RestUtils.parseJsonResponseArrayOrThrow(response, Profilering.class);
         }
         catch (Exception e){
             log.error("Error hent profileringer " + e);
@@ -79,35 +79,35 @@ public class ArbeidssoekerregisterClient {
         }
     }
 
-    public static class ArbeidssoekerPeriodeResponse {
-        UUID periodeId;
-        MetadataResponse startet;
-        MetadataResponse avsluttet;
+    public static class ArbeidssoekerPeriode {
+        public UUID periodeId;
+        public Metadata startet;
+        public Metadata avsluttet;
     }
 
-    static class MetadataResponse {
-        ZonedDateTime tidspunkt;
-        UtførtAv utfoertAv;
-        String kilde;
-        String aarsak;
-        TidspunktFraKildeResponse tidspunktFraKilde;
+    public static class Metadata {
+        public ZonedDateTime tidspunkt;
+        public UtførtAv utfoertAv;
+        public String kilde;
+        public String aarsak;
+        public TidspunktFraKildeResponse tidspunktFraKilde;
     }
 
-    static class ProfileringResponse {
-        String profileringId;
-        String periodeId;
-        ProfileringSendtInnAv profileringSendtInnAv;
-        ProfileringsResultat profilertTil;
+    public static class Profilering {
+        public String profileringId;
+        public String periodeId;
+        public ProfileringSendtInnAv profileringSendtInnAv;
+        public ProfileringsResultat profilertTil;
     }
 
-    static class ProfileringSendtInnAv {
-        LocalDateTime tidspunkt;
-        UtførtAv utfoertAv;
+    public static class ProfileringSendtInnAv {
+        public LocalDateTime tidspunkt;
+        public UtførtAv utfoertAv;
     }
 
     static class UtførtAv {
-        BrukerType type;
-        String id;
+        public BrukerType type;
+        public String id;
     }
 
     enum BrukerType {UKJENT_VERDI, UDEFINERT, VEILEDER, SYSTEM, SLUTTBRUKER}

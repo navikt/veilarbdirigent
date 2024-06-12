@@ -1,15 +1,25 @@
 package no.nav.veilarbdirigent.client.arbeidssoekerregisteret;
 
-import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import no.nav.common.json.JsonUtils;
 import no.nav.common.rest.client.RestClient;
+import no.nav.common.rest.client.RestUtils;
 import no.nav.common.types.identer.Fnr;
+import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static no.nav.common.rest.client.RestUtils.MEDIA_TYPE_JSON;
+
+@Slf4j
 public class ArbeidssoekerregisterClient {
 
     private final String apiUrl;
@@ -24,8 +34,26 @@ public class ArbeidssoekerregisterClient {
         this.client = RestClient.baseClient();
     }
 
+    @SneakyThrows
     public List<ArbeidssoekerPeriodeResponse> hentArbeidsoekerPerioder(Fnr fnr) {
-        return Lists.newArrayList();
+        String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/arbeidssoekerperioder");
+        var body = JsonUtils.toJson(new ArbeidssoekerperiodeRequest(fnr.get()));
+        log.info("Hent arbeidssøkerperioder");
+
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + machineToMachineTokenSupplier.get())
+                .post(RequestBody.create(MEDIA_TYPE_JSON, body))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            RestUtils.throwIfNotSuccessful(response);
+            return RestUtils.parseJsonResponseArrayOrThrow(response, ArbeidssoekerPeriodeResponse.class);
+        }
+        catch (Exception e){
+            log.error("Error hent oppfolgingsperiode " + e);
+            throw e;
+        }
     }
 
     public ProfileringsResultat hentProfilering(ProfileringRequest request) {
@@ -51,16 +79,19 @@ public class ArbeidssoekerregisterClient {
         BrukerType type;
         String id;
     }
+
     enum BrukerType {UKJENT_VERDI, UDEFINERT, VEILEDER, SYSTEM, SLUTTBRUKER}
-    record ArbeidssoekerperiodeRequest(String identitetsnummer) {
-    }
+
+    record ArbeidssoekerperiodeRequest(String identitetsnummer) { }
+
     static class TispunktFraKildeResponse {
         ZonedDateTime tidspunkt;
         AvviksTypeResponse avviksType;
     }
+
     enum AvviksTypeResponse {UKJENT_VERDI, FORSINKELSE, RETTING}
+
     enum ProfileringsResultat {UKJENT_VERDI, UDEFINERT, ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER}
 
-    record ProfileringRequest(String identitetsnummer, UUID periodeId) {
-    }
+    record ProfileringRequest(String identitetsnummer, UUID periodeId) { }
 }

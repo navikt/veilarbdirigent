@@ -21,11 +21,11 @@ class ArbeidssoekerregisterClientTest {
     private ArbeidssoekerregisterClient arbeidssoekerregisterClient = new ArbeidssoekerregisterClient(apiUrl, () -> "TOKEN");
 
     @Test
-    void testHentingAvArbeidssøkerperioder() {
+    void skalKunneHenteArbeidssøkerperioder() {
         Fnr fnr = Fnr.of("1234");
         mockAvArbeidssøkerperioder(fnr.get());
-        var arbeidsoekerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
-        assertThat(arbeidsoekerPerioder).isNotEmpty();
+        var arbeidsøkerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
+        assertThat(arbeidsøkerPerioder).hasSize(2);
     }
 
     @Test
@@ -74,6 +74,35 @@ class ArbeidssoekerregisterClientTest {
                                   "aarsak": "string",
                                   "tidspunktFraKilde": {
                                     "tidspunkt": "2021-09-29T11:20:33.444Z",
+                                    "avviksType": "UKJENT_VERDI"
+                                  }
+                                }
+                              },
+                              {
+                                "periodeId": "2fa85f64-5717-4562-b3fc-2c963f66afa6",
+                                "startet": {
+                                  "tidspunkt": "2023-09-29T11:22:33.444Z",
+                                  "utfoertAv": {
+                                    "type": "UKJENT_VERDI",
+                                    "id": "12345678910"
+                                  },
+                                  "kilde": "string",
+                                  "aarsak": "string",
+                                  "tidspunktFraKilde": {
+                                    "tidspunkt": "2023-09-29T11:20:33.444Z",
+                                    "avviksType": "UKJENT_VERDI"
+                                  }
+                                },
+                                "avsluttet": {
+                                  "tidspunkt": "2024-09-29T11:22:33.444Z",
+                                  "utfoertAv": {
+                                    "type": "UKJENT_VERDI",
+                                    "id": "12345678910"
+                                  },
+                                  "kilde": "string",
+                                  "aarsak": "string",
+                                  "tidspunktFraKilde": {
+                                    "tidspunkt": "2024-09-29T11:20:33.444Z",
                                     "avviksType": "UKJENT_VERDI"
                                   }
                                 }

@@ -79,7 +79,7 @@ public class ArbeidssoekerregisterClient {
         }
     }
 
-    static class ArbeidssoekerPeriodeResponse {
+    public static class ArbeidssoekerPeriodeResponse {
         UUID periodeId;
         MetadataResponse startet;
         MetadataResponse avsluttet;
@@ -121,7 +121,7 @@ public class ArbeidssoekerregisterClient {
 
     enum AvviksTypeResponse {UKJENT_VERDI, FORSINKELSE, RETTING}
 
-    enum ProfileringsResultat {UKJENT_VERDI, UDEFINERT, ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER}
+    public enum ProfileringsResultat {UKJENT_VERDI, UDEFINERT, ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER}
 
     record ProfileringRequest(String identitetsnummer, UUID periodeId) { }
 }

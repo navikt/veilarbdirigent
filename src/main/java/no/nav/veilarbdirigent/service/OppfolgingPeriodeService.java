@@ -6,6 +6,7 @@ import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.common.types.identer.Fnr;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
+import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
@@ -19,14 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
-import static no.nav.veilarbdirigent.utils.TaskFactory.lagKanskjePermittertDialogTask;
 import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
 import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
@@ -40,6 +37,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
     private final VeilarbregistreringClient veilarbregistreringClient;
 
+    private final ArbeidssoekerregisterClient arbeidssoekerregisterClient;
+
     private final TaskProcessorService taskProcessorService;
 
     private final TaskRepository taskRepository;
@@ -48,13 +47,14 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
     public OppfolgingPeriodeService(AktorOppslagClient aktorOppslagClient,
                                     VeilarboppfolgingClient veilarboppfolgingClient,
-                                    VeilarbregistreringClient veilarbregistreringClient,
+                                    VeilarbregistreringClient veilarbregistreringClient, ArbeidssoekerregisterClient arbeidssoekerregisterClient,
                                     TaskProcessorService taskProcessorService,
                                     TaskRepository taskRepository,
                                     JdbcTemplate jdbcTemplate){
         this.aktorOppslagClient = aktorOppslagClient;
         this.veilarboppfolgingClient = veilarboppfolgingClient;
         this.veilarbregistreringClient = veilarbregistreringClient;
+        this.arbeidssoekerregisterClient = arbeidssoekerregisterClient;
         this.taskProcessorService = taskProcessorService;
         this.taskRepository = taskRepository;
         this.jdbcTemplate = jdbcTemplate;
@@ -120,31 +120,15 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
                 return;
             }
 
-            boolean erNyRegistrert = RegistreringUtils.erNyregistrert(brukerRegistrering);
+            boolean erRegistrertSomArbeidssøker = RegistreringUtils.erRegistrertSomArbeidssøker(brukerRegistrering);
             boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(brukerRegistrering);
 
             log.info(
-                    "Behandler bruker hvor oppfølging har startet. aktorId={} erNyRegistrert={} erNySykmeldtBrukerRegistrert={}",
-                    aktorId, erNyRegistrert, erNySykmeldtBrukerRegistrert
+                    "Behandler bruker hvor oppfølging har startet. aktorId={} erRegistrertSomArbeidssøker={} erNySykmeldtBrukerRegistrert={}",
+                    aktorId, Boolean.valueOf(erRegistrertSomArbeidssøker), Boolean.valueOf(erNySykmeldtBrukerRegistrert)
             );
 
             List<Task> tasksToPerform = new ArrayList<>();
-
-            if (erNyRegistrert) {
-                // Fjernet 13.06.2023 - Hvis denne skal aktiveres igjen, sjekk https://jira.adeo.no/browse/FAGSYSTEM-281446
-//                Optional<Task> maybePermittertDialogTask = createTaskIfNotStoredInDb(
-//                        () -> lagKanskjePermittertDialogTask(oppfolgingsperiodeId.toString(), aktorId), taskRepository
-//                );
-//
-//                if (maybePermittertDialogTask.isPresent()) {
-//                    Task permittertDialogTask = maybePermittertDialogTask.get();
-//
-//                    Try<String> dialogTaskResult = taskProcessorService.processOpprettDialogTask(permittertDialogTask);
-//                    permittertDialogTask.setTaskStatus(getStatusFromTry(dialogTaskResult));
-//
-//                    tasksToPerform.add(permittertDialogTask);
-//                }
-            }
 
             if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
                 Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
@@ -175,4 +159,14 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         }
     }
 
+    private ArbeidssoekerregisterClient.ProfileringsResultat hentSisteProfilering(Fnr fnr) {
+        var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
+        var comparator = Comparator<Arbeid>
+        var nyesteArbeidssøkerperiode = arbeidssøkerperioder.stream().sorted((periode1, periode2) -> );
+    }
+
 }
+
+//(o1, o2)->o1.getItem().getValue().
+//compareTo(o2.getItem().getValue())).
+//collect(Collectors.toList()

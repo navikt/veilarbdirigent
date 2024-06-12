@@ -54,15 +54,15 @@ public class RegistreringUtilsTest {
     }
 
     @Test
-    public void erNyregistrert__skal_returnere_true_for_innsatsgrupper() {
-        assertTrue(RegistreringUtils.erNyregistrert("STANDARD_INNSATS"));
-        assertTrue(RegistreringUtils.erNyregistrert("SITUASJONSBESTEMT_INNSATS"));
-        assertTrue(RegistreringUtils.erNyregistrert("BEHOV_FOR_ARBEIDSEVNEVURDERING"));
+    public void erRegistrertSomArbeidssøker__skal_returnere_true_for_innsatsgrupper() {
+        assertTrue(RegistreringUtils.erRegistrertSomArbeidssøker("STANDARD_INNSATS"));
+        assertTrue(RegistreringUtils.erRegistrertSomArbeidssøker("SITUASJONSBESTEMT_INNSATS"));
+        assertTrue(RegistreringUtils.erRegistrertSomArbeidssøker("BEHOV_FOR_ARBEIDSEVNEVURDERING"));
     }
 
     @Test
     public void erNyregistrert__skal_returnere_false_om_innsatsgruppe_er_null() {
-        assertFalse(RegistreringUtils.erNyregistrert((String) null));
+        assertFalse(RegistreringUtils.erRegistrertSomArbeidssøker((String) null));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package no.nav.veilarbdirigent.client.arbeidssoekerregisteret;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import no.nav.common.json.JsonUtils;
 import no.nav.common.types.identer.Fnr;
 import no.nav.veilarbdirigent.TestUtils;
@@ -13,18 +14,16 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@WireMockTest(httpPort = 1234)
 class ArbeidssoekerregisterClientTest {
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(0);
-
-    private String apiUrl = "http://localhost:" + wireMockRule.port();
+    private String apiUrl = "http://localhost:1234"  ;
     private ArbeidssoekerregisterClient arbeidssoekerregisterClient = new ArbeidssoekerregisterClient(apiUrl, () -> "TOKEN");
 
     @Test
     void testHentingAvArbeidssøkerperioder() {
         Fnr fnr = Fnr.of("1234");
+        mockAvArbeidssøkerperioder(fnr.get());
         var arbeidsoekerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
         assertThat(arbeidsoekerPerioder).isNotEmpty();
     }

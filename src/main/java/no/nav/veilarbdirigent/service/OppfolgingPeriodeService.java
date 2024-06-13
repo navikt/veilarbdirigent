@@ -1,6 +1,5 @@
 package no.nav.veilarbdirigent.service;
 
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
@@ -19,13 +18,12 @@ import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import static no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient.ProfileringsResultat.*;
 import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
 import static no.nav.veilarbdirigent.utils.TaskUtils.createTaskIfNotStoredInDb;
 import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
@@ -108,7 +106,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             var arbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
 
             if (arbeidssøkerperiode.isPresent()) {
-                behandleOppfølgingStartetForArbeidssøker(arbeidssøkerperiode.get());
+                skalOppretteCvKortForArbeidssøker(fnr, arbeidssøkerperiode.get());
             } else {
                 behandleOppfølgingStartetForSykmeldt();
             }
@@ -170,11 +168,20 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         }
     }
 
-    private void behandleOppfølgingStartetForArbeidssøker(ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode) {
+    private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr, ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode) {
+        List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
+        var registreringsdato = arbeidssoekerPeriode.startet.tidspunkt;
+        var erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato.toLocalDateTime(), oppfolgingsperioder);
 
+        var profilering = hentSisteProfilering(fnr, arbeidssoekerPeriode.periodeId);
+        var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
+
+        return erNyligRegistrert && profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
     }
 
-    private void behandleOppfølgingStartetForSykmeldt() {
+
+
+    private boolean skalOppretteCvKortForSykmeldt() {
 
     }
 

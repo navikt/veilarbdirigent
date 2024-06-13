@@ -80,10 +80,12 @@ public class ClientConfig {
 
     @Bean
     public ArbeidssoekerregisterClient arbeidssoekerregisterClient(MachineToMachineTokenClient tokenClient) {
+        var url = isDevelopment().orElse(false)
+                ? "https://oppslag-arbeidssoekerregisteret.intern.dev.nav.no"
+                : "https://oppslag-arbeidssoekerregisteret.intern.nav.no";
         String tokenScope = String.format("api://%s-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
                 isProduction().orElse(false) ? "prod" : "dev");
-        return new ArbeidssoekerregisterClient(createServiceUrl("paw-arbeidssoekerregisteret-api-oppslag", "paw", false),
-                () -> tokenClient.createMachineToMachineToken(tokenScope));
+        return new ArbeidssoekerregisterClient(url, () -> tokenClient.createMachineToMachineToken(tokenScope));
     }
 
     private static String getEnvironment() {

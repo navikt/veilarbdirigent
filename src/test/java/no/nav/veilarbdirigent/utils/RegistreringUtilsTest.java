@@ -54,18 +54,6 @@ public class RegistreringUtilsTest {
     }
 
     @Test
-    public void erRegistrertSomArbeidssøker__skal_returnere_true_for_innsatsgrupper() {
-        assertTrue(RegistreringUtils.erRegistrertSomArbeidssøker("STANDARD_INNSATS"));
-        assertTrue(RegistreringUtils.erRegistrertSomArbeidssøker("SITUASJONSBESTEMT_INNSATS"));
-        assertTrue(RegistreringUtils.erRegistrertSomArbeidssøker("BEHOV_FOR_ARBEIDSEVNEVURDERING"));
-    }
-
-    @Test
-    public void erNyregistrert__skal_returnere_false_om_innsatsgruppe_er_null() {
-        assertFalse(RegistreringUtils.erRegistrertSomArbeidssøker((String) null));
-    }
-
-    @Test
     public void erNyligRegistrert__skal_returnere_true_hvis_bruker_kun_har_1_gjeldende_periode() {
         List<Oppfolgingsperiode> oppfolgingsperioder = List.of(
                 new Oppfolgingsperiode(UUID.randomUUID(), AktorId.of("test"), ZonedDateTime.now(), null)

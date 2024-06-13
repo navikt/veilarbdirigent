@@ -43,11 +43,6 @@ public class RegistreringUtils {
         }
     }
 
-    public static boolean erRegistrertSomArbeidssøker(BrukerRegistreringWrapper brukerRegistrering) {
-        return brukerRegistrering == null || !BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType());
-
-    }
-
     public static boolean erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(BrukerRegistreringWrapper brukerRegistrering) {
         if (brukerRegistrering == null || !BrukerRegistreringType.SYKMELDT.equals(brukerRegistrering.getType())) {
             return false;

@@ -107,8 +107,10 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             var skalHaCVKort = false;
 
             if (arbeidssøkerperiode.isPresent()) {
+                log.info("Behandler oppfølgingStartet for bruker med arbeidssøkerperiode fra nytt arbeidssøkerregister");
                 skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr, arbeidssøkerperiode.get());
             } else {
+                log.info("Behandler oppfølgingStarter for bruker uten arbeidssøkerperiode og som kanskje er sykmeldt");
                 skalHaCVKort = erSykmeldtOgSkalOppretteCvKort(fnr);
             }
 
@@ -144,6 +146,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
         var profilering = hentSisteProfilering(fnr, arbeidssoekerPeriode.periodeId);
         var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
+
+        log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, profileringerSomTilsierAtCvKortSkalOpprettes);
 
         return erNyligRegistrert && profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
     }

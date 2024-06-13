@@ -105,42 +105,15 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
             var arbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
 
+            var skalHaCVKort = false;
+
             if (arbeidssøkerperiode.isPresent()) {
-                skalOppretteCvKortForArbeidssøker(fnr, arbeidssøkerperiode.get());
+                skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr, arbeidssøkerperiode.get());
             } else {
-                behandleOppfølgingStartetForSykmeldt();
+                skalHaCVKort = erSykmeldtOgSkalOppretteCvKort(fnr);
             }
 
-            // TODO: Koden under kan splittes inn i metodene for arbeidssøker og sykmeldt
-
-            Optional<BrukerRegistreringWrapper> maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
-                    .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
-
-            if (maybeBrukerRegistrering.isEmpty()) {
-                log.info("Bruker aktorId={} har ikke registrert seg gjennom arbeidssokerregistrering og skal ikke ha aktivitet/dialog", aktorId);
-                return;
-            }
-
-            BrukerRegistreringWrapper brukerRegistrering = maybeBrukerRegistrering.get();
-
-            LocalDateTime registreringsdato = RegistreringUtils.hentRegistreringDato(brukerRegistrering);
-
-            if (!RegistreringUtils.erNyligRegistrert(registreringsdato, oppfolgingsperioder)) {
-                log.info("Bruker {} er ikke nylig registrert og skal ikke ha aktivitet/dialog", aktorId);
-                return;
-            }
-
-            boolean erRegistrertSomArbeidssøker = RegistreringUtils.erRegistrertSomArbeidssøker(brukerRegistrering);
-            boolean erNySykmeldtBrukerRegistrert = RegistreringUtils.erNySykmeldtBrukerRegistrert(brukerRegistrering);
-
-            log.info(
-                    "Behandler bruker hvor oppfølging har startet. aktorId={} erRegistrertSomArbeidssøker={} erNySykmeldtBrukerRegistrert={}",
-                    aktorId, Boolean.valueOf(erRegistrertSomArbeidssøker), Boolean.valueOf(erNySykmeldtBrukerRegistrert)
-            );
-
-            List<Task> tasksToPerform = new ArrayList<>();
-
-            if (erNySykmeldtBrukerRegistrert || erNyRegistrert) {
+            if (skalHaCVKort) {
                 Optional<Task> maybeCvJobbprofilAktivitetTask = createTaskIfNotStoredInDb(
                         () -> lagCvJobbprofilAktivitetTask(oppfolgingsperiodeId, aktorId), taskRepository
                 );
@@ -151,15 +124,12 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
                     Try<String> cvJobbprofilAktivitetResult = taskProcessorService.processOpprettAktivitetTask(cvJobbprofilAktivitetTask);
                     cvJobbprofilAktivitetTask.setTaskStatus(getStatusFromTry(cvJobbprofilAktivitetResult));
 
-                    tasksToPerform.add(cvJobbprofilAktivitetTask);
+                    log.info("Inserting task for aktorId={} task={}", aktorId, cvJobbprofilAktivitetTask);
+                    taskRepository.insert(cvJobbprofilAktivitetTask);
                 }
-            }
-
-            if (tasksToPerform.isEmpty()) {
-                log.info("No tasks for aktorId={}", aktorId);
-            } else {
-                log.info("Inserting tasks for aktorId={} tasks={}", aktorId, tasksToPerform);
-                taskRepository.insert(tasksToPerform);
+                else {
+                    log.info("No tasks for aktorId={}", aktorId);
+                }
             }
 
             log.info("Finished consuming kafka record for aktorId={}", aktorId);
@@ -180,9 +150,21 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
     }
 
 
+    private boolean erSykmeldtOgSkalOppretteCvKort(Fnr fnr) {
+        List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
+        var maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
+                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
+        if (maybeBrukerRegistrering.isEmpty()) {
+            return false;
+        }
 
-    private boolean skalOppretteCvKortForSykmeldt() {
+        BrukerRegistreringWrapper brukerRegistrering = maybeBrukerRegistrering.get();
+        LocalDateTime registreringsdato = RegistreringUtils.hentRegistreringDato(brukerRegistrering);
 
+        boolean skalIkkeTilbakeTilArbeidsgiver = RegistreringUtils.erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(brukerRegistrering);
+        boolean erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato, oppfolgingsperioder);
+
+        return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
     }
 
     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {

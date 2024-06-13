@@ -12,7 +12,7 @@ public class RegistreringUtils {
 
     private final static List<String> sykmeldtBrukerTyper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
 
-    public static boolean erNySykmeldtBrukerRegistrert(String sykmeldtBrukerType) {
+    public static boolean erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(String sykmeldtBrukerType) {
         if (sykmeldtBrukerType == null) {
             return false;
         }
@@ -48,7 +48,7 @@ public class RegistreringUtils {
 
     }
 
-    public static boolean erNySykmeldtBrukerRegistrert(BrukerRegistreringWrapper brukerRegistrering) {
+    public static boolean erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(BrukerRegistreringWrapper brukerRegistrering) {
         if (brukerRegistrering == null || !BrukerRegistreringType.SYKMELDT.equals(brukerRegistrering.getType())) {
             return false;
         }

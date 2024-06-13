@@ -32,11 +32,7 @@ public class TaskRepository {
     private final NamedParameterJdbcTemplate jdbc;
 
     @Transactional
-    public void insert(List<Task> tasks) {
-        tasks.forEach(this::insert);
-    }
-
-    private void insert(Task task) {
+    public void insert(Task task) {
         var params = new MapSqlParameterSource()
                 .addValue("id", task.getId())
                 .addValue("type", task.getType().getType())

@@ -44,13 +44,13 @@ public class RegistreringUtilsTest {
     }
 
     @Test
-    public void erNySykmeldtBrukerRegistrert__skal_returnere_true_om_bruker_skal_til_ny_arbeidsgiver() {
-        assertTrue(RegistreringUtils.erNySykmeldtBrukerRegistrert("SKAL_TIL_NY_ARBEIDSGIVER"));
+    public void erNySykmeldtBrukerRegistrert__skal_returnere_true_om_bruker_skal_til__arbeidsgiver() {
+        assertTrue(RegistreringUtils.erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver("SKAL_TIL_NY_ARBEIDSGIVER"));
     }
 
     @Test
     public void erNySykmeldtBrukerRegistrert__skal_returnere_false_om_type_er_null() {
-        assertFalse(RegistreringUtils.erNySykmeldtBrukerRegistrert((String) null));
+        assertFalse(RegistreringUtils.erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver((String) null));
     }
 
     @Test

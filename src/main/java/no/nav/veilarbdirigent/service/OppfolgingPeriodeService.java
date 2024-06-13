@@ -147,9 +147,10 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         var profilering = hentSisteProfilering(fnr, arbeidssoekerPeriode.periodeId);
         var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
 
-        log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, profileringerSomTilsierAtCvKortSkalOpprettes);
+        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
+        log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, harRiktigProfilering);
 
-        return erNyligRegistrert && profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
+        return erNyligRegistrert && harRiktigProfilering;
     }
 
 

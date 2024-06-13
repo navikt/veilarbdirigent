@@ -102,7 +102,6 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             AktorId aktorId = AktorId.of(aktorIdStr);
             Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
-            List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
             var arbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
 
             var skalHaCVKort = false;

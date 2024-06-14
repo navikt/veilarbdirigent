@@ -133,6 +133,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         var profilering = hentSisteProfilering(fnr, arbeidssoekerPeriode.periodeId);
         var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
 
+        if(profilering.isEmpty()) return false;
         var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
         log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, harRiktigProfilering);
 
@@ -189,13 +190,14 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         if (profileringer.isEmpty()) {
             log.info("Fant ingen profilering for arbeidssøkerperiode " + arbeidssøkerperiode);
             return Optional.empty();
+        } else if (profileringer.size() == 1) {
+            return Optional.of(profileringer.get(0).profilertTil);
+        } else {
+            var sisteProfilering = profileringer
+                    .stream()
+                    .filter(profilering -> profilering.profileringSendtInnAv != null)
+                    .max(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt));
+            return sisteProfilering.map(profilering -> profilering.profilertTil);
         }
-
-        var sisteProfilering = profileringer
-                .stream()
-                .max(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt))
-                .get();
-
-        return Optional.of(sisteProfilering.profilertTil);
     }
 }

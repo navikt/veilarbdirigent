@@ -11,7 +11,6 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -84,6 +83,67 @@ public class OppfolgingPeriodeServiceTest {
     }
 
     @Test
+    public void skalLageCVKortNårBrukerHarKunEnProfileringMenDenErUtenTidspunkt() {
+        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var profileringUtenTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
+        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
+                profileringUtenTidspunkt
+        ));
+        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
+                .aktorId("123")
+                .startDato(ZonedDateTime.now().minusMinutes(60))
+                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER).build();
+
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
+
+        verify(taskRepository, times(1)).insert(any());
+    }
+
+    @Test
+    public void skalForkasteProfileringUtenTidspunktOgBrukeDenSomHarTidspunkt() {
+        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var profileringUtenTidspunkt = profilering(ZonedDateTime.now().minusDays(1), ANTATT_GODE_MULIGHETER);
+        var profileringMedTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
+        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
+                profileringMedTidspunkt,
+                profileringUtenTidspunkt
+        ));
+        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
+                .aktorId("123")
+                .startDato(ZonedDateTime.now().minusMinutes(60))
+                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER).build();
+
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
+
+        verify(taskRepository, times(1)).insert(any());
+    }
+
+    @Test
+    public void skalIkkeOppretteCVKortNårAlleProfileringerManglerTidspunkt() {
+        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var profileringUtenTidspunkt1 = profilering(null, ANTATT_GODE_MULIGHETER);
+        var profileringUtenTidspunkt2 = profilering(null, ANTATT_GODE_MULIGHETER);
+        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
+                profileringUtenTidspunkt2,
+                profileringUtenTidspunkt1
+        ));
+        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
+                .aktorId("123")
+                .startDato(ZonedDateTime.now().minusMinutes(60))
+                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER).build();
+
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
+
+        verify(taskRepository, never()).insert(any());
+    }
+
+    @Test
     public void skalLageCVKortForSykmeldt() {
         when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
@@ -126,7 +186,7 @@ public class OppfolgingPeriodeServiceTest {
         ArbeidssoekerregisterClient.ProfileringSendtInnAv profileringSendtInnAv = new ArbeidssoekerregisterClient.ProfileringSendtInnAv();
         profileringSendtInnAv.tidspunkt = tidspunkt;
         ArbeidssoekerregisterClient.Profilering profilering = new ArbeidssoekerregisterClient.Profilering();
-        profilering.profileringSendtInnAv = profileringSendtInnAv;
+        profilering.profileringSendtInnAv = tidspunkt != null ? profileringSendtInnAv : null;
         profilering.profilertTil = profilertTil;
         return profilering;
     }

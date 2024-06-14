@@ -102,13 +102,13 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             AktorId aktorId = AktorId.of(aktorIdStr);
             Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
-            var arbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
+            var åpenArbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
 
             var skalHaCVKort = false;
 
-            if (arbeidssøkerperiode.isPresent()) {
+            if (åpenArbeidssøkerperiode.isPresent()) {
                 log.info("Behandler oppfølgingStartet for bruker med arbeidssøkerperiode fra nytt arbeidssøkerregister");
-                skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr, arbeidssøkerperiode.get());
+                skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr, åpenArbeidssøkerperiode.get());
             } else {
                 log.info("Behandler oppfølgingStarter for bruker uten arbeidssøkerperiode og som kanskje er sykmeldt");
                 skalHaCVKort = erSykmeldtOgSkalOppretteCvKort(fnr);

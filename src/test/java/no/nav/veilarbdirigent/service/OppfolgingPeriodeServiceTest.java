@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.service;
 
+import io.vavr.control.Try;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
@@ -14,13 +15,14 @@ import org.mockito.Mockito;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient.ProfileringsResultat.ANTATT_BEHOV_FOR_VEILEDNING;
+import static no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient.ProfileringsResultat.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class OppfolgingPeriodeServiceTest {
 
@@ -48,12 +50,35 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForArbeidssøker() {
-        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
-
         when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(profilering()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
+
         oppfolgingPeriodeService.behandleKafkaMeldingLogikk(sisteOppfølgingsperiode);
+
+        verify(taskRepository, times(1)).insert(any());
+    }
+
+    @Test
+    public void skalIkkeLageCvKortNårSisteProfileringErUkjentVerdi() {
+        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var profileringGodeMuligheter = profilering(ZonedDateTime.now().minusDays(2), ANTATT_GODE_MULIGHETER);
+        var profileringOppgitteHindringer = profilering(ZonedDateTime.now().minusDays(1), OPPGITT_HINDRINGER);
+        var profileringUkjentVerdi = profilering(ZonedDateTime.now().minusMinutes(1), UKJENT_VERDI);
+        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
+                profileringOppgitteHindringer,
+                profileringUkjentVerdi,
+                profileringGodeMuligheter
+        ));
+        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
+
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(sisteOppfølgingsperiode);
+
+        verify(taskRepository, never()).insert(any());
     }
 
     private ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode() {
@@ -76,5 +101,20 @@ public class OppfolgingPeriodeServiceTest {
         profilering.profileringSendtInnAv = profileringSendtInnAv;
         profilering.profilertTil = ANTATT_BEHOV_FOR_VEILEDNING;
         return profilering;
+    }
+
+    private ArbeidssoekerregisterClient.Profilering profilering(ZonedDateTime tidspunkt, ArbeidssoekerregisterClient.ProfileringsResultat profilertTil) {
+        ArbeidssoekerregisterClient.ProfileringSendtInnAv profileringSendtInnAv = new ArbeidssoekerregisterClient.ProfileringSendtInnAv();
+        profileringSendtInnAv.tidspunkt = tidspunkt;
+        ArbeidssoekerregisterClient.Profilering profilering = new ArbeidssoekerregisterClient.Profilering();
+        profilering.profileringSendtInnAv = profileringSendtInnAv;
+        profilering.profilertTil = profilertTil;
+        return profilering;
+    }
+
+
+
+    private Try<String> jobbprofilAktivitetTask() {
+        return Try.success("");
     }
 }

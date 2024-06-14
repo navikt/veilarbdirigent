@@ -207,9 +207,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
         var sisteProfilering = profileringer
                 .stream()
-                .sorted(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt))
-                .toList()
-                .get(0);
+                .max(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt))
+                .get();
 
         return Optional.of(sisteProfilering.profilertTil);
     }

@@ -11,8 +11,8 @@ import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProce
 import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder;
 import no.nav.common.kafka.consumer.util.deserializer.Deserializers;
 import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
-import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.service.OppfolgingPeriodeService;
+import no.nav.veilarbdirigent.service.OppfolgingsperiodeDto;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -49,14 +49,14 @@ public class KafkaConfigAiven {
         KafkaConsumerRepository consumerRepository = new OracleJdbcTemplateConsumerRepository(jdbcTemplate);
         List<KafkaConsumerClientBuilder.TopicConfig<?, ?>> topicConfigsAiven =
                 List.of(
-                        new KafkaConsumerClientBuilder.TopicConfig<String, SisteOppfolgingsperiodeV1>()
+                        new KafkaConsumerClientBuilder.TopicConfig<String, OppfolgingsperiodeDto>()
                                 .withLogging()
                                 .withMetrics(prometheusMeterRegistry)
                                 .withStoreOnFailure(consumerRepository)
                                 .withConsumerConfig(
                                         Topic.OPPFOLGING_PERIODE.topicName,
                                         Deserializers.stringDeserializer(),
-                                        Deserializers.jsonDeserializer(SisteOppfolgingsperiodeV1.class),
+                                        Deserializers.jsonDeserializer(OppfolgingsperiodeDto.class),
                                         oppfolgingPeriodeService::behandleKafkaRecord
                                 )
                 );
@@ -70,7 +70,7 @@ public class KafkaConfigAiven {
                                 .withProperties(aivenConsumerProperties)
                                 .withTopicConfig(config)
                                 .build())
-                .collect(Collectors.toList());
+                .toList();
 
 
         consumerRecordProcessor = KafkaConsumerRecordProcessorBuilder

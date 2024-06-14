@@ -1,10 +1,8 @@
 package no.nav.veilarbdirigent.service;
 
 import io.vavr.control.Try;
-import kotlin.collections.EmptyList;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
-import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
@@ -39,15 +37,12 @@ public class OppfolgingPeriodeServiceTest {
 
     private final TaskRepository taskRepository = Mockito.mock(TaskRepository.class);
 
-    private final JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
-
     OppfolgingPeriodeService oppfolgingPeriodeService = new OppfolgingPeriodeService(aktorOppslagClient,
             veilarboppfolgingClient,
             veilarbregistreringClient,
             arbeidssoekerregisterClient,
             taskProcessorService,
-            taskRepository,
-            jdbcTemplate);
+            taskRepository);
 
     @Test
     public void skalLageCVKortForArbeidssøker() {
@@ -55,9 +50,12 @@ public class OppfolgingPeriodeServiceTest {
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(profilering()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
-        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
+        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
+                .aktorId("123")
+                .startDato(ZonedDateTime.now().minusMinutes(60))
+                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER).build();
 
-        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(sisteOppfølgingsperiode);
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
 
         verify(taskRepository, times(1)).insert(any());
     }
@@ -75,9 +73,12 @@ public class OppfolgingPeriodeServiceTest {
                 profileringUkjentVerdi,
                 profileringGodeMuligheter
         ));
-        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
+        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
+                .aktorId("123")
+                .startDato(ZonedDateTime.now().minusMinutes(60))
+                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER).build();
 
-        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(sisteOppfølgingsperiode);
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
 
         verify(taskRepository, never()).insert(any());
     }
@@ -89,9 +90,12 @@ public class OppfolgingPeriodeServiceTest {
         when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(profilering()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         when(veilarbregistreringClient.hentRegistrering(any())).thenReturn(Try.success(Optional.of(brukerRegistrering())));
-        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
+        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
+                .aktorId("123")
+                .startDato(ZonedDateTime.now().minusMinutes(60))
+                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.SYKEMELDT_MER_OPPFOLGING).build();
 
-        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(sisteOppfølgingsperiode);
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
 
         verify(taskRepository, times(1)).insert(any());
     }

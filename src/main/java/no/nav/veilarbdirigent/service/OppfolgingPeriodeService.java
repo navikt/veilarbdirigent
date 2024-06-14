@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.common.types.identer.Fnr;
-import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
@@ -13,7 +12,6 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClie
 import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Task;
-import no.nav.veilarbdirigent.utils.DbUtils;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -30,7 +28,7 @@ import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 
 @Slf4j
 @Service
-public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOppfolgingsperiodeV1> {
+public class OppfolgingPeriodeService extends KafkaCommonConsumerService<OppfolgingsperiodeDto> {
 
     private final AktorOppslagClient aktorOppslagClient;
 
@@ -44,53 +42,41 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
     private final TaskRepository taskRepository;
 
-    private final JdbcTemplate jdbcTemplate;
-
     public OppfolgingPeriodeService(AktorOppslagClient aktorOppslagClient,
                                     VeilarboppfolgingClient veilarboppfolgingClient,
                                     VeilarbregistreringClient veilarbregistreringClient, ArbeidssoekerregisterClient arbeidssoekerregisterClient,
                                     TaskProcessorService taskProcessorService,
-                                    TaskRepository taskRepository,
-                                    JdbcTemplate jdbcTemplate) {
+                                    TaskRepository taskRepository) {
         this.aktorOppslagClient = aktorOppslagClient;
         this.veilarboppfolgingClient = veilarboppfolgingClient;
         this.veilarbregistreringClient = veilarbregistreringClient;
         this.arbeidssoekerregisterClient = arbeidssoekerregisterClient;
         this.taskProcessorService = taskProcessorService;
         this.taskRepository = taskRepository;
-        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    protected void behandleKafkaMeldingLogikk(SisteOppfolgingsperiodeV1 sisteOppfolgingsperiod) {
-        if (sisteOppfolgingsperiod.getAktorId().isEmpty() || sisteOppfolgingsperiod.getStartDato() == null) {
-            log.warn("Ugyldig data for siste oppfolging periode på bruker: " + sisteOppfolgingsperiod.getAktorId());
+    protected void behandleKafkaMeldingLogikk(OppfolgingsperiodeDto oppfolgingsperiodeDto) {
+        if (oppfolgingsperiodeDto.getAktorId().isEmpty() || oppfolgingsperiodeDto.getStartDato() == null) {
+            log.warn("Ugyldig data for siste oppfolging periode på bruker: " + oppfolgingsperiodeDto.getAktorId());
             return;
         }
-        if (sisteOppfolgingsperiod.getSluttDato() != null && sisteOppfolgingsperiod.getStartDato().isAfter(sisteOppfolgingsperiod.getSluttDato())) {
-            log.error("Ugyldig start/slutt dato for siste oppfolging periode på bruker: " + sisteOppfolgingsperiod.getAktorId());
+        if (oppfolgingsperiodeDto.getSluttDato() != null && oppfolgingsperiodeDto.getStartDato().isAfter(oppfolgingsperiodeDto.getSluttDato())) {
+            log.error("Ugyldig start/slutt dato for siste oppfolging periode på bruker: " + oppfolgingsperiodeDto.getAktorId());
             return;
         }
 
-        if (sisteOppfolgingsperiod.getSluttDato() == null) {
-            log.info("Starter oppfolging for: " + sisteOppfolgingsperiod.getAktorId());
-            consumeOppfolgingStartet(sisteOppfolgingsperiod.getAktorId(), sisteOppfolgingsperiod.getStartDato(), sisteOppfolgingsperiod.getUuid());
+        if (oppfolgingsperiodeDto.getSluttDato() == null) {
+            log.info("Starter oppfolging for: " + oppfolgingsperiodeDto.getAktorId());
+            consumeOppfolgingStartet(oppfolgingsperiodeDto.getAktorId(), oppfolgingsperiodeDto.getStartDato(), oppfolgingsperiodeDto.getUuid(), oppfolgingsperiodeDto.getStartetBegrunnelse());
         } else {
-            log.info("Avslutter oppfolging for: " + sisteOppfolgingsperiod.getAktorId());
+            log.info("Avslutter oppfolging for: " + oppfolgingsperiodeDto.getAktorId());
         }
     }
 
-    private void consumeOppfolgingStartet(String aktorIdStr, ZonedDateTime oppfolgingStartDato, UUID oppfolgingsperiodeId) throws RuntimeException {
+    private void consumeOppfolgingStartet(String aktorIdStr, ZonedDateTime oppfolgingStartDato, UUID oppfolgingsperiodeId, OppfolgingsperiodeDto.StartetBegrunnelseDTO startetBegrunnelse) throws RuntimeException {
         try {
-            /*
-            Siden vi utfører oppgaver som ikke er idempotent før vi lagrer resultatet i databasen, så gjør vi en ekstra sjekk
-            på om koblingen til databasen er grei, slik at vi ikke utfører oppgaver og ikke får lagret resultatet.
-            */
 
-            if (DbUtils.checkDbHealth(jdbcTemplate).isUnhealthy()) {
-                log.error("Health check failed, aborting consumption of kafka record");
-                throw new IllegalStateException("Cannot connect to database");
-            }
             // TODO: Fjerne, dette er en quick fix for å unngå race condition.
             //  Når man henter siste registrering fra veilarbregistrering,
             //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
@@ -102,14 +88,12 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
             AktorId aktorId = AktorId.of(aktorIdStr);
             Fnr fnr = aktorOppslagClient.hentFnr(aktorId);
 
-            var åpenArbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(fnr);
-
             var skalHaCVKort = false;
 
-            if (åpenArbeidssøkerperiode.isPresent()) {
+            if (startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER) {
                 log.info("Behandler oppfølgingStartet for bruker med arbeidssøkerperiode fra nytt arbeidssøkerregister");
-                skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr, åpenArbeidssøkerperiode.get());
-            } else {
+                skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr);
+            } else if (startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.SYKEMELDT_MER_OPPFOLGING) {
                 log.info("Behandler oppfølgingStarter for bruker uten arbeidssøkerperiode og som kanskje er sykmeldt");
                 skalHaCVKort = erSykmeldtOgSkalOppretteCvKort(fnr);
             }
@@ -127,8 +111,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
 
                     log.info("Inserting task for aktorId={} task={}", aktorId, cvJobbprofilAktivitetTask);
                     taskRepository.insert(cvJobbprofilAktivitetTask);
-                }
-                else {
+                } else {
                     log.info("No tasks for aktorId={}", aktorId);
                 }
             }
@@ -139,7 +122,10 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
         }
     }
 
-    private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr, ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode) {
+    private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr) {
+        var maybeArbeidssoekerPeriode = hentGjeldendeArbeidssøkerperiode(fnr);
+        if (maybeArbeidssoekerPeriode.isEmpty()) return false;
+        var arbeidssoekerPeriode = maybeArbeidssoekerPeriode.get();
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
         var registreringsdato = arbeidssoekerPeriode.startet.tidspunkt;
         var erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato.toLocalDateTime(), oppfolgingsperioder);
@@ -193,7 +179,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<SisteOp
                     .toList()
                     .get(0));
         } else {
-           return Optional.ofNullable(gjeldendePerioder.get(0));
+            return Optional.ofNullable(gjeldendePerioder.get(0));
         }
     }
 

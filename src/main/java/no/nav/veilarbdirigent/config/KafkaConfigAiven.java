@@ -31,7 +31,7 @@ public class KafkaConfigAiven {
     public static final String CONSUMER_GROUP_ID = "veilarbdirigent-consumer";
 
     public enum Topic {
-        OPPFOLGING_PERIODE("pto.siste-oppfolgingsperiode-v1");
+        OPPFOLGING_PERIODE("pto.oppfolgingsperiode-v1");
         @Getter
         final String topicName;
 

@@ -1,26 +1,27 @@
 package no.nav.veilarbdirigent.service;
 
 import io.vavr.control.Try;
+import kotlin.collections.EmptyList;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.pto_schema.kafka.json.topic.SisteOppfolgingsperiodeV1;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
-import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
+import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient.ProfileringsResultat.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -81,6 +82,20 @@ public class OppfolgingPeriodeServiceTest {
         verify(taskRepository, never()).insert(any());
     }
 
+    @Test
+    public void skalLageCVKortForSykmeldt() {
+        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of());
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(profilering()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        when(veilarbregistreringClient.hentRegistrering(any())).thenReturn(Try.success(Optional.of(brukerRegistrering())));
+        var sisteOppfølgingsperiode = SisteOppfolgingsperiodeV1.builder().aktorId("123").startDato(ZonedDateTime.now().minusMinutes(60)).build();
+
+        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(sisteOppfølgingsperiode);
+
+        verify(taskRepository, times(1)).insert(any());
+    }
+
     private ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode() {
         ArbeidssoekerregisterClient.Metadata startetMetadata = new ArbeidssoekerregisterClient.Metadata();
         startetMetadata.tidspunkt = ZonedDateTime.now().minusMinutes(10);
@@ -112,6 +127,14 @@ public class OppfolgingPeriodeServiceTest {
         return profilering;
     }
 
+    private BrukerRegistreringWrapper brukerRegistrering() {
+        return new BrukerRegistreringWrapper(
+                BrukerRegistreringType.SYKMELDT,
+                null,
+                new SykmeldtBrukerRegistrering(
+                        LocalDateTime.now().minusDays(1),
+                        new Besvarelse(null, FremtidigSituasjonSvar.NY_ARBEIDSGIVER)));
+    }
 
 
     private Try<String> jobbprofilAktivitetTask() {

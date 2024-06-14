@@ -34,10 +34,7 @@ class TaskRepositoryTest {
     @Test
     void persisting_task() {
         String data = "Noe data her";
-        List<Task> tasks = List.of(
-                TestUtils.createTask("id1", data)
-        );
-        dao.insert(tasks);
+        dao.insert(TestUtils.createTask("id1", data));
 
         List<Task> tasksFromDb = dao.fetchTasksReadyForExecution(100);
         assertThat(tasksFromDb.size()).isEqualTo(1);
@@ -56,9 +53,8 @@ class TaskRepositoryTest {
         Task task1 = TestUtils.createTask("id1", data);
         Task task2 = TestUtils.createTask("id2", data);
 
-        List<Task> tasks = List.of(task1, task2);
-
-        dao.insert(tasks);
+        dao.insert(task1);
+        dao.insert(task2);
 
         assertTrue(dao.hasTask("id2"));
         assertFalse(dao.hasTask("id3"));
@@ -69,9 +65,9 @@ class TaskRepositoryTest {
         String data = "{runMe: true}";
         Task task1 = TestUtils.createTask("id1", data);
         Task task2 = TestUtils.createTask("id2", data);
-        List<Task> tasks = List.of(task1, task2);
 
-        dao.insert(tasks);
+        dao.insert(task1);
+        dao.insert(task2);
 
         Task failingTask = task1.toBuilder().error("Something fishy happened").build();
         dao.setStatusForTask(failingTask, TaskStatus.FAILED);
@@ -99,9 +95,9 @@ class TaskRepositoryTest {
         String data = "{runMe: true}";
         Task task1 = TestUtils.createTask("id1", data);
         Task task2 = TestUtils.createTask("id2", data);
-        List<Task> tasks = List.of(task1, task2);
 
-        dao.insert(tasks);
+        dao.insert(task1);
+        dao.insert(task2);
 
         Task okTask = task1.toBuilder().jsonResult("{result: OK}").build();
 
@@ -134,7 +130,9 @@ class TaskRepositoryTest {
                 .jsonData(jsonData)
                 .taskStatus(TaskStatus.PENDING)
                 .build();
-        dao.insert(List.of(task1, task2, task3));
+        dao.insert(task1);
+        dao.insert(task2);
+        dao.insert(task3);
 
         var okTask = task1.toBuilder().jsonResult("{result: OK}").build();
         dao.setStatusForTask(okTask, TaskStatus.OK);

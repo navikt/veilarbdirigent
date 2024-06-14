@@ -12,21 +12,7 @@ public class RegistreringUtils {
 
     private final static List<String> sykmeldtBrukerTyper = List.of("SKAL_TIL_NY_ARBEIDSGIVER");
 
-    private final static List<String> registeringForslag = List.of(
-            "STANDARD_INNSATS",
-            "SITUASJONSBESTEMT_INNSATS",
-            "BEHOV_FOR_ARBEIDSEVNEVURDERING"
-    );
-
-    public static boolean erNyregistrert(String foreslattInnsatsgruppe) {
-        if (foreslattInnsatsgruppe == null) {
-            return false;
-        }
-
-        return registeringForslag.contains(foreslattInnsatsgruppe);
-    }
-
-    public static boolean erNySykmeldtBrukerRegistrert(String sykmeldtBrukerType) {
+    public static boolean erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(String sykmeldtBrukerType) {
         if (sykmeldtBrukerType == null) {
             return false;
         }
@@ -57,19 +43,7 @@ public class RegistreringUtils {
         }
     }
 
-    public static boolean erNyregistrert(BrukerRegistreringWrapper brukerRegistrering) {
-        if (brukerRegistrering == null || !BrukerRegistreringType.ORDINAER.equals(brukerRegistrering.getType())) {
-            return false;
-        }
-
-        String innsatsgruppe = brukerRegistrering.getOrdinaerBrukerRegistrering()
-                .getProfilering()
-                .getInnsatsgruppe();
-
-        return erNyregistrert(innsatsgruppe);
-    }
-
-    public static boolean erNySykmeldtBrukerRegistrert(BrukerRegistreringWrapper brukerRegistrering) {
+    public static boolean erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(BrukerRegistreringWrapper brukerRegistrering) {
         if (brukerRegistrering == null || !BrukerRegistreringType.SYKMELDT.equals(brukerRegistrering.getType())) {
             return false;
         }

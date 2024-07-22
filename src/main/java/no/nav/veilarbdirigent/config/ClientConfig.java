@@ -16,6 +16,7 @@ import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
 import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClientImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +27,12 @@ import static no.nav.common.utils.UrlUtils.*;
 @Configuration
 public class ClientConfig {
 
+    @Value("${app.env.veilarbaktivitetUrl}")
+    private String veilarbaktivitetUrl;
+
+    @Value("${app.env.veilarbaktivitetScope}")
+    private String veilarbaktivitetScope;
+
     private String devFss = "dev-fss";
     private String prodFss = "prod-fss";
     private String scope(String appName, String namespace, String cluster) {
@@ -34,15 +41,10 @@ public class ClientConfig {
     private boolean isDev = isDevelopment().orElse(false);
     private String veilarboppfolgingapiScope = scope("veilarboppfolging", "pto", isDev ? devFss : prodFss);
     private String veilarbdialogScope = scope("veilarbdialog", "pto", isDev ? devFss : prodFss);
-    private String veilarbaktivitetScope = scope("veilarbaktivitet", "pto", isDev ? devFss : prodFss);
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
-        String url = isDevelopment().orElse(false)
-                ? createAppAdeoPreprodIngressUrl("veilarbaktivitet", getEnvironment())
-                : createAppAdeoProdIngressUrl("veilarbaktivitet");
-
-        return new VeilarbaktivitetClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope));
+        return new VeilarbaktivitetClientImpl(veilarbaktivitetUrl, () -> tokenClient.createMachineToMachineToken(veilarbaktivitetScope));
     }
 
     @Bean

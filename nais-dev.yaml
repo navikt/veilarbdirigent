@@ -52,6 +52,10 @@ spec:
   env:
     - name: APP_ENVIRONMENT_NAME
       value: q1
+    - name: VEILARBAKTIVITET_URL
+      value: https://veilarbaktivitet.intern.dev.nav.no
+    - name: VEILARBAKTIVITET_SCOPE
+      value: api://dev-gcp.dab.veilarbaktivitet/.default
   azure:
     application:
       enabled: true

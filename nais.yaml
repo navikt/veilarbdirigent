@@ -57,7 +57,7 @@ spec:
       value: http://veilarbaktivitet.pto.svc.nais.local
     - name: VEILARBAKTIVITET_SCOPE
 #      value: api://prod-gcp.dab.veilarbaktivitet/.default
-      value: api://prod-fss.dab.veilarbaktivitet/.default
+      value: api://prod-fss.pto.veilarbaktivitet/.default
   azure:
     application:
       enabled: true

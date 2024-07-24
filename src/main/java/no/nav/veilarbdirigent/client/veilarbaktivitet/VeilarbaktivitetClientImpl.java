@@ -35,7 +35,7 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
 
     @Override
     public Try<String> lagAktivitet(String data, UUID oppfolgingsPeriodeId) {
-        String url = UrlUtils.joinPaths(apiUrl, format("/api/aktivitet/%s/ny?automatisk=true", oppfolgingsPeriodeId.toString()));
+        String url = UrlUtils.joinPaths(apiUrl, format("/veilarbaktivitet/api/aktivitet/%s/ny?automatisk=true", oppfolgingsPeriodeId.toString()));
 
         Request request = new Request.Builder()
                 .url(url)

@@ -58,8 +58,8 @@ public class ArbeidssoekerregisterClient {
                 throw new RuntimeException("Mottok fler enn en arbeidssøkerperioder - dette skal aldri skje");
             }
             return new SisteSamletInformasjon(
-                    Optional.of(samletInformasjon.arbeidssoekerperioder.get(0)),
-                    Optional.of(samletInformasjon.profileringer.get(0))
+                    samletInformasjon.arbeidssoekerperioder.stream().findFirst(),
+                    samletInformasjon.profileringer.stream().findFirst()
             );
         } catch (Exception e) {
             log.error("Error hent samlet-informasjon " + e);

@@ -15,6 +15,7 @@ import okhttp3.Response;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -36,8 +37,8 @@ public class ArbeidssoekerregisterClient {
     }
 
     @SneakyThrows
-    public SamletInformasjon hentSamletInformasjon(Fnr fnr) {
-        String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/samlet-informasjon");
+    public SisteSamletInformasjon hentSisteSamletInformasjon(Fnr fnr) {
+        String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/samlet-informasjon?siste=true");
         var body = JsonUtils.toJson(new SamletInformasjonRequest(fnr.get()));
         log.info("Hent arbeidssøkerperioder");
 
@@ -49,11 +50,25 @@ public class ArbeidssoekerregisterClient {
 
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
-            return RestUtils.parseJsonResponseOrThrow(response, SamletInformasjon.class);
+            var samletInformasjon = RestUtils.parseJsonResponseOrThrow(response, SamletInformasjon.class);
+            if (samletInformasjon.profileringer.size() > 1) {
+                throw new RuntimeException("Mottok fler enn en profilering - dette skal aldri skje");
+            }
+            if (samletInformasjon.arbeidssoekerperioder.size() > 1) {
+                throw new RuntimeException("Mottok fler enn en arbeidssøkerperioder - dette skal aldri skje");
+            }
+            return new SisteSamletInformasjon(
+                    Optional.of(samletInformasjon.arbeidssoekerperioder.get(0)),
+                    Optional.of(samletInformasjon.profileringer.get(0))
+            );
         } catch (Exception e) {
             log.error("Error hent samlet-informasjon " + e);
             throw e;
         }
+    }
+
+    public record SisteSamletInformasjon(Optional<ArbeidssoekerPeriode> arbeidssoekerperiode,
+                                         Optional<Profilering> profilering) {
     }
 
     public static class SamletInformasjon {

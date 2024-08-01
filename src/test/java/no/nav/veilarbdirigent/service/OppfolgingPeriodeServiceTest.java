@@ -45,7 +45,7 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForArbeidssøker() {
-        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon());
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -69,7 +69,7 @@ public class OppfolgingPeriodeServiceTest {
                 profileringUkjentVerdi,
                 profileringGodeMuligheter
         );
-        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -87,7 +87,7 @@ public class OppfolgingPeriodeServiceTest {
         var samletInformasjon = samletInformasjon();
         var profileringUtenTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
         samletInformasjon.profileringer = List.of(profileringUtenTidspunkt);
-        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -106,7 +106,7 @@ public class OppfolgingPeriodeServiceTest {
         var profileringUtenTidspunkt = profilering(ZonedDateTime.now().minusDays(1), ANTATT_GODE_MULIGHETER);
         var profileringMedTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
         samletInformasjon.profileringer = List.of(profileringMedTidspunkt, profileringUtenTidspunkt);
-        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -125,7 +125,7 @@ public class OppfolgingPeriodeServiceTest {
         var profileringUtenTidspunkt1 = profilering(null, ANTATT_GODE_MULIGHETER);
         var profileringUtenTidspunkt2 = profilering(null, ANTATT_GODE_MULIGHETER);
         samletInformasjon.profileringer = List.of(profileringUtenTidspunkt1, profileringUtenTidspunkt2);
-        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -140,7 +140,7 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForSykmeldt() {
-        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjonUtenVerdier());
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjonUtenVerdier());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         when(veilarbregistreringClient.hentRegistrering(any())).thenReturn(Try.success(Optional.of(brukerRegistrering())));

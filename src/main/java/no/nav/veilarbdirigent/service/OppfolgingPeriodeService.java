@@ -122,14 +122,15 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
     }
 
     private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr) {
-        var samletInformasjon = arbeidssoekerregisterClient.hentSamletInformasjon(fnr);
-        var maybeSisteArbeidssøkerperiode = finnGjeldendeArbeidssøkerperiode(samletInformasjon);
-        var maybeSisteProfilering = finnSisteProfilering(samletInformasjon);
-        if(maybeSisteArbeidssøkerperiode.isEmpty() || maybeSisteProfilering.isEmpty()) {
+        var sisteSamletInformasjon = arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr);
+        if(sisteSamletInformasjon.arbeidssoekerperiode().isEmpty() || sisteSamletInformasjon.profilering().isEmpty()) {
             return false;
         }
-        var sisteArbeidssøkerperiode = maybeSisteArbeidssøkerperiode.get();
-        var sisteProfilering = maybeSisteProfilering.get();
+        var sisteArbeidssøkerperiode = sisteSamletInformasjon.arbeidssoekerperiode().get();
+        var sisteProfilering = sisteSamletInformasjon.profilering().get();
+
+        var arbeidssøkerperiodeErAvsluttet = sisteArbeidssøkerperiode.avsluttet != null;
+        if(arbeidssøkerperiodeErAvsluttet) return false;
 
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
         var registreringsdato = sisteArbeidssøkerperiode.startet.tidspunkt;

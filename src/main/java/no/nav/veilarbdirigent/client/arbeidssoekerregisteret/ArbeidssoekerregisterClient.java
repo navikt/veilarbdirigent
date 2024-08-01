@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.client.arbeidssoekerregisteret;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.json.JsonUtils;
@@ -99,7 +100,8 @@ public class ArbeidssoekerregisterClient {
 
     public static class SamletInformasjon {
         public List<ArbeidssoekerPeriode> arbeidssoekerperioder;
-        public List<Profilering> profilering;
+        @JsonProperty("profilering")
+        public List<Profilering> profileringer;
     }
 
     public static class ArbeidssoekerPeriode {

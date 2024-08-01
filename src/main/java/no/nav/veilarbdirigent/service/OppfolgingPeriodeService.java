@@ -13,7 +13,6 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreri
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -123,18 +122,22 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
     }
 
     private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr) {
-        var maybeArbeidssoekerPeriode = hentGjeldendeArbeidssøkerperiode(fnr);
-        if (maybeArbeidssoekerPeriode.isEmpty()) return false;
-        var arbeidssoekerPeriode = maybeArbeidssoekerPeriode.get();
+        var samletInformasjon = arbeidssoekerregisterClient.hentSamletInformasjon(fnr);
+        var maybeSisteArbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(samletInformasjon);
+        var maybeSisteProfilering = hentSisteProfilering(samletInformasjon);
+        if(maybeSisteArbeidssøkerperiode.isEmpty() || maybeSisteProfilering.isEmpty()) {
+            return false;
+        }
+        var sisteArbeidssøkerperiode = maybeSisteArbeidssøkerperiode.get();
+        var sisteProfilering = maybeSisteProfilering.get();
+
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
-        var registreringsdato = arbeidssoekerPeriode.startet.tidspunkt;
+        var registreringsdato = sisteArbeidssøkerperiode.startet.tidspunkt;
         var erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato.toLocalDateTime(), oppfolgingsperioder);
 
-        var profilering = hentSisteProfilering(fnr, arbeidssoekerPeriode.periodeId);
         var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
 
-        if(profilering.isEmpty()) return false;
-        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
+        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(sisteProfilering);
         log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, harRiktigProfilering);
 
         return erNyligRegistrert && harRiktigProfilering;
@@ -158,8 +161,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
     }
 
-     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {
-        var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
+     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
+        var arbeidssøkerperioder = samletInformasjon.arbeidssoekerperioder;
         if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
 
         var gjeldendePerioder = arbeidssøkerperioder
@@ -184,11 +187,11 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         }
     }
 
-    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr, UUID arbeidssøkerperiode) {
-        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiode);
+    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
+        var profileringer = samletInformasjon.profileringer;
 
         if (profileringer.isEmpty()) {
-            log.info("Fant ingen profilering for arbeidssøkerperiode " + arbeidssøkerperiode);
+            log.info("Fant ingen profilering");
             return Optional.empty();
         } else if (profileringer.size() == 1) {
             return Optional.of(profileringer.get(0).profilertTil);

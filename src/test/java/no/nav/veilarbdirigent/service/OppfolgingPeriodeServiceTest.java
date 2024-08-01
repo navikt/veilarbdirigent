@@ -45,9 +45,8 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForArbeidssøker() {
-        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
+        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(profilering()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
                 .aktorId("123")
@@ -61,17 +60,18 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalIkkeLageCvKortNårSisteProfileringErUkjentVerdi() {
-        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
-        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var samletInformasjon = samletInformasjon();
         var profileringGodeMuligheter = profilering(ZonedDateTime.now().minusDays(2), ANTATT_GODE_MULIGHETER);
         var profileringOppgitteHindringer = profilering(ZonedDateTime.now().minusDays(1), OPPGITT_HINDRINGER);
         var profileringUkjentVerdi = profilering(ZonedDateTime.now().minusMinutes(1), UKJENT_VERDI);
-        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
+        samletInformasjon.profileringer = List.of(
                 profileringOppgitteHindringer,
                 profileringUkjentVerdi,
                 profileringGodeMuligheter
-        ));
+        );
+        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
                 .aktorId("123")
                 .startDato(ZonedDateTime.now().minusMinutes(60))
@@ -158,6 +158,13 @@ public class OppfolgingPeriodeServiceTest {
         oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
 
         verify(taskRepository, times(1)).insert(any());
+    }
+
+    private ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon() {
+        ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon= new ArbeidssoekerregisterClient.SamletInformasjon();
+        samletInformasjon.arbeidssoekerperioder = List.of(arbeidssoekerPeriode());
+        samletInformasjon.profileringer = List.of(profilering());
+        return samletInformasjon;
     }
 
     private ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode() {

@@ -79,6 +79,33 @@ public class ArbeidssoekerregisterClient {
         }
     }
 
+    @SneakyThrows
+    public SamletInformasjon hentSamletInformasjon(Fnr fnr) {
+        String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/samlet-informasjon");
+        var body = JsonUtils.toJson(new SamletInformasjonRequest(fnr.get()));
+        log.info("Hent arbeidssøkerperioder");
+
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + machineToMachineTokenSupplier.get())
+                .post(RequestBody.create(MEDIA_TYPE_JSON, body))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            RestUtils.throwIfNotSuccessful(response);
+            return RestUtils.parseJsonResponseOrThrow(response, SamletInformasjon.class);
+        }
+        catch (Exception e){
+            log.error("Error hent samlet-informasjon " + e);
+            throw e;
+        }
+    }
+
+    public static class SamletInformasjon {
+        public List<ArbeidssoekerPeriode> arbeidssoekerperioder;
+        public List<Profilering> profilering;
+    }
+
     public static class ArbeidssoekerPeriode {
         public UUID periodeId;
         public Metadata startet;
@@ -113,6 +140,8 @@ public class ArbeidssoekerregisterClient {
     enum BrukerType {UKJENT_VERDI, UDEFINERT, VEILEDER, SYSTEM, SLUTTBRUKER}
 
     record ArbeidssoekerperiodeRequest(String identitetsnummer) { }
+
+    record SamletInformasjonRequest(String identitetsnummer) { }
 
     static class TidspunktFraKildeResponse {
         ZonedDateTime tidspunkt;

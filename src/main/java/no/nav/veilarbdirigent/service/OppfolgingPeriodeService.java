@@ -158,7 +158,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
     }
 
-    private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {
+     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {
         var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
         if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
 

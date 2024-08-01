@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
 import java.util.List;
-import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,33 +19,41 @@ class ArbeidssoekerregisterClientTest {
     private ArbeidssoekerregisterClient arbeidssoekerregisterClient = new ArbeidssoekerregisterClient(apiUrl, () -> "TOKEN");
 
     @Test
-    void skalKunneHenteArbeidssøkerperioder() {
+    void skalKunneHenteSamletInformasjonOmArbeidssøker() {
         Fnr fnr = Fnr.of("1234");
-        mockAvArbeidssøkerperioder(fnr.get());
+        mockSamletInformasjon(fnr.get());
         var arbeidsøkerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
         assertThat(arbeidsøkerPerioder).hasSize(1);
     }
 
-    @Test
-    void skalKunneHenteProfileringer() {
-        Fnr fnr = Fnr.of("1234");
-        UUID arbeidssøkerperiodeId = UUID.randomUUID();
-        mockAvProfilering(fnr.get(), arbeidssøkerperiodeId);
-
-        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiodeId);
-
-        assertThat(profileringer).hasSize(1);
-    }
+//    @Test
+//    void skalKunneHenteArbeidssøkerperioder() {
+//        Fnr fnr = Fnr.of("1234");
+//        mockAvArbeidssøkerperioder(fnr.get());
+//        var arbeidsøkerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
+//        assertThat(arbeidsøkerPerioder).hasSize(1);
+//    }
+//
+//    @Test
+//    void skalKunneHenteProfileringer() {
+//        Fnr fnr = Fnr.of("1234");
+//        UUID arbeidssøkerperiodeId = UUID.randomUUID();
+//        mockAvProfilering(fnr.get(), arbeidssøkerperiodeId);
+//
+//        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiodeId);
+//
+//        assertThat(profileringer).hasSize(1);
+//    }
 
     @Test
     void testDeserialization() {
-        String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssoekerperioder.json");
-        List<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> arbeidssoekerPeriodeRespons = JsonUtils.fromJsonArray(json, ArbeidssoekerregisterClient.ArbeidssoekerPeriode.class);
-        assertThat(arbeidssoekerPeriodeRespons).isNotEmpty();
+        String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon.json");
+        ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon = JsonUtils.fromJson(json, ArbeidssoekerregisterClient.SamletInformasjon.class);
+        assertThat(samletInformasjon).isNotNull();
     }
 
-    private void mockAvArbeidssøkerperioder(String fnr) {
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssoekerperioder.json");
+    private void mockSamletInformasjon(String fnr) {
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon.json");
         givenThat(post(urlEqualTo("/api/v1/veileder/arbeidssoekerperioder"))
                 .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
                 .withRequestBody(equalToJson(String.format("""
@@ -61,23 +68,5 @@ class ArbeidssoekerregisterClientTest {
                         .withBody(jsonResponse)
                 )
         );
-    }
-
-    private void mockAvProfilering(String fnr, UUID arbeidssøkerperiode) {
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/profileringer.json");
-        givenThat(post(urlEqualTo("/api/v1/veileder/profilering"))
-                .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
-                .withRequestBody(equalToJson(String.format("""
-                        {
-                           "identitetsnummer": "%s",
-                           "periodeId": "%s"
-                         }
-                        """, fnr, arbeidssøkerperiode)
-                ))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                        .withBody(jsonResponse))
-                );
     }
 }

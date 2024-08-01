@@ -138,7 +138,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
 
         var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
 
-        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(sisteProfilering);
+        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(sisteProfilering.profilertTil);
         log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, harRiktigProfilering);
 
         return erNyligRegistrert && harRiktigProfilering;
@@ -160,48 +160,5 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         boolean erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato, oppfolgingsperioder);
 
         return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
-    }
-
-     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> finnGjeldendeArbeidssøkerperiode(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
-        var arbeidssøkerperioder = samletInformasjon.arbeidssoekerperioder;
-        if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
-
-        var gjeldendePerioder = arbeidssøkerperioder
-                .stream()
-                .filter((arbeidssoekerPeriode ->
-                        arbeidssoekerPeriode.avsluttet == null && arbeidssoekerPeriode.startet.tidspunkt.isBefore(ZonedDateTime.now())
-                ))
-                .toList();
-
-        if (gjeldendePerioder.isEmpty()) {
-            log.info("Fant ingen gjeldende arbeidssøkerperiode");
-            return Optional.empty();
-        } else if (gjeldendePerioder.size() > 1) {
-            log.info("Fant mer enn en åpne arbeidssøkerperioder. Returnerer den siste");
-            return Optional.ofNullable(gjeldendePerioder
-                    .stream()
-                    .sorted(Comparator.comparing(arbeidssoekerPeriode -> arbeidssoekerPeriode.startet.tidspunkt))
-                    .toList()
-                    .get(0));
-        } else {
-            return Optional.ofNullable(gjeldendePerioder.get(0));
-        }
-    }
-
-    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> finnSisteProfilering(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
-        var profileringer = samletInformasjon.profileringer;
-
-        if (profileringer.isEmpty()) {
-            log.info("Fant ingen profilering");
-            return Optional.empty();
-        } else if (profileringer.size() == 1) {
-            return Optional.of(profileringer.get(0).profilertTil);
-        } else {
-            var sisteProfilering = profileringer
-                    .stream()
-                    .filter(profilering -> profilering.profileringSendtInnAv != null)
-                    .max(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt));
-            return sisteProfilering.map(profilering -> profilering.profilertTil);
-        }
     }
 }

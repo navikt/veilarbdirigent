@@ -45,7 +45,7 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForArbeidssøker() {
-        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon());
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(sisteSamletInformasjon());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -59,15 +59,11 @@ public class OppfolgingPeriodeServiceTest {
     }
 
     @Test
-    public void skalIkkeLageCvKortNårSisteProfileringErUkjentVerdi() {
-        var samletInformasjon = samletInformasjon();
-        var profileringGodeMuligheter = profilering(ZonedDateTime.now().minusDays(2), ANTATT_GODE_MULIGHETER);
-        var profileringOppgitteHindringer = profilering(ZonedDateTime.now().minusDays(1), OPPGITT_HINDRINGER);
+    public void skalIkkeLageCvKortNårProfileringErUkjentVerdi() {
         var profileringUkjentVerdi = profilering(ZonedDateTime.now().minusMinutes(1), UKJENT_VERDI);
-        samletInformasjon.profileringer = List.of(
-                profileringOppgitteHindringer,
-                profileringUkjentVerdi,
-                profileringGodeMuligheter
+        var samletInformasjon = new ArbeidssoekerregisterClient.SisteSamletInformasjon(
+                Optional.of(arbeidssoekerPeriode()),
+                Optional.of(profileringUkjentVerdi)
         );
         when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
@@ -83,10 +79,11 @@ public class OppfolgingPeriodeServiceTest {
     }
 
     @Test
-    public void skalLageCVKortNårBrukerHarKunEnProfileringMenDenErUtenTidspunkt() {
-        var samletInformasjon = samletInformasjon();
-        var profileringUtenTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
-        samletInformasjon.profileringer = List.of(profileringUtenTidspunkt);
+    public void skalIkkeLageCvKortNårProfileringMangler() {
+        var samletInformasjon = new ArbeidssoekerregisterClient.SisteSamletInformasjon(
+                Optional.of(arbeidssoekerPeriode()),
+                Optional.empty()
+        );
         when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
@@ -97,34 +94,15 @@ public class OppfolgingPeriodeServiceTest {
 
         oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
 
-        verify(taskRepository, times(1)).insert(any());
+        verify(taskRepository, never()).insert(any());
     }
 
     @Test
-    public void skalForkasteProfileringUtenTidspunktOgBrukeDenSomHarTidspunkt() {
-        var samletInformasjon = samletInformasjon();
-        var profileringUtenTidspunkt = profilering(ZonedDateTime.now().minusDays(1), ANTATT_GODE_MULIGHETER);
-        var profileringMedTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
-        samletInformasjon.profileringer = List.of(profileringMedTidspunkt, profileringUtenTidspunkt);
-        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
-        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
-        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
-                .aktorId("123")
-                .startDato(ZonedDateTime.now().minusMinutes(60))
-                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER).build();
-
-        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
-
-        verify(taskRepository, times(1)).insert(any());
-    }
-
-    @Test
-    public void skalIkkeOppretteCVKortNårAlleProfileringerManglerTidspunkt() {
-        var samletInformasjon = samletInformasjon();
-        var profileringUtenTidspunkt1 = profilering(null, ANTATT_GODE_MULIGHETER);
-        var profileringUtenTidspunkt2 = profilering(null, ANTATT_GODE_MULIGHETER);
-        samletInformasjon.profileringer = List.of(profileringUtenTidspunkt1, profileringUtenTidspunkt2);
+    public void skalIkkeLageCvKortNårArbeidssøkerperiodeMangler() {
+        var samletInformasjon = new ArbeidssoekerregisterClient.SisteSamletInformasjon(
+                Optional.empty(),
+                Optional.of(profilering())
+        );
         when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
@@ -140,7 +118,7 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForSykmeldt() {
-        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(samletInformasjonUtenVerdier());
+        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(sisteSamletInformasjonUtenVerdier());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         when(veilarbregistreringClient.hentRegistrering(any())).thenReturn(Try.success(Optional.of(brukerRegistrering())));
@@ -154,18 +132,18 @@ public class OppfolgingPeriodeServiceTest {
         verify(taskRepository, times(1)).insert(any());
     }
 
-    private ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon() {
-        ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon= new ArbeidssoekerregisterClient.SamletInformasjon();
-        samletInformasjon.arbeidssoekerperioder = List.of(arbeidssoekerPeriode());
-        samletInformasjon.profileringer = List.of(profilering());
-        return samletInformasjon;
+    private ArbeidssoekerregisterClient.SisteSamletInformasjon sisteSamletInformasjon() {
+        return new ArbeidssoekerregisterClient.SisteSamletInformasjon(
+                Optional.of(arbeidssoekerPeriode()),
+                Optional.of(profilering())
+        );
     }
 
-    private ArbeidssoekerregisterClient.SamletInformasjon samletInformasjonUtenVerdier() {
-        ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon= new ArbeidssoekerregisterClient.SamletInformasjon();
-        samletInformasjon.arbeidssoekerperioder = List.of();
-        samletInformasjon.profileringer = List.of();
-        return samletInformasjon;
+    private ArbeidssoekerregisterClient.SisteSamletInformasjon sisteSamletInformasjonUtenVerdier() {
+        return new ArbeidssoekerregisterClient.SisteSamletInformasjon(
+            Optional.empty(),
+            Optional.empty()
+        );
     }
 
     private ArbeidssoekerregisterClient.ArbeidssoekerPeriode arbeidssoekerPeriode() {

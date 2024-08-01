@@ -84,13 +84,12 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortNårBrukerHarKunEnProfileringMenDenErUtenTidspunkt() {
-        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
+        var samletInformasjon = samletInformasjon();
+        var profileringUtenTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
+        samletInformasjon.profileringer = List.of(profileringUtenTidspunkt);
+        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
-        var profileringUtenTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
-        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
-                profileringUtenTidspunkt
-        ));
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
                 .aktorId("123")
                 .startDato(ZonedDateTime.now().minusMinutes(60))
@@ -103,15 +102,13 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalForkasteProfileringUtenTidspunktOgBrukeDenSomHarTidspunkt() {
-        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
-        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var samletInformasjon = samletInformasjon();
         var profileringUtenTidspunkt = profilering(ZonedDateTime.now().minusDays(1), ANTATT_GODE_MULIGHETER);
         var profileringMedTidspunkt = profilering(null, ANTATT_GODE_MULIGHETER);
-        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
-                profileringMedTidspunkt,
-                profileringUtenTidspunkt
-        ));
+        samletInformasjon.profileringer = List.of(profileringMedTidspunkt, profileringUtenTidspunkt);
+        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
                 .aktorId("123")
                 .startDato(ZonedDateTime.now().minusMinutes(60))
@@ -124,15 +121,13 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalIkkeOppretteCVKortNårAlleProfileringerManglerTidspunkt() {
-        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of(arbeidssoekerPeriode()));
-        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
+        var samletInformasjon = samletInformasjon();
         var profileringUtenTidspunkt1 = profilering(null, ANTATT_GODE_MULIGHETER);
         var profileringUtenTidspunkt2 = profilering(null, ANTATT_GODE_MULIGHETER);
-        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(
-                profileringUtenTidspunkt2,
-                profileringUtenTidspunkt1
-        ));
+        samletInformasjon.profileringer = List.of(profileringUtenTidspunkt1, profileringUtenTidspunkt2);
+        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjon);
+        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
+        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
                 .aktorId("123")
                 .startDato(ZonedDateTime.now().minusMinutes(60))

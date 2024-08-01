@@ -22,8 +22,8 @@ class ArbeidssoekerregisterClientTest {
     void skalKunneHenteSamletInformasjonOmArbeidssøker() {
         Fnr fnr = Fnr.of("1234");
         mockSamletInformasjon(fnr.get());
-        var arbeidsøkerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
-        assertThat(arbeidsøkerPerioder).hasSize(1);
+        var samletInformasjon = arbeidssoekerregisterClient.hentSamletInformasjon(fnr);
+        assertThat(samletInformasjon).isNotNull();
     }
 
 //    @Test
@@ -54,7 +54,7 @@ class ArbeidssoekerregisterClientTest {
 
     private void mockSamletInformasjon(String fnr) {
         String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon.json");
-        givenThat(post(urlEqualTo("/api/v1/veileder/arbeidssoekerperioder"))
+        givenThat(post(urlEqualTo("/api/v1/veileder/samlet-informasjon"))
                 .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
                 .withRequestBody(equalToJson(String.format("""
                     {

@@ -12,7 +12,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -50,8 +49,7 @@ public class ArbeidssoekerregisterClient {
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
             return RestUtils.parseJsonResponseArrayOrThrow(response, ArbeidssoekerPeriode.class);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error hent arbeidssøkerperioder " + e);
             throw e;
         }
@@ -72,8 +70,7 @@ public class ArbeidssoekerregisterClient {
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
             return RestUtils.parseJsonResponseArrayOrThrow(response, Profilering.class);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error hent profileringer " + e);
             throw e;
         }
@@ -94,8 +91,7 @@ public class ArbeidssoekerregisterClient {
         try (Response response = client.newCall(request).execute()) {
             RestUtils.throwIfNotSuccessful(response);
             return RestUtils.parseJsonResponseOrThrow(response, SamletInformasjon.class);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error hent samlet-informasjon " + e);
             throw e;
         }
@@ -139,9 +135,11 @@ public class ArbeidssoekerregisterClient {
 
     enum BrukerType {UKJENT_VERDI, UDEFINERT, VEILEDER, SYSTEM, SLUTTBRUKER}
 
-    record ArbeidssoekerperiodeRequest(String identitetsnummer) { }
+    record ArbeidssoekerperiodeRequest(String identitetsnummer) {
+    }
 
-    record SamletInformasjonRequest(String identitetsnummer) { }
+    record SamletInformasjonRequest(String identitetsnummer) {
+    }
 
     static class TidspunktFraKildeResponse {
         ZonedDateTime tidspunkt;
@@ -152,5 +150,6 @@ public class ArbeidssoekerregisterClient {
 
     public enum ProfileringsResultat {UKJENT_VERDI, UDEFINERT, ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER}
 
-    record ProfileringRequest(String identitetsnummer, UUID periodeId) { }
+    record ProfileringRequest(String identitetsnummer, UUID periodeId) {
+    }
 }

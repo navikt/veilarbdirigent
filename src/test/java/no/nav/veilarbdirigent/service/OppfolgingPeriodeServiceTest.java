@@ -140,9 +140,8 @@ public class OppfolgingPeriodeServiceTest {
 
     @Test
     public void skalLageCVKortForSykmeldt() {
-        when(arbeidssoekerregisterClient.hentArbeidsoekerPerioder(any())).thenReturn(List.of());
+        when(arbeidssoekerregisterClient.hentSamletInformasjon(any())).thenReturn(samletInformasjonUtenVerdier());
         when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(arbeidssoekerregisterClient.hentProfileringer(any(), any())).thenReturn(List.of(profilering()));
         when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
         when(veilarbregistreringClient.hentRegistrering(any())).thenReturn(Try.success(Optional.of(brukerRegistrering())));
         var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
@@ -159,6 +158,13 @@ public class OppfolgingPeriodeServiceTest {
         ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon= new ArbeidssoekerregisterClient.SamletInformasjon();
         samletInformasjon.arbeidssoekerperioder = List.of(arbeidssoekerPeriode());
         samletInformasjon.profileringer = List.of(profilering());
+        return samletInformasjon;
+    }
+
+    private ArbeidssoekerregisterClient.SamletInformasjon samletInformasjonUtenVerdier() {
+        ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon= new ArbeidssoekerregisterClient.SamletInformasjon();
+        samletInformasjon.arbeidssoekerperioder = List.of();
+        samletInformasjon.profileringer = List.of();
         return samletInformasjon;
     }
 

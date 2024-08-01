@@ -36,48 +36,6 @@ public class ArbeidssoekerregisterClient {
     }
 
     @SneakyThrows
-    public List<ArbeidssoekerPeriode> hentArbeidsoekerPerioder(Fnr fnr) {
-        String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/arbeidssoekerperioder");
-        var body = JsonUtils.toJson(new ArbeidssoekerperiodeRequest(fnr.get()));
-        log.info("Hent arbeidssøkerperioder");
-
-        Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", "Bearer " + machineToMachineTokenSupplier.get())
-                .post(RequestBody.create(MEDIA_TYPE_JSON, body))
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            RestUtils.throwIfNotSuccessful(response);
-            return RestUtils.parseJsonResponseArrayOrThrow(response, ArbeidssoekerPeriode.class);
-        } catch (Exception e) {
-            log.error("Error hent arbeidssøkerperioder " + e);
-            throw e;
-        }
-    }
-
-    @SneakyThrows
-    public List<Profilering> hentProfileringer(Fnr fnr, UUID arbeidssøkerperiodeId) {
-        String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/profilering");
-        var body = JsonUtils.toJson(new ProfileringRequest(fnr.get(), arbeidssøkerperiodeId));
-        log.info("Hent profileringer");
-
-        Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", "Bearer " + machineToMachineTokenSupplier.get())
-                .post(RequestBody.create(MEDIA_TYPE_JSON, body))
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            RestUtils.throwIfNotSuccessful(response);
-            return RestUtils.parseJsonResponseArrayOrThrow(response, Profilering.class);
-        } catch (Exception e) {
-            log.error("Error hent profileringer " + e);
-            throw e;
-        }
-    }
-
-    @SneakyThrows
     public SamletInformasjon hentSamletInformasjon(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/samlet-informasjon");
         var body = JsonUtils.toJson(new SamletInformasjonRequest(fnr.get()));
@@ -137,9 +95,6 @@ public class ArbeidssoekerregisterClient {
 
     enum BrukerType {UKJENT_VERDI, UDEFINERT, VEILEDER, SYSTEM, SLUTTBRUKER}
 
-    record ArbeidssoekerperiodeRequest(String identitetsnummer) {
-    }
-
     record SamletInformasjonRequest(String identitetsnummer) {
     }
 
@@ -151,7 +106,4 @@ public class ArbeidssoekerregisterClient {
     enum AvviksTypeResponse {UKJENT_VERDI, FORSINKELSE, RETTING}
 
     public enum ProfileringsResultat {UKJENT_VERDI, UDEFINERT, ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER}
-
-    record ProfileringRequest(String identitetsnummer, UUID periodeId) {
-    }
 }

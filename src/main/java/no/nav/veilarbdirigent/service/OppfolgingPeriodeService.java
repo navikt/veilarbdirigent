@@ -123,8 +123,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
 
     private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr) {
         var samletInformasjon = arbeidssoekerregisterClient.hentSamletInformasjon(fnr);
-        var maybeSisteArbeidssøkerperiode = hentGjeldendeArbeidssøkerperiode(samletInformasjon);
-        var maybeSisteProfilering = hentSisteProfilering(samletInformasjon);
+        var maybeSisteArbeidssøkerperiode = finnGjeldendeArbeidssøkerperiode(samletInformasjon);
+        var maybeSisteProfilering = finnSisteProfilering(samletInformasjon);
         if(maybeSisteArbeidssøkerperiode.isEmpty() || maybeSisteProfilering.isEmpty()) {
             return false;
         }
@@ -161,7 +161,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
     }
 
-     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
+     private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> finnGjeldendeArbeidssøkerperiode(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
         var arbeidssøkerperioder = samletInformasjon.arbeidssoekerperioder;
         if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
 
@@ -187,7 +187,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         }
     }
 
-    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
+    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> finnSisteProfilering(ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon) {
         var profileringer = samletInformasjon.profileringer;
 
         if (profileringer.isEmpty()) {

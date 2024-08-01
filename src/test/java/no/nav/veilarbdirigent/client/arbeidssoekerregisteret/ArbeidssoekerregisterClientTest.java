@@ -7,8 +7,6 @@ import no.nav.veilarbdirigent.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
-import java.util.List;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,25 +23,6 @@ class ArbeidssoekerregisterClientTest {
         var samletInformasjon = arbeidssoekerregisterClient.hentSamletInformasjon(fnr);
         assertThat(samletInformasjon).isNotNull();
     }
-
-//    @Test
-//    void skalKunneHenteArbeidssøkerperioder() {
-//        Fnr fnr = Fnr.of("1234");
-//        mockAvArbeidssøkerperioder(fnr.get());
-//        var arbeidsøkerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
-//        assertThat(arbeidsøkerPerioder).hasSize(1);
-//    }
-//
-//    @Test
-//    void skalKunneHenteProfileringer() {
-//        Fnr fnr = Fnr.of("1234");
-//        UUID arbeidssøkerperiodeId = UUID.randomUUID();
-//        mockAvProfilering(fnr.get(), arbeidssøkerperiodeId);
-//
-//        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiodeId);
-//
-//        assertThat(profileringer).hasSize(1);
-//    }
 
     @Test
     void testDeserialization() {

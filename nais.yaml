@@ -53,9 +53,9 @@ spec:
     - name: APP_ENVIRONMENT_NAME
       value: p
     - name: VEILARBAKTIVITET_URL
-      value: https://veilarbaktivitet.prod-fss-pub.nais.io
+      value: https://veilarbaktivitet.intern.nav.no
     - name: VEILARBAKTIVITET_SCOPE
-      value: api://prod-fss.pto.veilarbaktivitet/.default
+      value: api://prod-gcp.dab.veilarbaktivitet/.default
   azure:
     application:
       enabled: true

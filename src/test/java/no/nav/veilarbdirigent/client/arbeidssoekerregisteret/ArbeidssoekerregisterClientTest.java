@@ -20,7 +20,7 @@ class ArbeidssoekerregisterClientTest {
     @Test
     void skalKunneHenteSamletInformasjonOmArbeidssøker() {
         Fnr fnr = Fnr.of("1234");
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon.json");
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon.json");
         mockSamletInformasjon(fnr.get(), jsonResponse);
         var samletInformasjon = arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr);
         assertThat(samletInformasjon.arbeidssoekerperiode()).isNotEmpty();
@@ -30,7 +30,7 @@ class ArbeidssoekerregisterClientTest {
     @Test
     void skalKasteFeilHvisServerSvarerMedFlereProfileringer() {
         Fnr fnr = Fnr.of("1234");
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon-flere-profileringer.json");
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon-flere-profileringer.json");
         mockSamletInformasjon(fnr.get(), jsonResponse);
         assertThatThrownBy(() -> arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr)).isInstanceOf(Exception.class);
     }
@@ -38,7 +38,7 @@ class ArbeidssoekerregisterClientTest {
     @Test
     void skalKasteFeilHvisServerSvarerMedFlereArbeidssøkerperioder() {
         Fnr fnr = Fnr.of("1234");
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon-flere-arbeidssøkerperioder.json");
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon-flere-arbeidssøkerperioder.json");
         mockSamletInformasjon(fnr.get(), jsonResponse);
         assertThatThrownBy(() -> arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr)).isInstanceOf(Exception.class);
     }
@@ -46,7 +46,7 @@ class ArbeidssoekerregisterClientTest {
     @Test
     void skalHåndtereAtDetIkkeFinnesArbeidssøkerperiodeOgProfilering() {
         Fnr fnr = Fnr.of("1234");
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon-uten-profilering-og-arbeidssøkerperiode.json");
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon-uten-profilering-og-arbeidssøkerperiode.json");
         mockSamletInformasjon(fnr.get(), jsonResponse);
         var samletInformasjon = arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr);
         assertThat(samletInformasjon.arbeidssoekerperiode()).isEmpty();
@@ -55,7 +55,7 @@ class ArbeidssoekerregisterClientTest {
 
     @Test
     void testDeserialization() {
-        String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssøker-samletinformasjon.json");
+        String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon.json");
         ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon = JsonUtils.fromJson(json, ArbeidssoekerregisterClient.SamletInformasjon.class);
         assertThat(samletInformasjon).isNotNull();
     }

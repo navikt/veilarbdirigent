@@ -40,7 +40,7 @@ public class ArbeidssoekerregisterClient {
     public SisteSamletInformasjon hentSisteSamletInformasjon(Fnr fnr) {
         String url = UrlUtils.joinPaths(apiUrl, "/api/v1/veileder/samlet-informasjon?siste=true");
         var body = JsonUtils.toJson(new SamletInformasjonRequest(fnr.get()));
-        log.info("Hent arbeidssøkerperioder");
+        log.info("Hent siste samlet-informasjon");
 
         Request request = new Request.Builder()
                 .url(url)

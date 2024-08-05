@@ -7,53 +7,67 @@ import no.nav.veilarbdirigent.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
-import java.util.List;
-import java.util.UUID;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @WireMockTest(httpPort = 1234)
 class ArbeidssoekerregisterClientTest {
 
-    private String apiUrl = "http://localhost:1234"  ;
+    private String apiUrl = "http://localhost:1234";
     private ArbeidssoekerregisterClient arbeidssoekerregisterClient = new ArbeidssoekerregisterClient(apiUrl, () -> "TOKEN");
 
     @Test
-    void skalKunneHenteArbeidssøkerperioder() {
+    void skalKunneHenteSamletInformasjonOmArbeidssøker() {
         Fnr fnr = Fnr.of("1234");
-        mockAvArbeidssøkerperioder(fnr.get());
-        var arbeidsøkerPerioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
-        assertThat(arbeidsøkerPerioder).hasSize(1);
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon.json");
+        mockSamletInformasjon(fnr.get(), jsonResponse);
+        var samletInformasjon = arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr);
+        assertThat(samletInformasjon.arbeidssoekerperiode()).isNotEmpty();
+        assertThat(samletInformasjon.profilering()).isNotEmpty();
     }
 
     @Test
-    void skalKunneHenteProfileringer() {
+    void skalKasteFeilHvisServerSvarerMedFlereProfileringer() {
         Fnr fnr = Fnr.of("1234");
-        UUID arbeidssøkerperiodeId = UUID.randomUUID();
-        mockAvProfilering(fnr.get(), arbeidssøkerperiodeId);
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon-flere-profileringer.json");
+        mockSamletInformasjon(fnr.get(), jsonResponse);
+        assertThatThrownBy(() -> arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr)).isInstanceOf(Exception.class);
+    }
 
-        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiodeId);
+    @Test
+    void skalKasteFeilHvisServerSvarerMedFlereArbeidssøkerperioder() {
+        Fnr fnr = Fnr.of("1234");
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon-flere-arbeidssøkerperioder.json");
+        mockSamletInformasjon(fnr.get(), jsonResponse);
+        assertThatThrownBy(() -> arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr)).isInstanceOf(Exception.class);
+    }
 
-        assertThat(profileringer).hasSize(1);
+    @Test
+    void skalHåndtereAtDetIkkeFinnesArbeidssøkerperiodeOgProfilering() {
+        Fnr fnr = Fnr.of("1234");
+        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon-uten-profilering-og-arbeidssøkerperiode.json");
+        mockSamletInformasjon(fnr.get(), jsonResponse);
+        var samletInformasjon = arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr);
+        assertThat(samletInformasjon.arbeidssoekerperiode()).isEmpty();
+        assertThat(samletInformasjon.profilering()).isEmpty();
     }
 
     @Test
     void testDeserialization() {
-        String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssoekerperioder.json");
-        List<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> arbeidssoekerPeriodeRespons = JsonUtils.fromJsonArray(json, ArbeidssoekerregisterClient.ArbeidssoekerPeriode.class);
-        assertThat(arbeidssoekerPeriodeRespons).isNotEmpty();
+        String json = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/samletinformasjon.json");
+        ArbeidssoekerregisterClient.SamletInformasjon samletInformasjon = JsonUtils.fromJson(json, ArbeidssoekerregisterClient.SamletInformasjon.class);
+        assertThat(samletInformasjon).isNotNull();
     }
 
-    private void mockAvArbeidssøkerperioder(String fnr) {
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/arbeidssoekerperioder.json");
-        givenThat(post(urlEqualTo("/api/v1/veileder/arbeidssoekerperioder"))
+    private void mockSamletInformasjon(String fnr, String jsonResponse) {
+        givenThat(post(urlEqualTo("/api/v1/veileder/samlet-informasjon?siste=true"))
                 .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
                 .withRequestBody(equalToJson(String.format("""
-                    {
-                      "identitetsnummer": "%s"
-                    }
-                    """, fnr)
+                        {
+                          "identitetsnummer": "%s"
+                        }
+                        """, fnr)
                 ))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -61,23 +75,5 @@ class ArbeidssoekerregisterClientTest {
                         .withBody(jsonResponse)
                 )
         );
-    }
-
-    private void mockAvProfilering(String fnr, UUID arbeidssøkerperiode) {
-        String jsonResponse = TestUtils.readTestResourceFile("client/arbeidssoekerregisteret/profileringer.json");
-        givenThat(post(urlEqualTo("/api/v1/veileder/profilering"))
-                .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
-                .withRequestBody(equalToJson(String.format("""
-                        {
-                           "identitetsnummer": "%s",
-                           "periodeId": "%s"
-                         }
-                        """, fnr, arbeidssøkerperiode)
-                ))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                        .withBody(jsonResponse))
-                );
     }
 }

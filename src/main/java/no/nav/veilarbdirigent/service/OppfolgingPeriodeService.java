@@ -13,7 +13,6 @@ import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreri
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -123,18 +122,23 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
     }
 
     private boolean skalOppretteCvKortForArbeidssøker(Fnr fnr) {
-        var maybeArbeidssoekerPeriode = hentGjeldendeArbeidssøkerperiode(fnr);
-        if (maybeArbeidssoekerPeriode.isEmpty()) return false;
-        var arbeidssoekerPeriode = maybeArbeidssoekerPeriode.get();
+        var sisteSamletInformasjon = arbeidssoekerregisterClient.hentSisteSamletInformasjon(fnr);
+        if(sisteSamletInformasjon.arbeidssoekerperiode().isEmpty() || sisteSamletInformasjon.profilering().isEmpty()) {
+            return false;
+        }
+        var sisteArbeidssøkerperiode = sisteSamletInformasjon.arbeidssoekerperiode().get();
+        var sisteProfilering = sisteSamletInformasjon.profilering().get();
+
+        var arbeidssøkerperiodeErAvsluttet = sisteArbeidssøkerperiode.avsluttet != null;
+        if(arbeidssøkerperiodeErAvsluttet) return false;
+
         List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
-        var registreringsdato = arbeidssoekerPeriode.startet.tidspunkt;
+        var registreringsdato = sisteArbeidssøkerperiode.startet.tidspunkt;
         var erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato.toLocalDateTime(), oppfolgingsperioder);
 
-        var profilering = hentSisteProfilering(fnr, arbeidssoekerPeriode.periodeId);
         var profileringerSomTilsierAtCvKortSkalOpprettes = List.of(ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER);
 
-        if(profilering.isEmpty()) return false;
-        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(profilering.get());
+        var harRiktigProfilering = profileringerSomTilsierAtCvKortSkalOpprettes.contains(sisteProfilering.profilertTil);
         log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, harRiktigProfilering);
 
         return erNyligRegistrert && harRiktigProfilering;
@@ -156,48 +160,5 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         boolean erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato, oppfolgingsperioder);
 
         return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
-    }
-
-    private Optional<ArbeidssoekerregisterClient.ArbeidssoekerPeriode> hentGjeldendeArbeidssøkerperiode(Fnr fnr) {
-        var arbeidssøkerperioder = arbeidssoekerregisterClient.hentArbeidsoekerPerioder(fnr);
-        if (arbeidssøkerperioder.isEmpty()) return Optional.empty();
-
-        var gjeldendePerioder = arbeidssøkerperioder
-                .stream()
-                .filter((arbeidssoekerPeriode ->
-                        arbeidssoekerPeriode.avsluttet == null && arbeidssoekerPeriode.startet.tidspunkt.isBefore(ZonedDateTime.now())
-                ))
-                .toList();
-
-        if (gjeldendePerioder.isEmpty()) {
-            log.info("Fant ingen gjeldende arbeidssøkerperiode");
-            return Optional.empty();
-        } else if (gjeldendePerioder.size() > 1) {
-            log.info("Fant mer enn en åpne arbeidssøkerperioder. Returnerer den siste");
-            return Optional.ofNullable(gjeldendePerioder
-                    .stream()
-                    .sorted(Comparator.comparing(arbeidssoekerPeriode -> arbeidssoekerPeriode.startet.tidspunkt))
-                    .toList()
-                    .get(0));
-        } else {
-            return Optional.ofNullable(gjeldendePerioder.get(0));
-        }
-    }
-
-    private Optional<ArbeidssoekerregisterClient.ProfileringsResultat> hentSisteProfilering(Fnr fnr, UUID arbeidssøkerperiode) {
-        var profileringer = arbeidssoekerregisterClient.hentProfileringer(fnr, arbeidssøkerperiode);
-
-        if (profileringer.isEmpty()) {
-            log.info("Fant ingen profilering for arbeidssøkerperiode " + arbeidssøkerperiode);
-            return Optional.empty();
-        } else if (profileringer.size() == 1) {
-            return Optional.of(profileringer.get(0).profilertTil);
-        } else {
-            var sisteProfilering = profileringer
-                    .stream()
-                    .filter(profilering -> profilering.profileringSendtInnAv != null)
-                    .max(Comparator.comparing(profilering -> profilering.profileringSendtInnAv.tidspunkt));
-            return sisteProfilering.map(profilering -> profilering.profilertTil);
-        }
     }
 }

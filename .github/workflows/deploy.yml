@@ -92,4 +92,3 @@ jobs:
           SLACK_TITLE: 'Veilarbdirigent: deploy til prod feilet'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: 'Commit-message til feilende deploy: ${{ github.event.head_commit.message }}'
-

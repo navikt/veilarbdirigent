@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @WireMockTest(httpPort = 1234)
 class ArbeidssoekerregisterClientTest {
 
-    private String apiUrl = "http://localhost:1234"  ;
+    private String apiUrl = "http://localhost:1234";
     private ArbeidssoekerregisterClient arbeidssoekerregisterClient = new ArbeidssoekerregisterClient(apiUrl, () -> "TOKEN");
 
     @Test
@@ -64,10 +64,10 @@ class ArbeidssoekerregisterClientTest {
         givenThat(post(urlEqualTo("/api/v1/veileder/samlet-informasjon?siste=true"))
                 .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
                 .withRequestBody(equalToJson(String.format("""
-                    {
-                      "identitetsnummer": "%s"
-                    }
-                    """, fnr)
+                        {
+                          "identitetsnummer": "%s"
+                        }
+                        """, fnr)
                 ))
                 .willReturn(aResponse()
                         .withStatus(200)

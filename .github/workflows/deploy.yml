@@ -9,9 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   packages: write
-
 
 env:
   IMAGE_TAG: ${{ github.sha }}

@@ -1,6 +1,5 @@
 package no.nav.veilarbdirigent.config;
 
-import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.token_client.client.MachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
@@ -33,6 +32,13 @@ public class ClientConfig {
     @Value("${app.env.veilarbaktivitetScope}")
     private String veilarbaktivitetScope;
 
+    @Value("${app.env.veilarbdialogUrl}")
+    private String veilarbdialogUrl;
+
+    @Value("${app.env.veilarbdialogScope}")
+    private String veilarbdialogScope;
+
+
     private String devFss = "dev-fss";
     private String prodFss = "prod-fss";
     private String scope(String appName, String namespace, String cluster) {
@@ -40,7 +46,6 @@ public class ClientConfig {
     }
     private boolean isDev = isDevelopment().orElse(false);
     private String veilarboppfolgingapiScope = scope("veilarboppfolging", "pto", isDev ? devFss : prodFss);
-    private String veilarbdialogScope = scope("veilarbdialog", "pto", isDev ? devFss : prodFss);
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
@@ -49,8 +54,7 @@ public class ClientConfig {
 
     @Bean
     public VeilarbdialogClient veilarbdialogClient(AzureAdMachineToMachineTokenClient tokenClient) {
-        String url = UrlUtils.createServiceUrl("veilarbdialog", "pto", true);
-        return new VeilarbdialogClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarbdialogScope));
+        return new VeilarbdialogClientImpl(veilarbdialogUrl, () -> tokenClient.createMachineToMachineToken(veilarbdialogScope));
     }
 
     @Bean

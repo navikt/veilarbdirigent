@@ -56,6 +56,10 @@ spec:
       value: https://veilarbaktivitet.intern.dev.nav.no
     - name: VEILARBAKTIVITET_SCOPE
       value: api://dev-gcp.dab.veilarbaktivitet/.default
+    - name: VEILARBDIALOG_URL
+      value: https://veilarbdialog.intern.dev.nav.no
+    - name: VEILARBDIALOG_SCOPE
+      value: api://dev-gcp.dab.veilarbdialog/.default
   azure:
     application:
       enabled: true

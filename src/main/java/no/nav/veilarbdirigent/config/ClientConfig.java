@@ -30,15 +30,13 @@ public class ClientConfig {
     @Value("${app.env.veilarbaktivitetScope}")
     private String veilarbaktivitetScope;
 
-    @Value("${app.env.veilarboppfolgingUrl}")
-    private String veilarboppfolgingUrl;
-
-    @Value("${app.env.veilarboppfolgingScope}")
-    private String veilarboppfolgingScope;
-
+    private String devFss = "dev-fss";
+    private String prodFss = "prod-fss";
     private String scope(String appName, String namespace, String cluster) {
         return String.format("api://%s.%s.%s/.default", cluster, namespace, appName);
     }
+    private boolean isDev = isDevelopment().orElse(false);
+    private String veilarboppfolgingapiScope = scope("veilarboppfolging", "pto", isDev ? devFss : prodFss);
 
     @Bean
     public VeilarbaktivitetClient veilarbaktivitetClient(AzureAdMachineToMachineTokenClient tokenClient) {
@@ -47,7 +45,8 @@ public class ClientConfig {
 
     @Bean
     public VeilarboppfolgingClient veilarboppfolgingClient(AzureAdMachineToMachineTokenClient tokenClient) {
-        return new VeilarboppfolgingClientImpl(veilarboppfolgingUrl, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingScope));
+        String url = UrlUtils.createServiceUrl("veilarboppfolging", "pto", true);
+        return new VeilarboppfolgingClientImpl(url, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingapiScope));
     }
 
     @Bean

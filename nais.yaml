@@ -52,7 +52,7 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: veilarboppfolging.intern.nav.no
+        - host: veilarboppfolging-gcp.intern.nav.no
   env:
     - name: APP_ENVIRONMENT_NAME
       value: p
@@ -61,7 +61,7 @@ spec:
     - name: VEILARBAKTIVITET_SCOPE
       value: api://prod-gcp.dab.veilarbaktivitet/.default
     - name: VEILARBOPPFOLGING_URL
-      value: https://veilarboppfolging.intern.nav.no
+      value: https://veilarboppfolging-gcp.intern.nav.no
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://prod-gcp.poao.veilarboppfolging/.default
   azure:

@@ -49,6 +49,10 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
       - kvPath: /oracle/data/dev/config/veilarbdirigent_q1
         mountPath: /var/run/secrets/nais.io/oracle_config
+  accessPolicy:
+    outbound:
+      external:
+        - host: veilarboppfolging.intern.dev.nav.no
   env:
     - name: APP_ENVIRONMENT_NAME
       value: q1
@@ -56,6 +60,10 @@ spec:
       value: https://veilarbaktivitet.intern.dev.nav.no
     - name: VEILARBAKTIVITET_SCOPE
       value: api://dev-gcp.dab.veilarbaktivitet/.default
+    - name: VEILARBOPPFOLGING_URL
+      value: https://veilarboppfolging.intern.dev.nav.no
+    - name: VEILARBOPPFOLGING_SCOPE
+      value: api://dev-gcp.poao.veilarboppfolging/.default
   azure:
     application:
       enabled: true

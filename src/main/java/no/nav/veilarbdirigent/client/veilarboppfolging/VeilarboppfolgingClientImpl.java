@@ -32,7 +32,7 @@ public class VeilarboppfolgingClientImpl implements VeilarboppfolgingClient {
     @SneakyThrows
     @Override
     public List<Oppfolgingsperiode> hentOppfolgingsperioder(Fnr fnr) {
-        String url = UrlUtils.joinPaths(apiUrl, "/api/oppfolging/oppfolgingsperioder?fnr=" + fnr);
+        String url = UrlUtils.joinPaths(apiUrl, "/veilarboppfolging/api/oppfolging/oppfolgingsperioder?fnr=" + fnr);
 
         log.info("Hent oppfolgingsperioder");
         Request request = new Request.Builder()

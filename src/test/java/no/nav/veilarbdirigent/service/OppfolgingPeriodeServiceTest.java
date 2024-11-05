@@ -6,13 +6,10 @@ import no.nav.common.types.identer.AktorId;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
-import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.*;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,20 +22,13 @@ import static org.mockito.Mockito.*;
 public class OppfolgingPeriodeServiceTest {
 
     private final AktorOppslagClient aktorOppslagClient = Mockito.mock(AktorOppslagClient.class);
-
     private final VeilarboppfolgingClient veilarboppfolgingClient = Mockito.mock(VeilarboppfolgingClient.class);
-
-    private final VeilarbregistreringClient veilarbregistreringClient = Mockito.mock(VeilarbregistreringClient.class);
-
     private final ArbeidssoekerregisterClient arbeidssoekerregisterClient = Mockito.mock(ArbeidssoekerregisterClient.class);
-
     private final TaskProcessorService taskProcessorService = Mockito.mock(TaskProcessorService.class);
-
     private final TaskRepository taskRepository = Mockito.mock(TaskRepository.class);
 
     OppfolgingPeriodeService oppfolgingPeriodeService = new OppfolgingPeriodeService(aktorOppslagClient,
             veilarboppfolgingClient,
-            veilarbregistreringClient,
             arbeidssoekerregisterClient,
             taskProcessorService,
             taskRepository);
@@ -116,33 +106,10 @@ public class OppfolgingPeriodeServiceTest {
         verify(taskRepository, never()).insert(any());
     }
 
-    @Test
-    public void skalLageCVKortForSykmeldt() {
-        when(arbeidssoekerregisterClient.hentSisteSamletInformasjon(any())).thenReturn(sisteSamletInformasjonUtenVerdier());
-        when(veilarboppfolgingClient.hentOppfolgingsperioder(any())).thenReturn(List.of(oppfølgingsperiode()));
-        when(taskProcessorService.processOpprettAktivitetTask(any())).thenReturn(jobbprofilAktivitetTask());
-        when(veilarbregistreringClient.hentRegistrering(any())).thenReturn(Try.success(Optional.of(brukerRegistrering())));
-        var oppfolgingsperiode = OppfolgingsperiodeDto.builder()
-                .aktorId("123")
-                .startDato(ZonedDateTime.now().minusMinutes(60))
-                .startetBegrunnelse(OppfolgingsperiodeDto.StartetBegrunnelseDTO.SYKEMELDT_MER_OPPFOLGING).build();
-
-        oppfolgingPeriodeService.behandleKafkaMeldingLogikk(oppfolgingsperiode);
-
-        verify(taskRepository, times(1)).insert(any());
-    }
-
     private ArbeidssoekerregisterClient.SisteSamletInformasjon sisteSamletInformasjon() {
         return new ArbeidssoekerregisterClient.SisteSamletInformasjon(
                 Optional.of(arbeidssoekerPeriode()),
                 Optional.of(profilering())
-        );
-    }
-
-    private ArbeidssoekerregisterClient.SisteSamletInformasjon sisteSamletInformasjonUtenVerdier() {
-        return new ArbeidssoekerregisterClient.SisteSamletInformasjon(
-            Optional.empty(),
-            Optional.empty()
         );
     }
 
@@ -176,16 +143,6 @@ public class OppfolgingPeriodeServiceTest {
         profilering.profilertTil = profilertTil;
         return profilering;
     }
-
-    private BrukerRegistreringWrapper brukerRegistrering() {
-        return new BrukerRegistreringWrapper(
-                BrukerRegistreringType.SYKMELDT,
-                null,
-                new SykmeldtBrukerRegistrering(
-                        LocalDateTime.now().minusDays(1),
-                        new Besvarelse(null, FremtidigSituasjonSvar.NY_ARBEIDSGIVER)));
-    }
-
 
     private Try<String> jobbprofilAktivitetTask() {
         return Try.success("");

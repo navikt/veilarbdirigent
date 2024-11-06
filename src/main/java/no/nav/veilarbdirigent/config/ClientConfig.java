@@ -11,8 +11,6 @@ import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
 import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClientImpl;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
-import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
-import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClientImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,19 +54,6 @@ public class ClientConfig {
                 ? createAppAdeoPreprodIngressUrl("veilarbmalverk", getEnvironment())
                 : createAppAdeoProdIngressUrl("veilarbmalverk");
         return new VeilarbmalverkClientImpl(url);
-    }
-
-    @Bean
-    public VeilarbregistreringClient veilarbregistreringClient(AzureAdMachineToMachineTokenClient tokenClient) {
-        var appName = "veilarbregistrering";
-        String url = isDevelopment().orElse(false)
-                ? joinPaths(createDevInternalIngressUrl(appName), appName)
-                : joinPaths(createProdInternalIngressUrl(appName), appName);
-        var cluster = isDevelopment().orElse(false) ? "dev-gcp" : "prod-gcp";
-        return new VeilarbregistreringClientImpl(
-                url,
-                () -> tokenClient.createMachineToMachineToken(scope("veilarbregistrering", "paw", cluster))
-        );
     }
 
     @Bean

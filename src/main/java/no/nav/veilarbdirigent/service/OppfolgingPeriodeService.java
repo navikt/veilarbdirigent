@@ -8,17 +8,13 @@ import no.nav.common.types.identer.Fnr;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
-import no.nav.veilarbdirigent.client.veilarbregistrering.VeilarbregistreringClient;
-import no.nav.veilarbdirigent.client.veilarbregistrering.domain.BrukerRegistreringWrapper;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.utils.RegistreringUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 import static no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient.ProfileringsResultat.*;
 import static no.nav.veilarbdirigent.utils.TaskFactory.lagCvJobbprofilAktivitetTask;
@@ -30,25 +26,18 @@ import static no.nav.veilarbdirigent.utils.TaskUtils.getStatusFromTry;
 public class OppfolgingPeriodeService extends KafkaCommonConsumerService<OppfolgingsperiodeDto> {
 
     private final AktorOppslagClient aktorOppslagClient;
-
     private final VeilarboppfolgingClient veilarboppfolgingClient;
-
-    private final VeilarbregistreringClient veilarbregistreringClient;
-
     private final ArbeidssoekerregisterClient arbeidssoekerregisterClient;
-
     private final TaskProcessorService taskProcessorService;
-
     private final TaskRepository taskRepository;
 
     public OppfolgingPeriodeService(AktorOppslagClient aktorOppslagClient,
                                     VeilarboppfolgingClient veilarboppfolgingClient,
-                                    VeilarbregistreringClient veilarbregistreringClient, ArbeidssoekerregisterClient arbeidssoekerregisterClient,
+                                    ArbeidssoekerregisterClient arbeidssoekerregisterClient,
                                     TaskProcessorService taskProcessorService,
                                     TaskRepository taskRepository) {
         this.aktorOppslagClient = aktorOppslagClient;
         this.veilarboppfolgingClient = veilarboppfolgingClient;
-        this.veilarbregistreringClient = veilarbregistreringClient;
         this.arbeidssoekerregisterClient = arbeidssoekerregisterClient;
         this.taskProcessorService = taskProcessorService;
         this.taskRepository = taskRepository;
@@ -77,8 +66,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         try {
 
             // TODO: Fjerne, dette er en quick fix for å unngå race condition.
-            //  Når man henter siste registrering fra veilarbregistrering,
-            //  så har ikke nødvendigvis veilarbregistrering fått svar fra arena og oppdatert så siste registrering er gjeldende
+            //  Når man henter siste registrering fra arbeidsøkerregisteret,
+            //  så har ikke nødvendigvis arbeidsøkerregisteret fått svar fra arena og oppdatert så siste registrering er gjeldende
             var date = ZonedDateTime.now().minusMinutes(1);
             if (oppfolgingStartDato.isAfter(date)) {
                 Thread.sleep(60000);
@@ -94,7 +83,7 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
                 skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr);
             } else if (startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.SYKEMELDT_MER_OPPFOLGING) {
                 log.info("Behandler oppfølgingStarter for bruker uten arbeidssøkerperiode og som kanskje er sykmeldt");
-                skalHaCVKort = erSykmeldtOgSkalOppretteCvKort(fnr);
+                skalHaCVKort = false;
             }
 
             if (skalHaCVKort) {
@@ -142,23 +131,5 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
         log.info("Avgjør om CV-kort skal opprettes for arbeidssøker, erNyligRegistrert={}, harRiktigProfilering={}", erNyligRegistrert, harRiktigProfilering);
 
         return erNyligRegistrert && harRiktigProfilering;
-    }
-
-
-    private boolean erSykmeldtOgSkalOppretteCvKort(Fnr fnr) {
-        List<Oppfolgingsperiode> oppfolgingsperioder = veilarboppfolgingClient.hentOppfolgingsperioder(fnr);
-        var maybeBrukerRegistrering = veilarbregistreringClient.hentRegistrering(fnr)
-                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
-        if (maybeBrukerRegistrering.isEmpty()) {
-            return false;
-        }
-
-        BrukerRegistreringWrapper brukerRegistrering = maybeBrukerRegistrering.get();
-        LocalDateTime registreringsdato = RegistreringUtils.hentRegistreringDato(brukerRegistrering);
-
-        boolean skalIkkeTilbakeTilArbeidsgiver = RegistreringUtils.erSykmeldtOgSkalIkkeTilbakeTilArbeidsgiver(brukerRegistrering);
-        boolean erNyligRegistrert = RegistreringUtils.erNyligRegistrert(registreringsdato, oppfolgingsperioder);
-
-        return skalIkkeTilbakeTilArbeidsgiver && erNyligRegistrert;
     }
 }

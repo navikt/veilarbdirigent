@@ -17,7 +17,8 @@ public class OppfolgingsperiodeDto {
 
             enum StartetBegrunnelseDTO {
                 ARBEIDSSOKER,
-                SYKEMELDT_MER_OPPFOLGING
+                SYKEMELDT_MER_OPPFOLGING,
+                MANUELL_REGISTRERING_VEILEDER // Lagt inn pga bug i veilarboppfølging, men de skal heller ikke ha cv-kort
             }
 }
 

@@ -81,7 +81,8 @@ public class OppfolgingPeriodeService extends KafkaCommonConsumerService<Oppfolg
             if (startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.ARBEIDSSOKER) {
                 log.info("Behandler oppfølgingStartet for bruker med arbeidssøkerperiode fra nytt arbeidssøkerregister");
                 skalHaCVKort = skalOppretteCvKortForArbeidssøker(fnr);
-            } else if (startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.SYKEMELDT_MER_OPPFOLGING) {
+            } else if (startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.SYKEMELDT_MER_OPPFOLGING
+                    || startetBegrunnelse == OppfolgingsperiodeDto.StartetBegrunnelseDTO.MANUELL_REGISTRERING_VEILEDER) {
                 log.info("Behandler oppfølgingStarter for bruker uten arbeidssøkerperiode og som kanskje er sykmeldt");
                 skalHaCVKort = false;
             }

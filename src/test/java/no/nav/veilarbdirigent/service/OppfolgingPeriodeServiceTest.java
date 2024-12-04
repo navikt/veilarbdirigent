@@ -2,7 +2,6 @@ package no.nav.veilarbdirigent.service;
 
 import io.vavr.control.Try;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
-import no.nav.common.types.identer.AktorId;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
@@ -123,7 +122,7 @@ public class OppfolgingPeriodeServiceTest {
     }
 
     private Oppfolgingsperiode oppfølgingsperiode() {
-        return new Oppfolgingsperiode(UUID.randomUUID(), AktorId.of("123"), ZonedDateTime.now().minusDays(2), null);
+        return new Oppfolgingsperiode(UUID.randomUUID(), "123", null, ZonedDateTime.now().minusDays(2), null, null, null);
     }
 
     private ArbeidssoekerregisterClient.Profilering profilering() {

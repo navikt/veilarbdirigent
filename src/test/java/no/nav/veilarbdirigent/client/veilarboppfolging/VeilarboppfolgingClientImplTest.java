@@ -28,7 +28,7 @@ public class VeilarboppfolgingClientImplTest {
         String apiUrl = "http://localhost:" + wireMockRule.port();
         VeilarboppfolgingClient veilarboppfolgingClient = new VeilarboppfolgingClientImpl(apiUrl, () -> "TOKEN");
 
-        givenThat(get(urlEqualTo("/veilarboppfolging/api/oppfolging/oppfolgingsperioder?fnr=" + fnr))
+        givenThat(post(urlEqualTo("/veilarboppfolging/api/v3/oppfolging/hent-perioder"))
                 .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -42,7 +42,7 @@ public class VeilarboppfolgingClientImplTest {
 
         Oppfolgingsperiode oppfolgingsperiode = oppfolgingsperioder.get(0);
 
-        assertEquals(AktorId.of("aktorId123"), oppfolgingsperiode.getAktorId());
+        assertEquals("aktorId123", oppfolgingsperiode.getAktorId());
         assertEquals(UUID.fromString("6aaadded-6d6a-4962-ae38-c9b4664a8d8c"), oppfolgingsperiode.getUuid());
         assertEquals("2021-05-11T10:40:37+02:00", oppfolgingsperiode.getStartDato().toString());
         assertNull(oppfolgingsperiode.getSluttDato());

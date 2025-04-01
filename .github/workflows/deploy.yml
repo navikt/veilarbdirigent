@@ -67,7 +67,7 @@ jobs:
 
   deploy-prod:
     name: Deploy application to prod
-    needs: deploy-dev
+    needs: [deploy-dev, test-build-and-push]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

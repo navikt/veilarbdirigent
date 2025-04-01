@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: ghcr.io/navikt/veilarbdirigent/veilarbdirigent:{{version}}
+  image: {{image}}
   ingresses:
     - https://veilarbdirigent.nais.adeo.no
     - https://app.adeo.no/veilarbdirigent

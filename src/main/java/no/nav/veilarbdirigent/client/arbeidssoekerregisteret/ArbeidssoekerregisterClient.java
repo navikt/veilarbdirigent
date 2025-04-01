@@ -118,7 +118,7 @@ public class ArbeidssoekerregisterClient {
         AvviksTypeResponse avviksType;
     }
 
-    enum AvviksTypeResponse {UKJENT_VERDI, FORSINKELSE, RETTING}
+    enum AvviksTypeResponse {UKJENT_VERDI, FORSINKELSE, RETTING, TIDSPUNKT_KORRIGERT}
 
     public enum ProfileringsResultat {UKJENT_VERDI, UDEFINERT, ANTATT_GODE_MULIGHETER, ANTATT_BEHOV_FOR_VEILEDNING, OPPGITT_HINDRINGER}
 }

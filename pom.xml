@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.4.4</version>
         <relativePath/>
     </parent>
 
@@ -194,7 +194,7 @@
     </dependencies>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <common.version>3.2024.04.10_12.03-fddb587e3a68</common.version>
 
         <!-- LOGGING -->
@@ -205,6 +205,7 @@
         <wiremock.version>3.0.0-beta-3</wiremock.version>
         <commons-io.version>2.11.0</commons-io.version>
         <commons-lang.version>3.12.0</commons-lang.version>
+        <okhttp.version>4.12.0</okhttp.version>
     </properties>
 
 
@@ -336,26 +337,6 @@
 
             <!-- SLUTT COMMON -->
 
-            <!-- spring -->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
-                <scope>test</scope>
-            </dependency>
-
-
-
-
             <dependency>
                 <groupId>com.github.everit-org.json-schema</groupId>
                 <artifactId>org.everit.json.schema</artifactId>
@@ -374,7 +355,7 @@
 
             <dependency>
                 <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-core</artifactId>
+                <artifactId>mmicrometer-registry-prometheus</artifactId>
             </dependency>
 
 

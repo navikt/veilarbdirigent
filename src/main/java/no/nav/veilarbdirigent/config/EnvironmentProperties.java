@@ -9,10 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.env")
 public class EnvironmentProperties {
     private String azureAdDiscoveryUrl;
-
     private String azureAdClientId;
-
     private String stsDiscoveryUrl;
-
-    private String abacUrl;
 }

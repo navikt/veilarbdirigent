@@ -121,14 +121,6 @@
         </dependency>
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>abac</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>sts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>auth</artifactId>
         </dependency>
         <dependency>
@@ -316,11 +308,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>abac</artifactId>
-                <version>${common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
                 <artifactId>types</artifactId>
                 <version>${common.version}</version>
             </dependency>
@@ -360,11 +347,6 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
                 <optional>true</optional>
             </dependency>
             <dependency>
@@ -440,12 +422,6 @@
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.oracle.database.jdbc</groupId>
-                <artifactId>ojdbc11</artifactId>
-                <version>${ojdbc.version}</version>
-            </dependency>
-
             <!--Testing-->
 
             <dependency>

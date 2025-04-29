@@ -5,7 +5,6 @@ import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.utils.TokenUtils;
-import no.nav.common.types.identer.AktorId;
 import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

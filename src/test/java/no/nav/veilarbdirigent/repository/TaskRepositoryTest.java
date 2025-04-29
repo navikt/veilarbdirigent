@@ -39,7 +39,9 @@ class TaskRepositoryTest {
 
     @AfterAll
     public static void cleanupAll() throws IOException {
-        postgres.close();
+        if (postgres != null) {
+            postgres.close();
+        }
     }
 
     private NamedParameterJdbcTemplate db = new NamedParameterJdbcTemplate(dataSource);

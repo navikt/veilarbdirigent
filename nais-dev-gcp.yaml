@@ -1,0 +1,63 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: veilarbdirigent
+  namespace: dab
+  labels:
+    team: dab
+spec:
+  image: {{image}}
+  port: 8080
+  prometheus:
+    enabled: true
+    path: veilarbdirigent/internal/prometheus
+  liveness:
+    path: veilarbdirigent/internal/isAlive
+    initialDelay: 60
+  readiness:
+    path: veilarbdirigent/internal/isReady
+    initialDelay: 60
+  replicas:
+    min: 1
+    max: 1 # It should be 1. Race condition problems may arise if this is greater
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: "2"
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 768Mi
+  secureLogs:
+    enabled: true
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_16
+        diskType: SSD
+        tier: db-f1-micro
+        databases:
+          - name: veilarbdirigent
+  kafka:
+    pool: nav-dev
+  accessPolicy:
+    outbound:
+      external:
+        - host: veilarboppfolging.intern.dev.nav.no
+  env:
+    - name: APP_ENVIRONMENT_NAME
+      value: q1
+    - name: VEILARBAKTIVITET_URL
+      value: https://veilarbaktivitet.intern.dev.nav.no
+    - name: VEILARBAKTIVITET_SCOPE
+      value: api://dev-gcp.dab.veilarbaktivitet/.default
+    - name: VEILARBOPPFOLGING_URL
+      value: https://veilarboppfolging.intern.dev.nav.no
+    - name: VEILARBOPPFOLGING_SCOPE
+      value: api://dev-gcp.poao.veilarboppfolging/.default
+    - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_URL
+      value: https://oppslag-arbeidssoekerregisteret.intern.dev.nav.no
+    - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_SCOPE
+      value: api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default
+  azure:
+    application:
+      enabled: true

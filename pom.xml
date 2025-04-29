@@ -70,15 +70,17 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+        </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>9.22.3</version>
         </dependency>
-        <dependency>
-            <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc11</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>kafka</artifactId>
@@ -170,10 +172,10 @@
             <scope>test</scope>
         </dependency>
 
-
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-postgres</artifactId>
+            <version>2.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

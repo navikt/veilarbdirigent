@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 @Configuration
 @EnableTransactionManagement
@@ -32,9 +32,10 @@ public class DbConfig {
     @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
+        // Url with credentials
         config.setJdbcUrl(datasourceProperties.url);
-        config.setUsername(datasourceProperties.username);
-        config.setPassword(datasourceProperties.password);
+//        config.setUsername(datasourceProperties.username);
+//        config.setPassword(datasourceProperties.password);
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 
@@ -53,12 +54,15 @@ public class DbConfig {
         return new JdbcTemplate(dataSource);
     }
 
-    public void migrateDb(DataSource dataSource) {
+    static public void migrateDb(DataSource dataSource) {
         var flyway = Flyway
                 .configure()
+                .baselineVersion(MigrationVersion.fromVersion("2"))
+                .baselineOnMigrate(true)
                 .table("schema_version")
                 .dataSource(dataSource)
                 .load();
+        flyway.baseline();
         flyway.migrate();
     }
 

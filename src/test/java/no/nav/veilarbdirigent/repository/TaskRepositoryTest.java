@@ -2,14 +2,19 @@ package no.nav.veilarbdirigent.repository;
 
 import io.vavr.Tuple;
 import io.vavr.collection.Map;
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import no.nav.veilarbdirigent.TestUtils;
-import no.nav.veilarbdirigent.mock.LocalH2Database;
+import no.nav.veilarbdirigent.config.DbConfig;
 import no.nav.veilarbdirigent.repository.domain.Task;
 import no.nav.veilarbdirigent.repository.domain.TaskStatus;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import javax.sql.DataSource;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +27,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TaskRepositoryTest {
 
-    private NamedParameterJdbcTemplate db = new NamedParameterJdbcTemplate(LocalH2Database.getDb());
+    static private EmbeddedPostgres postgres;
+    static private DataSource dataSource;
+
+    @BeforeAll
+    public static void setup() throws IOException {
+        postgres = EmbeddedPostgres.start();
+        DbConfig.migrateDb(postgres.getPostgresDatabase());
+        dataSource = postgres.getPostgresDatabase();
+    }
+
+    @AfterAll
+    public static void cleanupAll() throws IOException {
+        postgres.close();
+    }
+
+    private NamedParameterJdbcTemplate db = new NamedParameterJdbcTemplate(dataSource);
 
     private TaskRepository dao = new TaskRepository(db);
 

@@ -54,6 +54,8 @@ spec:
       value: https://veilarboppfolging.intern.dev.nav.no
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://dev-gcp.poao.veilarboppfolging/.default
+    - name: VEILARBMALVERK_URL
+      value: https://veilarbmalverk.dev-fss-pub.nais.io
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_URL
       value: https://oppslag-arbeidssoekerregisteret.intern.dev.nav.no
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_SCOPE

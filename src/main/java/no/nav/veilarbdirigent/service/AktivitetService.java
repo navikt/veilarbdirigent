@@ -22,7 +22,7 @@ public class AktivitetService {
         var gjeldendeOppfolgingsPeriode = veilarboppfolgingClient.hentOppfolgingsperioder(aktorOppslagClient.hentFnr(aktorId))
                 .stream().filter(periode -> periode.getSluttDato() == null).findFirst();
         return gjeldendeOppfolgingsPeriode.map((periode) -> veilarbmalverkClient
-                .hentMal(malName)
+                .hentMal(malName) // cv_jobbprofil_aktivitet
                 .flatMap((template) -> veilarbaktivitetClient.lagAktivitet(template, periode.getUuid())))
                 .orElse(Try.failure(new IllegalStateException("Ingen åpne perioder (bruker ikke under oppfolging)")));
     }

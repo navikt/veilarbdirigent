@@ -32,10 +32,10 @@ public class DbConfig {
     @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
-        // Url with credentials
+        config.setDriverClassName("org.postgresql.Driver");
         config.setJdbcUrl(datasourceProperties.url);
-//        config.setUsername(datasourceProperties.username);
-//        config.setPassword(datasourceProperties.password);
+        config.setUsername(datasourceProperties.username);
+        config.setPassword(datasourceProperties.password);
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 
@@ -73,6 +73,7 @@ public class DbConfig {
         String url;
         String username;
         String password;
+        String database;
     }
 
 }

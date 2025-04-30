@@ -32,10 +32,11 @@ public class DbConfig {
     @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
-        config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+//        config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
         config.setJdbcUrl(datasourceProperties.url);
-        config.setUsername(datasourceProperties.username);
-        config.setPassword(datasourceProperties.password);
+//        config.setUsername(datasourceProperties.username);
+//        config.setPassword(datasourceProperties.password);
+//        config.setPassword(datasourceProperties.password);
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 

@@ -32,8 +32,8 @@ public class DbConfig {
     @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
-//        config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
         config.setJdbcUrl(datasourceProperties.url);
+        config.setDriverClassName(org.postgresql.Driver.class.getName());
 //        config.setUsername(datasourceProperties.username);
 //        config.setPassword(datasourceProperties.password);
 //        config.setPassword(datasourceProperties.password);

@@ -13,7 +13,6 @@ import no.nav.common.metrics.MetricsClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.token_client.client.MachineToMachineTokenClient;
-import no.nav.common.utils.Credentials;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import static no.nav.common.utils.EnvironmentUtils.isProduction;
-import static no.nav.common.utils.NaisUtils.getCredentials;
 import static no.nav.common.utils.UrlUtils.createServiceUrl;
 
 @Slf4j
@@ -31,11 +29,6 @@ import static no.nav.common.utils.UrlUtils.createServiceUrl;
 public class ApplicationConfig {
 
     public static final String APPLICATION_NAME = "veilarbdirigent";
-
-    @Bean
-    public Credentials serviceUserCredentials() {
-        return getCredentials("service_user");
-    }
 
     @Bean
     public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {

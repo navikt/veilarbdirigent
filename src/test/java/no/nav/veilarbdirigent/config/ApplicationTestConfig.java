@@ -4,7 +4,6 @@ import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.utils.Credentials;
 import no.nav.veilarbdirigent.controller.AdminController;
 import no.nav.veilarbdirigent.mock.MetricsClientMock;
 import no.nav.veilarbdirigent.repository.TaskRepository;
@@ -30,11 +29,6 @@ import static org.mockito.Mockito.when;
         FilterTestConfig.class
 })
 public class ApplicationTestConfig {
-
-    @Bean
-    public Credentials serviceUserCredentials() {
-        return new Credentials("username", "password");
-    }
 
     @Bean
     public AktorOppslagClient aktorOppslagClient() {

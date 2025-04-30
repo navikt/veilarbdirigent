@@ -29,7 +29,7 @@ public class DbConfig {
     private final DatasourceProperties datasourceProperties;
 
 
-    @Bean
+//    @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
         config.setJdbcUrl(datasourceProperties.url);

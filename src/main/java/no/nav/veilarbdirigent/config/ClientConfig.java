@@ -5,8 +5,6 @@ import no.nav.common.token_client.client.MachineToMachineTokenClient;
 import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.ArbeidssoekerregisterClient;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClientImpl;
-import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
-import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClientImpl;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClientImpl;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,9 +24,6 @@ public class ClientConfig {
     @Value("${app.env.veilarboppfolgingScope}")
     private String veilarboppfolgingScope;
 
-    @Value("${app.env.veilarbmalverkUrl}")
-    private String veilarbmalverkUrl;
-
     @Value("${app.env.arbeidsokerRegisterertOppslagUrl}")
     private String arbeidsokerRegisterertOppslagUrl;
     @Value("${app.env.arbeidsokerRegisterertOppslagScope}")
@@ -42,11 +37,6 @@ public class ClientConfig {
     @Bean
     public VeilarboppfolgingClient veilarboppfolgingClient(AzureAdMachineToMachineTokenClient tokenClient) {
         return new VeilarboppfolgingClientImpl(veilarboppfolgingUrl, () -> tokenClient.createMachineToMachineToken(veilarboppfolgingScope));
-    }
-
-    @Bean
-    public VeilarbmalverkClient veilarbmalverkClient() {
-        return new VeilarbmalverkClientImpl(veilarbmalverkUrl);
     }
 
     @Bean

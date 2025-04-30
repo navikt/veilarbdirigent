@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.types.identer.AktorId;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
-import no.nav.veilarbdirigent.client.veilarbmalverk.VeilarbmalverkClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +13,17 @@ import org.springframework.stereotype.Service;
 public class AktivitetService {
 
     private final VeilarbaktivitetClient veilarbaktivitetClient;
-    private final VeilarbmalverkClient veilarbmalverkClient;
     private final VeilarboppfolgingClient veilarboppfolgingClient;
     private final AktorOppslagClient aktorOppslagClient;
+    private final AktivitetTemplateProviderService aktivitetTemplateProviderService;
 
     public Try<String> opprettAktivitetForBrukerMedMal(AktorId aktorId, String malName) {
         var gjeldendeOppfolgingsPeriode = veilarboppfolgingClient.hentOppfolgingsperioder(aktorOppslagClient.hentFnr(aktorId))
                 .stream().filter(periode -> periode.getSluttDato() == null).findFirst();
-        return gjeldendeOppfolgingsPeriode.map((periode) -> veilarbmalverkClient
-                .hentMal(malName) // cv_jobbprofil_aktivitet
-                .flatMap((template) -> veilarbaktivitetClient.lagAktivitet(template, periode.getUuid())))
+        return gjeldendeOppfolgingsPeriode
+                .map((periode) -> veilarbaktivitetClient
+                        .lagAktivitet(aktivitetTemplateProviderService.getCvJobbprofilAktivitetMal(), periode.getUuid())
+                )
                 .orElse(Try.failure(new IllegalStateException("Ingen åpne perioder (bruker ikke under oppfolging)")));
     }
 

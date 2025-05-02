@@ -8,6 +8,7 @@ import no.nav.common.client.aktoroppslag.CachedAktorOppslagClient;
 import no.nav.common.client.aktoroppslag.PdlAktorOppslagClient;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.ShedLockLeaderElectionClient;
+import no.nav.common.metrics.Event;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
@@ -18,6 +19,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.Map;
 
 import static no.nav.common.utils.EnvironmentUtils.isProduction;
 import static no.nav.common.utils.UrlUtils.createServiceUrl;
@@ -50,7 +53,17 @@ public class ApplicationConfig {
 
     @Bean
     public MetricsClient metricsClient() {
-        return new InfluxClient();
+        return new MetricsClient() {
+            @Override
+            public void report(Event event) {
+                // TODO: Implement metrics reporting
+            }
+
+            @Override
+            public void report(String s, Map<String, Object> map, Map<String, String> map1, long l) {
+                // TODO: Implement metrics reporting
+            }
+        };
     }
 
     @Bean

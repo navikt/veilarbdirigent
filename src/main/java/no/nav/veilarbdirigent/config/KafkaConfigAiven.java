@@ -10,7 +10,7 @@ import no.nav.common.kafka.consumer.feilhandtering.backoff.LinearBackoffStrategy
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder;
 import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder;
 import no.nav.common.kafka.consumer.util.deserializer.Deserializers;
-import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
+import no.nav.common.kafka.spring.PostgresJdbcTemplateConsumerRepository;
 import no.nav.veilarbdirigent.service.OppfolgingPeriodeService;
 import no.nav.veilarbdirigent.service.OppfolgingsperiodeDto;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import static no.nav.common.kafka.consumer.util.ConsumerUtils.findConsumerConfigsWithStoreOnFailure;
 import static no.nav.common.kafka.util.KafkaPropertiesPreset.aivenDefaultConsumerProperties;
@@ -46,7 +45,7 @@ public class KafkaConfigAiven {
 
     public KafkaConfigAiven(JdbcTemplate jdbcTemplate, OppfolgingPeriodeService oppfolgingPeriodeService){
         MeterRegistry prometheusMeterRegistry = new MetricsReporter.ProtectedPrometheusMeterRegistry();
-        KafkaConsumerRepository consumerRepository = new OracleJdbcTemplateConsumerRepository(jdbcTemplate);
+        KafkaConsumerRepository consumerRepository = new PostgresJdbcTemplateConsumerRepository(jdbcTemplate);
         List<KafkaConsumerClientBuilder.TopicConfig<?, ?>> topicConfigsAiven =
                 List.of(
                         new KafkaConsumerClientBuilder.TopicConfig<String, OppfolgingsperiodeDto>()

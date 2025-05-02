@@ -41,6 +41,11 @@ spec:
     pool: nav-dev
   accessPolicy:
     outbound:
+      rules:
+        - application: veilarboppfolging
+          namespace: poao
+        - application: veilarbaktivitet
+          namespace: dab
       external:
         - host: veilarboppfolging.intern.dev.nav.no
   env:

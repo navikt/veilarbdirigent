@@ -58,12 +58,9 @@ public class DbConfig {
     static public void migrateDb(DataSource dataSource) {
         var flyway = Flyway
                 .configure()
-                .baselineVersion(MigrationVersion.fromVersion("2"))
-                .baselineOnMigrate(true)
                 .table("schema_version")
                 .dataSource(dataSource)
                 .load();
-        flyway.baseline();
         flyway.migrate();
     }
 

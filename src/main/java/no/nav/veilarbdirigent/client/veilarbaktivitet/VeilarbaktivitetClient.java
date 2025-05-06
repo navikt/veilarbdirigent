@@ -9,4 +9,6 @@ public interface VeilarbaktivitetClient {
 
     Try<String> lagAktivitet(String data, UUID oppfolgingsPeriodeId);
 
+    Try<Boolean> getKafkaFeatureToggle();
+
 }

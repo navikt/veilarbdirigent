@@ -41,7 +41,7 @@ public class DbConfig {
         config.setMinimumIdle(2);
 
         var dataSource = new HikariDataSource(config);
-        migrateDb(dataSource);
+//        migrateDb(dataSource);
         return dataSource;
     }
 

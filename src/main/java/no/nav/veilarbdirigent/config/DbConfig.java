@@ -33,6 +33,7 @@ public class DbConfig {
     public DataSource dataSource() {
         var config = new HikariConfig();
         config.setJdbcUrl(datasourceProperties.url);
+        config.setDriverClassName("oracle.jdbc.OracleDriver");
         config.setUsername(datasourceProperties.username);
         config.setPassword(datasourceProperties.password);
         config.setMaximumPoolSize(10);

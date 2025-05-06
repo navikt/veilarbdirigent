@@ -17,7 +17,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 @Configuration
 @EnableTransactionManagement
@@ -29,7 +28,7 @@ public class DbConfig {
     private final DatasourceProperties datasourceProperties;
 
 
-    @Bean
+//    @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
         config.setJdbcUrl(datasourceProperties.url);

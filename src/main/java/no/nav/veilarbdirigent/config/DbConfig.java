@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.utils.NaisUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,14 +28,16 @@ public class DbConfig {
 
     private final DatasourceProperties datasourceProperties;
 
-
-//    @Bean
+    @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
-        config.setJdbcUrl(datasourceProperties.url);
+        var jdbcUrl = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_config/jdbc_url");
+        var username = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_creds/username");
+        var password = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_creds/password");
+        config.setJdbcUrl(jdbcUrl);
         config.setDriverClassName("oracle.jdbc.OracleDriver");
-        config.setUsername(datasourceProperties.username);
-        config.setPassword(datasourceProperties.password);
+        config.setUsername(username);
+        config.setPassword(password);
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 

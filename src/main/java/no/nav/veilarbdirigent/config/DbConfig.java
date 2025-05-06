@@ -35,7 +35,6 @@ public class DbConfig {
         var username = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_creds/username");
         var password = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_creds/password");
         config.setJdbcUrl(jdbcUrl);
-        config.setDriverClassName("oracle.jdbc.OracleDriver");
         config.setUsername(username);
         config.setPassword(password);
         config.setMaximumPoolSize(10);

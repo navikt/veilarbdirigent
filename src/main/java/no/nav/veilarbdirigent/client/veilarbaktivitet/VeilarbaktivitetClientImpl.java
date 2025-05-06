@@ -72,7 +72,7 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
                 .addHeader(AUTHORIZATION, createBearerToken(serviceTokenSupplier.get()))
                 .build();
         try(Response response = client.newCall(request).execute()) {
-            Map<String, String> map = JsonUtils.fromJson(response.body().string(), Map.class);
+            Map<String, Boolean> map = JsonUtils.fromJson(response.body().string(), Map.class);
             return Try.success(map.get(KAFKA_CONSUMER_FEATURE_TOGGLE_NAME).equals("true"));
         } catch (Exception e) {
             return Try.failure(e);

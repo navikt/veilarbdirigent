@@ -47,11 +47,8 @@ public class KafkaConfigAiven {
     private final List<KafkaConsumerClient> consumerClientAiven;
 
     public Boolean isConsumerToggledOn() {
-        var result = veilarbaktivitetClient.getKafkaFeatureToggle();
-        var isConsumerDisabled = result
-                .onFailure((error) -> {
-                    log.error("Failed to fetch Kafka feature toggle", error);
-                })
+        var isConsumerDisabled = veilarbaktivitetClient.isOppfolgingsperiodeConsumerDisabledToggle()
+                .onFailure((error) -> log.error("Failed to fetch Kafka feature toggle", error))
                 .getOrElse(true); // Default to disabled consumer if the call fails
         return !isConsumerDisabled;
     }

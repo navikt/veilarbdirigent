@@ -73,7 +73,7 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
                 .build();
         try(Response response = client.newCall(request).execute()) {
             Map<String, Boolean> map = JsonUtils.fromJson(response.body().string(), Map.class);
-            var isDisabled = map.get(KAFKA_CONSUMER_FEATURE_TOGGLE_NAME);
+            Boolean isDisabled = map.get(KAFKA_CONSUMER_FEATURE_TOGGLE_NAME);
             return Try.success(isDisabled);
         } catch (Exception e) {
             return Try.failure(e);

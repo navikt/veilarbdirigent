@@ -46,11 +46,11 @@ public class KafkaConfigAiven {
     private final VeilarbaktivitetClient veilarbaktivitetClient;
     private final List<KafkaConsumerClient> consumerClientAiven;
 
-    public Boolean isConsumerToggledOn() {
+    public Boolean isConsumerToggledOff() {
         var isConsumerDisabled = veilarbaktivitetClient.isOppfolgingsperiodeConsumerDisabledToggle()
                 .onFailure((error) -> log.error("Failed to fetch Kafka feature toggle", error))
                 .getOrElse(true); // Default to disabled consumer if the call fails
-        return !isConsumerDisabled;
+        return isConsumerDisabled;
     }
 
     public KafkaConfigAiven(JdbcTemplate jdbcTemplate, OppfolgingPeriodeService oppfolgingPeriodeService, VeilarbaktivitetClient veilarbaktivitetClient){
@@ -80,7 +80,7 @@ public class KafkaConfigAiven {
                         KafkaConsumerClientBuilder.builder()
                                 .withProperties(aivenConsumerProperties)
                                 .withTopicConfig(config)
-                                .withToggle(this::isConsumerToggledOn)
+                                .withToggle(this::isConsumerToggledOff)
                                 .build())
                 .toList();
 

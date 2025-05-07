@@ -1,15 +1,8 @@
 package no.nav.veilarbdirigent.config;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationVersion;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,30 +14,9 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-@EnableConfigurationProperties(DbConfig.DatasourceProperties.class)
 @RequiredArgsConstructor
 @Slf4j
 public class DbConfig {
-
-    private final DatasourceProperties datasourceProperties;
-
-
-//    @Bean
-    public DataSource dataSource() {
-        var config = new HikariConfig();
-        config.setJdbcUrl(datasourceProperties.url);
-        config.setDriverClassName(org.postgresql.Driver.class.getName());
-//        config.setUsername(datasourceProperties.username);
-//        config.setPassword(datasourceProperties.password);
-//        config.setPassword(datasourceProperties.password);
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(2);
-
-        var dataSource = new HikariDataSource(config);
-        migrateDb(dataSource);
-        return dataSource;
-    }
-
     @Bean
     public PlatformTransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
@@ -63,15 +35,4 @@ public class DbConfig {
                 .load();
         flyway.migrate();
     }
-
-    @Getter
-    @Setter
-    @ConfigurationProperties(prefix = "app.datasource")
-    public static class DatasourceProperties {
-        String url;
-        String username;
-        String password;
-        String database;
-    }
-
 }

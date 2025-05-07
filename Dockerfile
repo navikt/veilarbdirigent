@@ -14,4 +14,4 @@ RUN /bin/mkdir /secure-logs
 RUN chown nonroot /secure-logs
 EXPOSE 8080
 USER nonroot
-CMD ["app.jar"]
+ENTRYPOINT ["/bin/sh", "-c", "java $JAVA_PROXY_OPTIONS -jar app.jar"]

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.utils.NaisUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 @Configuration
 @EnableTransactionManagement
@@ -28,18 +28,20 @@ public class DbConfig {
 
     private final DatasourceProperties datasourceProperties;
 
-
     @Bean
     public DataSource dataSource() {
         var config = new HikariConfig();
-        config.setJdbcUrl(datasourceProperties.url);
-        config.setUsername(datasourceProperties.username);
-        config.setPassword(datasourceProperties.password);
+        var jdbcUrl = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_config/jdbc_url");
+        var username = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_creds/username");
+        var password = NaisUtils.getFileContent("/var/run/secrets/nais.io/oracle_creds/password");
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername(username);
+        config.setPassword(password);
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 
         var dataSource = new HikariDataSource(config);
-        migrateDb(dataSource);
+//        migrateDb(dataSource);
         return dataSource;
     }
 

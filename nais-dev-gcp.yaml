@@ -48,6 +48,8 @@ spec:
           namespace: dab
         - application: paw-arbeidssoekerregisteret-api-oppslag
           namespace: paw
+      external:
+        - host: pdl-api.dev-fss-pub.nais.io
   env:
     - name: APP_ENVIRONMENT_NAME
       value: q1

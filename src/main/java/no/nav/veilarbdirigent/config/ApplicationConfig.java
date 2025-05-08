@@ -13,6 +13,7 @@ import no.nav.common.metrics.MetricsClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.token_client.client.MachineToMachineTokenClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,11 @@ public class ApplicationConfig {
 
     public static final String APPLICATION_NAME = "veilarbdirigent";
 
+    @Value("${app.env.pdlUrl}")
+    private String pdlUrl;
+    @Value("${app.env.pdlScope}")
+    private String pdlScope;
+
     @Bean
     public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
         return AzureAdTokenClientBuilder.builder()
@@ -41,12 +47,9 @@ public class ApplicationConfig {
 
     @Bean
     public AktorOppslagClient aktorregisterClient(MachineToMachineTokenClient tokenClient) {
-        String tokenScop = String.format("api://%s-fss.pdl.pdl-api/.default",
-                isProduction().orElse(false) ? "prod" : "dev"
-        );
         return new CachedAktorOppslagClient(new PdlAktorOppslagClient(
-                createServiceUrl("pdl-api", "pdl", false),
-                () -> tokenClient.createMachineToMachineToken(tokenScop))
+                pdlUrl,
+                () -> tokenClient.createMachineToMachineToken(pdlScope))
         );
     }
 

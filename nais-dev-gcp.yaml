@@ -63,6 +63,10 @@ spec:
       value: https://oppslag-arbeidssoekerregisteret.intern.dev.nav.no
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_SCOPE
       value: api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default
+    - name: PDL_URL
+      value: "https://pdl-api.dev-fss-pub.nais.io"
+    - name: PDL_SCOPE
+      value: "api://dev-fss.pdl.pdl-api/.default"
   azure:
     application:
       enabled: true

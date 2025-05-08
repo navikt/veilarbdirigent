@@ -54,11 +54,11 @@ spec:
     - name: APP_ENVIRONMENT_NAME
       value: q1
     - name: VEILARBAKTIVITET_URL
-      value: https://veilarbaktivitet.intern.dev.nav.no
+      value: http://veilarbaktivitet
     - name: VEILARBAKTIVITET_SCOPE
       value: api://dev-gcp.dab.veilarbaktivitet/.default
     - name: VEILARBOPPFOLGING_URL
-      value: https://veilarboppfolging.intern.dev.nav.no
+      value: http://veilarboppfolging
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://dev-gcp.poao.veilarboppfolging/.default
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_URL

@@ -62,7 +62,7 @@ spec:
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://dev-gcp.poao.veilarboppfolging/.default
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_URL
-      value: https://oppslag-arbeidssoekerregisteret.intern.dev.nav.no
+      value: http://paw-arbeidssoekerregisteret-api-oppslag.paw
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_SCOPE
       value: api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default
     - name: PDL_URL

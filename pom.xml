@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>4.43.0</version>
+            <version>6.4.0</version>
         </dependency>
 
         <dependency>
@@ -70,15 +70,23 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+        </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc11</artifactId>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway.version}</version>
+            <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>kafka</artifactId>
@@ -110,14 +118,6 @@
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>abac</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>sts</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
@@ -170,11 +170,22 @@
             <scope>test</scope>
         </dependency>
 
-
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-postgres</artifactId>
+            <version>2.1.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.19.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
@@ -195,7 +206,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>3.2024.04.10_12.03-fddb587e3a68</common.version>
+        <common.version>3.2025.04.01_09.46-936a3ae3d5d9</common.version>
 
         <!-- LOGGING -->
         <janino.version>3.1.8</janino.version>
@@ -206,6 +217,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <commons-lang.version>3.12.0</commons-lang.version>
         <okhttp.version>4.12.0</okhttp.version>
+        <flyway.version>11.8.0</flyway.version>
     </properties>
 
 
@@ -296,11 +308,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>abac</artifactId>
-                <version>${common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
                 <artifactId>types</artifactId>
                 <version>${common.version}</version>
             </dependency>
@@ -340,11 +347,6 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
                 <optional>true</optional>
             </dependency>
             <dependency>
@@ -420,12 +422,6 @@
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.oracle.database.jdbc</groupId>
-                <artifactId>ojdbc11</artifactId>
-                <version>${ojdbc.version}</version>
-            </dependency>
-
             <!--Testing-->
 
             <dependency>

@@ -52,7 +52,7 @@ public class TaskRepository {
                 .addValue("id", taskId);
 
         var sql = """
-                SELECT * FROM TASK WHERE ID = :id FETCH FIRST 1 ROW ONLY
+                SELECT * FROM TASK WHERE ID = :id LIMIT 1
                 """;
 
         RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
@@ -69,7 +69,7 @@ public class TaskRepository {
                 .addValue("id", taskId);
 
         var sql = """
-                SELECT * FROM TASK WHERE ID = :id FETCH FIRST 1 ROW ONLY
+                SELECT * FROM TASK WHERE ID = :id LIMIT 1
                 """;
 
         RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
@@ -89,7 +89,7 @@ public class TaskRepository {
                 SELECT * FROM TASK WHERE STATUS IN (:statuser)
                 AND NEXT_ATTEMPT <= CURRENT_TIMESTAMP
                 ORDER BY CREATED
-                FETCH FIRST :limit ROWS ONLY
+                LIMIT :limit
                 """;
         RowMapper<Task> rowmapper = (rs, rowNum) -> toTask(rs);
         return jdbc.query(sql, params, rowmapper);

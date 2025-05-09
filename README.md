@@ -6,7 +6,9 @@ Microservice som dirigerer oppgaver mellom ulike FO-applikasjoner.
 - Bedskjeder kommer inn i systemet fra diverse input. Dette kan være ulike feeds eller REST endepunkter
 - Bedskjedene blir oversatt til en eller flere oppgaver og lagret for sennere utførelse av systemet.
 - Oppgavene ikke fullført blir periodisk plukket opp og prøvd utført. Hvis utførelsen feiler så vil oppgaven bli plukket opp på et sennere tidspunkt, som øker ved hver feilende utførelse. 
-- Utførelsene av oppgavene er forskjellig basert på oppgave typen. Det kan være disse blir oversatt til utgående bedskjeder og sendt til andre systemer. Resultat av utførelsen av oppgaven blir alltid lagret og status oppdatert, både når ting funker og feiler. 
+- Utførelsene av oppgavene er forskjellig basert på oppgave typen. Det kan være disse blir oversatt til utgående bedskjeder og sendt til andre systemer. Resultat av utførelsen av oppgaven blir alltid lagret og status oppdatert, både når ting funker og feiler.
+
+![Skjermbilde 2025-05-08 kl  08 50 44](https://github.com/user-attachments/assets/743a3499-e8bb-4ffe-9cce-7804df6a2a87)
 
 ### Komme i gang
 

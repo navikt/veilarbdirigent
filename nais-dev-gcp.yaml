@@ -58,7 +58,7 @@ spec:
     - name: VEILARBAKTIVITET_SCOPE
       value: api://dev-gcp.dab.veilarbaktivitet/.default
     - name: VEILARBOPPFOLGING_URL
-      value: http://veilarboppfolging.dab
+      value: http://veilarboppfolging.poao
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://dev-gcp.poao.veilarboppfolging/.default
     - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_URL

@@ -15,7 +15,7 @@ public class AktivitetTemplateProviderService {
 
     public String getCvJobbprofilAktivitetMal() {
         try {
-            ClassPathResource resource = new ClassPathResource("cv_jobbprofil_aktivitet.json");
+            ClassPathResource resource = new ClassPathResource("template/cv_jobbprofil_aktivitet.json");
             InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
             var templateString = FileCopyUtils.copyToString(reader);
             var now = ZonedDateTime.now();

@@ -95,7 +95,7 @@ public class KafkaConfigAiven {
     }
 
 
-    @PostConstruct
+//    @PostConstruct
     public void start() {
         consumerRecordProcessor.start();
         consumerClientAiven.forEach(KafkaConsumerClient::start);

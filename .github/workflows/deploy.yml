@@ -49,7 +49,7 @@ jobs:
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
-          team: pto
+          team: dab
 
   deploy-dev:
     name: Deploy application to dev

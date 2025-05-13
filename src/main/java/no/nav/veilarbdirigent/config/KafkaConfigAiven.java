@@ -11,7 +11,7 @@ import no.nav.common.kafka.consumer.feilhandtering.backoff.LinearBackoffStrategy
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder;
 import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder;
 import no.nav.common.kafka.consumer.util.deserializer.Deserializers;
-import no.nav.common.kafka.spring.OracleJdbcTemplateConsumerRepository;
+import no.nav.common.kafka.spring.PostgresJdbcTemplateConsumerRepository;
 import no.nav.veilarbdirigent.client.veilarbaktivitet.VeilarbaktivitetClient;
 import no.nav.veilarbdirigent.service.OppfolgingPeriodeService;
 import no.nav.veilarbdirigent.service.OppfolgingsperiodeDto;
@@ -57,7 +57,7 @@ public class KafkaConfigAiven {
         this.veilarbaktivitetClient = veilarbaktivitetClient;
 
         MeterRegistry prometheusMeterRegistry = new MetricsReporter.ProtectedPrometheusMeterRegistry();
-        KafkaConsumerRepository consumerRepository = new OracleJdbcTemplateConsumerRepository(jdbcTemplate);
+        KafkaConsumerRepository consumerRepository = new PostgresJdbcTemplateConsumerRepository(jdbcTemplate);
         List<KafkaConsumerClientBuilder.TopicConfig<?, ?>> topicConfigsAiven =
                 List.of(
                         new KafkaConsumerClientBuilder.TopicConfig<String, OppfolgingsperiodeDto>()
@@ -95,7 +95,7 @@ public class KafkaConfigAiven {
     }
 
 
-//    @PostConstruct
+    @PostConstruct
     public void start() {
         consumerRecordProcessor.start();
         consumerClientAiven.forEach(KafkaConsumerClient::start);

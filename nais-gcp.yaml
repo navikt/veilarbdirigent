@@ -1,0 +1,75 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: veilarbdirigent
+  namespace: dab
+  labels:
+    team: dab
+spec:
+  image: {{image}}
+  port: 8080
+  prometheus:
+    enabled: true
+    path: veilarbdirigent/internal/prometheus
+  liveness:
+    path: veilarbdirigent/internal/isAlive
+    initialDelay: 15
+  readiness:
+    path: veilarbdirigent/internal/isReady
+    initialDelay: 15
+  replicas:
+    min: 1
+    max: 1 # It should be 1. Race condition problems may arise if this is greater
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  secureLogs:
+    enabled: true
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_16
+        diskType: SSD
+        tier: db-f1-micro
+        databases:
+          - name: veilarbdirigent
+  kafka:
+    pool: nav-prod
+  accessPolicy:
+    outbound:
+      rules:
+        - application: veilarboppfolging
+          namespace: poao
+        - application: veilarbaktivitet
+          namespace: dab
+        - application: paw-arbeidssoekerregisteret-api-oppslag
+          namespace: paw
+      external:
+        - host: pdl-api.prod-fss-pub.nais.io
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+  env:
+    - name: VEILARBAKTIVITET_URL
+      value: http://veilarbaktivitet
+    - name: VEILARBAKTIVITET_SCOPE
+      value: api://prod-gcp.dab.veilarbaktivitet/.default
+    - name: VEILARBOPPFOLGING_URL
+      value: http://veilarboppfolging.poao
+    - name: VEILARBOPPFOLGING_SCOPE
+      value: api://prod-gcp.poao.veilarboppfolging/.default
+    - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_URL
+      value: http://paw-arbeidssoekerregisteret-api-oppslag.paw
+    - name: ARBEIDSSOKER_REGISTERET_OPPSLAG_SCOPE
+      value: api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default
+    - name: PDL_URL
+      value: https://pdl-api.prod-fss-pub.nais.io
+    - name: PDL_SCOPE
+      value: api://prod-fss.pdl.pdl-api/.default
+  azure:
+    application:
+      enabled: true

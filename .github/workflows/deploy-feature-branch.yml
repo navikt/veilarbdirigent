@@ -38,11 +38,12 @@ jobs:
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
-          team: pto
+          team: dab
 
   deploy-dev:
     name: Deploy application to dev
     needs: test-build-and-push
+    environment: dev-gcp
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,6 +51,6 @@ jobs:
       - name: Deploy application
         uses: nais/deploy/actions/deploy@v2
         env:
-          CLUSTER: dev-fss
-          RESOURCE: nais-dev.yaml
+          CLUSTER: dev-gcp
+          RESOURCE: nais-dev-gcp.yaml
           VAR: image=${{ needs.test-build-and-push.outputs.image }}

@@ -1,11 +1,10 @@
 package no.nav.veilarbdirigent.config;
 
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import no.nav.common.client.aktoroppslag.AktorOppslagClient;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.utils.Credentials;
 import no.nav.veilarbdirigent.controller.AdminController;
-import no.nav.veilarbdirigent.mock.LocalH2Database;
 import no.nav.veilarbdirigent.mock.MetricsClientMock;
 import no.nav.veilarbdirigent.repository.TaskRepository;
 import org.mockito.Mockito;
@@ -18,6 +17,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
+import java.io.IOException;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,11 +29,6 @@ import static org.mockito.Mockito.when;
         FilterTestConfig.class
 })
 public class ApplicationTestConfig {
-
-    @Bean
-    public Credentials serviceUserCredentials() {
-        return new Credentials("username", "password");
-    }
 
     @Bean
     public AktorOppslagClient aktorOppslagClient() {
@@ -57,13 +53,14 @@ public class ApplicationTestConfig {
     }
 
     @Bean
-    public DataSource dataSource() {
-        return LocalH2Database.getDb().getDataSource();
+    public DataSource dataSource() throws IOException {
+        var db = EmbeddedPostgres.start();
+        return db.getPostgresDatabase();
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate() {
-        return LocalH2Database.getDb();
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 
 }

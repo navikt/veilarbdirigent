@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Service
@@ -18,7 +19,7 @@ public class AktivitetTemplateProviderService {
             ClassPathResource resource = new ClassPathResource("template/cv_jobbprofil_aktivitet.json");
             InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
             var templateString = FileCopyUtils.copyToString(reader);
-            var now = ZonedDateTime.now().toOffsetDateTime();
+            var now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Z"));
             return templateString
                 .replace("{{FRADATO}}", now.toString())
                 .replace("{{TILDATO}}", now.plusDays(8).toString());

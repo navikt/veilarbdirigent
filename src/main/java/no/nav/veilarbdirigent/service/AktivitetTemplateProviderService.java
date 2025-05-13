@@ -18,7 +18,7 @@ public class AktivitetTemplateProviderService {
             ClassPathResource resource = new ClassPathResource("template/cv_jobbprofil_aktivitet.json");
             InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
             var templateString = FileCopyUtils.copyToString(reader);
-            var now = ZonedDateTime.now();
+            var now = ZonedDateTime.now().toOffsetDateTime();
             return templateString
                 .replace("{{FRADATO}}", now.toString())
                 .replace("{{TILDATO}}", now.plusDays(8).toString());

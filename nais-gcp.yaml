@@ -49,6 +49,10 @@ spec:
           namespace: paw
       external:
         - host: pdl-api.prod-fss-pub.nais.io
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   env:
     - name: VEILARBAKTIVITET_URL
       value: http://veilarbaktivitet

@@ -57,6 +57,7 @@ public class ArbeidssoekerregisterClient {
             if (samletInformasjon.arbeidssoekerperioder.size() > 1) {
                 throw new RuntimeException("Mottok fler enn en arbeidssøkerperioder - dette skal aldri skje");
             }
+            log.info("Suksess: Hentet siste samlet-informasjon");
             return new SisteSamletInformasjon(
                     samletInformasjon.arbeidssoekerperioder.stream().findFirst(),
                     samletInformasjon.profileringer.stream().findFirst()
@@ -110,8 +111,7 @@ public class ArbeidssoekerregisterClient {
 
     enum BrukerType {UKJENT_VERDI, UDEFINERT, VEILEDER, SYSTEM, SLUTTBRUKER}
 
-    record SamletInformasjonRequest(String identitetsnummer) {
-    }
+    record SamletInformasjonRequest(String identitetsnummer) { }
 
     static class TidspunktFraKildeResponse {
         ZonedDateTime tidspunkt;

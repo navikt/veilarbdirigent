@@ -45,7 +45,7 @@ spec:
           namespace: poao
         - application: veilarbaktivitet
           namespace: dab
-        - application: paw-arbeidssoekerregisteret-api-oppslag
+        - application: paw-arbeidssoekerregisteret-api-oppslag-v2
           namespace: paw
       external:
         - host: pdl-api.prod-fss-pub.nais.io

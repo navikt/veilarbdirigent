@@ -28,8 +28,6 @@ spec:
     requests:
       cpu: 200m
       memory: 768Mi
-  secureLogs:
-    enabled: true
   gcp:
     sqlInstances:
       - type: POSTGRES_16

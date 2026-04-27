@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.common.health.selftest.SelfTestCheck;
 import no.nav.common.health.selftest.SelfTestUtils;
 import no.nav.common.health.selftest.SelftTestCheckResult;
@@ -19,6 +20,7 @@ import java.util.List;
 import static no.nav.common.health.selftest.SelfTestUtils.checkAllParallel;
 import static no.nav.veilarbdirigent.utils.DbUtils.checkDbHealth;
 
+@Slf4j
 @RestController
 @RequestMapping("/internal")
 public class InternalController {
@@ -35,12 +37,17 @@ public class InternalController {
     }
 
     @GetMapping("/isReady")
-    public void isReady() { }
+    public void isReady() {
+        log.info("Appen er ready");
+    }
 
     @GetMapping("/isAlive")
     public void isAlive() {
         if (checkDbHealth(db).isUnhealthy()) {
+            log.warn("Alive rapporterer unhealthy");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            log.info("Alive rapporterer healthy");
         }
     }
 

@@ -61,7 +61,6 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
 
     @Override
     public Try<Boolean> isOppfolgingsperiodeConsumerDisabledToggle() {
-        log.info("Gjør kall til veilarbaktivitet..");
         String url = UrlUtils.joinPaths(apiUrl, format("/veilarbaktivitet/api/feature?feature=%s", KAFKA_CONSUMER_FEATURE_TOGGLE_NAME));
         Request request = new Request.Builder()
                 .url(url)
@@ -69,7 +68,6 @@ public class VeilarbaktivitetClientImpl implements VeilarbaktivitetClient {
                 .addHeader(AUTHORIZATION, createBearerToken(serviceTokenSupplier.get()))
                 .build();
         try(Response response = client.newCall(request).execute()) {
-            log.info("Fikk svar fra veilarbaktivitet, status: {}", response.code());
             Map<String, Boolean> map = JsonUtils.fromJson(response.body().string(), Map.class);
             Boolean isDisabled = map.get(KAFKA_CONSUMER_FEATURE_TOGGLE_NAME);
             return Try.success(isDisabled);

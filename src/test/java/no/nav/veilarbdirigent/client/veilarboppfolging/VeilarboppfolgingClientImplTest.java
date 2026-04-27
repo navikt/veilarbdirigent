@@ -1,16 +1,14 @@
 package no.nav.veilarbdirigent.client.veilarboppfolging;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import no.nav.common.types.identer.AktorId;
+import java.util.List;
+import java.util.UUID;
 import no.nav.common.types.identer.Fnr;
 import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
-
-import java.util.List;
-import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.assertEquals;

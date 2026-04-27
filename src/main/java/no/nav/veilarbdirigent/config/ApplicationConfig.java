@@ -1,5 +1,6 @@
 package no.nav.veilarbdirigent.config;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
@@ -19,11 +20,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.util.Map;
-
-import static no.nav.common.utils.EnvironmentUtils.isProduction;
-import static no.nav.common.utils.UrlUtils.createServiceUrl;
 
 @Slf4j
 @Configuration

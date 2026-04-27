@@ -42,10 +42,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
@@ -344,13 +340,6 @@
                 <scope>runtime</scope>
             </dependency>
 
-            <!-- Prometheus -->
-
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>mmicrometer-registry-prometheus</artifactId>
-            </dependency>
-
             <!-- annet -->
 
             <dependency>
@@ -359,11 +348,6 @@
                 <version>${jackson.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.bitbucket.b_c</groupId>
-                <artifactId>jose4j</artifactId>
-                <version>${bitbucket-jose4.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -378,11 +362,6 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp-jvm</artifactId>
                 <version>${okhttp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.jknack</groupId>
-                <artifactId>handlebars</artifactId>
-                <version>${handlebars.version}</version>
             </dependency>
 
             <dependency>

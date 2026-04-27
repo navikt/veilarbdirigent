@@ -13,10 +13,10 @@ spec:
     path: veilarbdirigent/internal/prometheus
   liveness:
     path: veilarbdirigent/internal/isAlive
-    initialDelay: 60
+    initialDelay: 80
   readiness:
     path: veilarbdirigent/internal/isReady
-    initialDelay: 60
+    initialDelay: 80
   replicas:
     min: 1
     max: 1 # It should be 1. Race condition problems may arise if this is greater

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.9</version>
+        <version>4.0.6</version>
         <relativePath/>
     </parent>
 
@@ -30,19 +30,11 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,12 +46,12 @@
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
+            <artifactId>okhttp-jvm</artifactId>
         </dependency>
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>6.4.0</version>
+            <version>${shedlock.version}</version>
         </dependency>
 
         <dependency>
@@ -67,81 +59,69 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.5</version>
+            <version>42.7.10</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>${flyway.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>kafka</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>feature-toggle</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>metrics</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>job</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>util</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>types</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>auth</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>log</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>health</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>token-client</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -156,14 +136,9 @@
         <dependency>
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
-            <version> 0.10.4</version>
+            <version>1.0.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -173,7 +148,7 @@
         <dependency>
             <groupId>io.zonky.test</groupId>
             <artifactId>embedded-postgres</artifactId>
-            <version>2.1.0</version>
+            <version>2.2.2</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -185,20 +160,15 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.19.0</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
+            <groupId>org.wiremock</groupId>
             <artifactId>wiremock-standalone</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>test</artifactId>
             <scope>test</scope>
         </dependency>
@@ -206,18 +176,17 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>3.2025.04.01_09.46-936a3ae3d5d9</common.version>
+        <common.version>4.2026.04.24_05.25-cab3c16705f7</common.version>
+        <tomcat.version>11.0.21</tomcat.version>
 
         <!-- LOGGING -->
-        <janino.version>3.1.8</janino.version>
-        <shedlock.version>4.43.0</shedlock.version>
-        <ojdbc.version>21.3.0.0</ojdbc.version>
-        <json-schema-validation.version>1.5.1</json-schema-validation.version>
-        <wiremock.version>3.0.0-beta-3</wiremock.version>
-        <commons-io.version>2.11.0</commons-io.version>
-        <commons-lang.version>3.12.0</commons-lang.version>
-        <okhttp.version>4.12.0</okhttp.version>
-        <flyway.version>11.8.0</flyway.version>
+        <janino.version>3.1.12</janino.version>
+        <shedlock.version>7.7.0</shedlock.version>
+        <wiremock.version>3.13.2</wiremock.version>
+        <commons-io.version>2.22.0</commons-io.version>
+        <commons-lang.version>3.20.0</commons-lang.version>
+        <okhttp.version>5.3.2</okhttp.version>
+        <jackson.version>3.1.2</jackson.version>
     </properties>
 
 
@@ -226,139 +195,106 @@
 
             <!-- START COMMON -->
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>job</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>log</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>util</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>client</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>feature-toggle</artifactId>
-                <version>${common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>metrics</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>metrics</artifactId>
                 <version>${common.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>auth</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>auth</artifactId>
                 <version>${common.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>sts</artifactId>
-                <version>${common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>json</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>kafka</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>json</artifactId>
                 <version>${common.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>yaml</artifactId>
-                <version>${common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>rest</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>types</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>health</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>token-client</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>test</artifactId>
                 <version>${common.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>test</artifactId>
                 <version>${common.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
-            </dependency>
-
-
-            <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>nais</artifactId>
-                <version>${common.version}</version>
             </dependency>
 
             <!-- SLUTT COMMON -->
 
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
                 <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.everit-org.json-schema</groupId>
-                <artifactId>org.everit.json.schema</artifactId>
-                <version>${json-schema-validation.version}</version>
             </dependency>
 
             <!--Logging-->
@@ -369,21 +305,14 @@
                 <scope>runtime</scope>
             </dependency>
 
-            <!-- Prometheus -->
-
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>mmicrometer-registry-prometheus</artifactId>
-            </dependency>
-
-
             <!-- annet -->
 
             <dependency>
-                <groupId>org.bitbucket.b_c</groupId>
-                <artifactId>jose4j</artifactId>
-                <version>${bitbucket-jose4.version}</version>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -396,13 +325,8 @@
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
+                <artifactId>okhttp-jvm</artifactId>
                 <version>${okhttp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.jknack</groupId>
-                <artifactId>handlebars</artifactId>
-                <version>${handlebars.version}</version>
             </dependency>
 
             <dependency>
@@ -411,21 +335,10 @@
                 <version>${shedlock.version}</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>${gson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>${jsoup.version}</version>
-            </dependency>
             <!--Testing-->
 
             <dependency>
-                <groupId>com.github.tomakehurst</groupId>
+                <groupId>org.wiremock</groupId>
                 <artifactId>wiremock-standalone</artifactId>
                 <version>${wiremock.version}</version>
                 <scope>test</scope>
@@ -441,14 +354,13 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <repositories>
-                <!-- Legger til central eksplisitt for prioritet over jitpack -->
+                <repository>
+                    <id>github</id>
+                    <url>https://github-package-registry-mirror.gc.nav.no/cached/maven-release</url>
+                </repository>
                 <repository>
                     <id>central</id>
                     <url>https://repo.maven.apache.org/maven2</url>
-                </repository>
-                <repository>
-                    <id>jitpack</id>
-                    <url>https://jitpack.io</url>
                 </repository>
             </repositories>
         </profile>

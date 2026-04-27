@@ -1,22 +1,18 @@
 package no.nav.veilarbdirigent.client.veilarbaktivitet;
 
-import com.nimbusds.jwt.JWTClaimsSet;
 import io.vavr.control.Try;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.json.JsonUtils;
 import no.nav.common.rest.client.RestClient;
-import no.nav.common.token_client.utils.TokenUtils;
 import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import java.text.ParseException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static no.nav.common.rest.client.RestUtils.MEDIA_TYPE_JSON;

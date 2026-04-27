@@ -1,13 +1,11 @@
 package no.nav.veilarbdirigent.client.veilarboppfolging.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.nav.common.types.identer.AktorId;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor

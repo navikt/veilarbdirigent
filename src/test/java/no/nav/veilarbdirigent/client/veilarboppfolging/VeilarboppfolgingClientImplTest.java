@@ -1,32 +1,35 @@
 package no.nav.veilarbdirigent.client.veilarboppfolging;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.List;
 import java.util.UUID;
 import no.nav.common.types.identer.Fnr;
 import no.nav.veilarbdirigent.TestUtils;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.HttpHeaders;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class VeilarboppfolgingClientImplTest {
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(0);
+    @RegisterExtension
+    static WireMockExtension wireMock = WireMockExtension.newInstance()
+            .options(wireMockConfig().dynamicPort())
+            .build();
 
     @Test
     public void skal_lage_riktig_request_og_parse_oppfolgingsperioder() {
         String oppfolgingsperioderJson = TestUtils.readTestResourceFile("client/veilarboppfolging/oppfolgingsperioder-response.json");
         Fnr fnr = Fnr.of("1234");
-        String apiUrl = "http://localhost:" + wireMockRule.port();
+        String apiUrl = "http://localhost:" + wireMock.getPort();
         VeilarboppfolgingClient veilarboppfolgingClient = new VeilarboppfolgingClientImpl(apiUrl, () -> "TOKEN");
 
-        givenThat(post(urlEqualTo("/veilarboppfolging/api/v3/oppfolging/hent-perioder"))
+        wireMock.stubFor(post(urlEqualTo("/veilarboppfolging/api/v3/oppfolging/hent-perioder"))
                 .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer TOKEN"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -47,3 +50,5 @@ public class VeilarboppfolgingClientImplTest {
     }
 
 }
+
+

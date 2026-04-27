@@ -6,7 +6,7 @@ import no.nav.veilarbdirigent.client.arbeidssoekerregisteret.Arbeidssoekerregist
 import no.nav.veilarbdirigent.client.veilarboppfolging.VeilarboppfolgingClient;
 import no.nav.veilarbdirigent.client.veilarboppfolging.domain.Oppfolgingsperiode;
 import no.nav.veilarbdirigent.repository.TaskRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.ZonedDateTime;

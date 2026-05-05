@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.10</version>
+            <version>42.7.11</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -176,7 +176,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>4.2026.04.24_05.25-cab3c16705f7</common.version>
+        <common.version>4.2026.05.05_06.25-f72fab488a93</common.version>
         <tomcat.version>11.0.21</tomcat.version>
 
         <!-- LOGGING -->

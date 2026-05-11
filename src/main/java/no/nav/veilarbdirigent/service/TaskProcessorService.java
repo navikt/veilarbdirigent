@@ -40,7 +40,7 @@ public class TaskProcessorService {
     }
 
     private Try<String> processOpprettAktivitetTaskData(OpprettAktivitetTaskDataV2 taskData) {
-        log.info("Processing task {} aktorId={} malName={}", AKTIVITET_TASK_TYPE_V2, taskData.getAktorId(), taskData.getMalName());
+        log.info("Processing task {} malName={}", AKTIVITET_TASK_TYPE_V2, taskData.getMalName());
         return aktivitetService.opprettAktivitetForBrukerMedMal(taskData.getAktorId(), taskData.getMalName());
     }
 }

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.6</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
 
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.11</version>
+            <version>42.7.12</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -176,7 +176,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>4.2026.05.05_06.25-f72fab488a93</common.version>
+        <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
         <tomcat.version>11.0.21</tomcat.version>
 
         <!-- LOGGING -->
@@ -185,8 +185,8 @@
         <wiremock.version>3.13.2</wiremock.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang.version>3.20.0</commons-lang.version>
-        <okhttp.version>5.3.2</okhttp.version>
-        <jackson.version>3.1.4</jackson.version>
+        <okhttp.version>5.4.0</okhttp.version>
+        <jackson.version>3.2.0</jackson.version>
     </properties>
 
 
@@ -311,6 +311,11 @@
                 <groupId>tools.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.22</version>
             </dependency>
 
             <dependency>

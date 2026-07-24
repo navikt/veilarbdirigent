@@ -186,7 +186,7 @@
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang.version>3.20.0</commons-lang.version>
         <okhttp.version>5.4.0</okhttp.version>
-        <jackson.version>3.2.0</jackson.version>
+        <jackson.version>3.2.1</jackson.version>
     </properties>
 
 

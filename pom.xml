@@ -177,7 +177,6 @@
     <properties>
         <java.version>21</java.version>
         <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
-        <tomcat.version>11.0.21</tomcat.version>
 
         <!-- LOGGING -->
         <janino.version>3.1.12</janino.version>

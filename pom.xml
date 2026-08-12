@@ -176,7 +176,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
+        <common.version>4.2026.08.10_07.01-38289b000bb0</common.version>
 
         <!-- LOGGING -->
         <janino.version>3.1.12</janino.version>

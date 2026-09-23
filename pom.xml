@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
 
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.12</version>
+            <version>42.7.13</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -176,17 +176,17 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
+        <common.version>4.2026.09.14_05.43-2bd32bda23c4</common.version>
         <tomcat.version>11.0.26</tomcat.version>
 
         <!-- LOGGING -->
         <janino.version>3.1.12</janino.version>
-        <shedlock.version>7.7.0</shedlock.version>
+        <shedlock.version>7.9.0</shedlock.version>
         <wiremock.version>3.13.2</wiremock.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang.version>3.20.0</commons-lang.version>
-        <okhttp.version>5.4.0</okhttp.version>
-        <jackson.version>3.2.0</jackson.version>
+        <okhttp.version>5.5.0</okhttp.version>
+        <jackson.version>3.2.2</jackson.version>
     </properties>
 
 

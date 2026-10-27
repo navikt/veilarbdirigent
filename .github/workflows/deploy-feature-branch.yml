@@ -51,5 +51,5 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: nais-dev-gcp.yaml
-          VAR: image=${{ needs.build.outputs.image }}
-          TELEMETRY: ${{ needs.build.outputs.telemetry }}
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}

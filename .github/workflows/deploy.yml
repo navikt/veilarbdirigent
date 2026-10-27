@@ -62,8 +62,8 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: nais-dev-gcp.yaml
-          VAR: image=${{ needs.test-build-push.outputs.image }}
-          TELEMETRY: ${{ needs.test-build-push.outputs.telemetry }}
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}
       - name: Slack Notification (deploy failure)
         if: failure()
         uses: rtCamp/action-slack-notify@v2
@@ -89,8 +89,8 @@ jobs:
         env:
           CLUSTER: prod-gcp
           RESOURCE: nais-gcp.yaml
-          VAR: image=${{ needs.test-build-push.outputs.image }}
-          TELEMETRY: ${{ needs.test-build-push.outputs.telemetry }}
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}
       - name: Slack Notification (deploy failure)
         if: failure()
         uses: rtCamp/action-slack-notify@v2

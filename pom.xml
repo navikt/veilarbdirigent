@@ -176,7 +176,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>4.2026.11.05_07.24-dd0ce2805c16</common.version>
+        <common.version>4.2026.11.16_22.48-f6f69ab8d9b9</common.version>
         <tomcat.version>11.0.27</tomcat.version>
 
         <!-- LOGGING -->

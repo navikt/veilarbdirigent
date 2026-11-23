@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version>
+        <version>4.2.0</version>
         <relativePath/>
     </parent>
 
@@ -186,7 +186,7 @@
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang.version>3.22.0</commons-lang.version>
         <okhttp.version>5.5.1</okhttp.version>
-        <jackson.version>3.1.7</jackson.version>
+        <jackson.version>3.3.0</jackson.version>
     </properties>
 
 
